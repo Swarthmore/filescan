@@ -70,19 +70,10 @@ public function get_content() {
 					$filenames .= "<BR>" . $cm->get_formatted_name() . " (" . $f->get_filename() . ")";
 					$file_item = create_file_item($coursename, $courseshortname, $courseurl, $cm, $cmtype, $module_name, $f);
 					array_push($file_listing, $file_item);
-					//echo (json_encode($file_item)."<BR><BR>");
-					
-					//$tempfile = tempnam('/Users/aruether/Downloads/test', 'pdf_');
-					//$f->copy_content_to($tempfile);
-					//echo "Temp file: " . $tempfile;
-					//check_pdf($tempfile);
-					//unlink($tempfile);
-
+					check_db_for_file($file_item, $f);
 				}
 			}
-		}
-		
-			
+		}		
 	}
 				
 
@@ -125,31 +116,11 @@ public function get_content() {
 		'courseshortname' => $courseshortname,
 		'timemodified' => $cmfile->get_timemodified(),
 		'filename' => $cmfile->get_filename(),
-		'contenthash' => $cmfile->get_contenthash()
+		'contenthash' => $cmfile->get_contenthash(),
+		'filepath' => $cmfile->get_filepath()
 	);
 }
 
-
-
-function check_pdf($filepath) {
-
-	//$filepath = "/Users/aruether/Downloads/test_pdfs/sample_pdf_text.pdf";
-
-	echo $filepath; 
-
-	$target_url = 'http://127.0.0.1:8080';
-
-	
-   $ch = curl_init($target_url); 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $args['file'] = new CurlFile($filepath,'application/pdf',"test.pdf");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $args); 
-    $result = curl_exec($ch);
-    echo $result; 
-    curl_close ($ch);      
-}
 
 
 

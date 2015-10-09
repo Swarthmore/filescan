@@ -3,129 +3,169 @@
 // Include the SDK using the Composer autoloader
 require 'vendor/autoload.php';
 
+$config = [];
+
 
 function init_aws_services() {
 
 	echo "Starting AWS script\n";
+	echo "KEY: " . getenv('AWS_ACCESS_KEY_ID');
+
+	global $config;
 
 	// Use the us-west-2 region and latest version of each client.
-	$sharedConfig = [
+	 $config['sharedConfig'] = [
 		'region'  => 'us-east-1',
 		'version' => 'latest'
 	];
 
 	// Create an SDK class used to share configuration across clients.
-	$sdk = new Aws\Sdk($sharedConfig);
+	$config['sdk'] = new Aws\Sdk( $config['sharedConfig']);
 
 	echo "Created SDK class\n";
 
-}
+	// Set up dynamodb
+	$config['dynamodb'] = $config['sdk']->createDynamoDb();
+	echo "Created DynamoDB client\n";
 
-
-
-function check_db_for_file($file_object) {
-
-
+	$config['tableName'] = 'moodle-files';
 
 }
 
 
 
 
-function upload_file_to_s3() {
 
 
+function check_db_for_file($filedata, $file) {
 
-// Create an Amazon S3 client using the shared configuration data.
-$s3Client = $sdk->createS3();
+	global $config;
 
-echo "Created S3 client\n";
+	echo "Looking up contenthash in database";
+	
+	// Lookup contenthash in db
+	try {
 
+		$response = $config['dynamodb']->getItem([
+			'TableName' => $config['tableName'],
+			'Key' => [
+				'contenthash' => [ 'S' => $filedata['contenthash'] ],
+			]
+		]);
 
+	} catch (DynamoDbException $e) {
+		// Catch an DynamoDb specific exception.
+		echo "DynamoDb Error: ";
+		echo $e->getMessage();
+	} catch (AwsException $e) {
+		// This catches the more generic AwsException. You can grab information
+		// from the exception using methods of the exception object.
+		echo "AWS Error: ";
+		echo $e->getAwsRequestId() . "\n";
+		echo $e->getAwsErrorType() . "\n";
+		echo $e->getAwsErrorCode() . "\n";
+	}	
+	
+	echo "Lookup data in database\n";
 
-// See if contenthash exists in database
-$dynamodb = $sdk->createDynamoDb();
-echo "Created DynamoDB client\n";
+	if (isset($response['Item'])) {
+		echo "File already exists in db!";
+	} else {
+		echo "File does not exist in db!";
+		write_filedata_to_db($filedata);
+		upload_file_to_s3($filedata, $file);
+	}
 
-$tableName = 'moodle-files';
-
-try {
-    $response = $dynamodb->batchWriteItem([
-        'RequestItems' => [
-            $tableName => [
-                [
-                    'PutRequest' => [
-                        'Item' => [
-                            'contenthash'     => ['S' => '206'], 
-                            'status'          => ['S' => '{"status":null}'],      
-                        ]
-                    ]
-                ]
-            ],
-        ],
-    ]);
-    echo "done.\n";
-} catch (DynamoDbException $e) {
-    echo $e->getMessage() . "\n";
-    exit ("Unable to load data into $tableName\n");
 }
 
 
 
 
-// Lookup file
-try {
 
-	$response = $dynamodb->getItem([
-		'TableName' => $tableName,
-		'Key' => [
-			'contenthash' => [ 'S' => '206' ],
-		]
-	]);
 
-} catch (DynamoDbException $e) {
-    // Catch an DynamoDb specific exception.
-    echo "DynamoDb Error: ";
-    echo $e->getMessage();
-} catch (AwsException $e) {
-    // This catches the more generic AwsException. You can grab information
-    // from the exception using methods of the exception object.
-    echo "AWS Error: ";
-    echo $e->getAwsRequestId() . "\n";
-    echo $e->getAwsErrorType() . "\n";
-    echo $e->getAwsErrorCode() . "\n";
-}	
+function write_filedata_to_db($filedata) {
+
+	global $config;
+	echo "Writing file to db";
+
+	$contenthash = $filedata['contenthash'];
+	unset($filedata['contenthash']);		// Remove to avoid duplication
+
+	try {
+		$response = $config['dynamodb']->batchWriteItem([
+			'RequestItems' => [
+				$config['tableName'] => [
+					[
+						'PutRequest' => [
+							'Item' => [
+								'contenthash'     => ['S' => $contenthash], 
+								'status'          => ['S' => json_encode($filedata)],      
+							]
+						]
+					]
+				],
+			],
+		]);
+		echo "done.\n";
+	} catch (DynamoDbException $e) {
+		echo $e->getMessage() . "\n";
+		exit ("Unable to load data into $tableName\n");
+	}
 	
-echo "Lookup data in database\n";
 
-print_r ($response['Item']);
 
 }
 
-/*
-try {
-	// Send a PutObject request and get the result object.
-	$result = $s3Client->putObject([
-		'Bucket' => 'pdf-checker',
-		'Key'    => 'my-key',
-		'Body'   => 'this is the body!'
-	]);
+
+
+
+
+function upload_file_to_s3($filedata, $file) {
+
+	global $config;
+
+	// Create an Amazon S3 client using the shared configuration data.
+	$s3Client = $config['sdk']->createS3();
+
+	echo "Created S3 client\n";
+
+	// Need to copy file locally (can't get direct access to Moodle files)
+	$tempfile = tempnam('./temp', 'pdf_');
+	$file->copy_content_to($tempfile);
+	echo "Temp file: " . $tempfile;
+
+
+	try {
+	    // Upload data.
+		$result = $s3Client->putObject(array(
+			'Bucket' => 'pdf-checker',
+			'Key'    => $filedata['contenthash'],
+			'SourceFile'   => $tempfile
+		));
+
+		// Print the URL to the object.
+		echo $result['ObjectURL'] . "\n";
+		
+	} catch (MultipartUploadException $e) {
+		echo $e->getMessage() . "\n";
+	} catch (S3Exception $e) {
+		// Catch an S3 specific exception.
+		echo $e->getMessage();
+	} catch (AwsException $e) {
+		// This catches the more generic AwsException. You can grab information
+		// from the exception using methods of the exception object.
+		echo $e->getAwsRequestId() . "\n";
+		echo $e->getAwsErrorType() . "\n";
+		echo $e->getAwsErrorCode() . "\n";
+	}	
 	
-} catch (S3Exception $e) {
-    // Catch an S3 specific exception.
-    echo $e->getMessage();
-} catch (AwsException $e) {
-    // This catches the more generic AwsException. You can grab information
-    // from the exception using methods of the exception object.
-    echo $e->getAwsRequestId() . "\n";
-    echo $e->getAwsErrorType() . "\n";
-    echo $e->getAwsErrorCode() . "\n";
-}	
 	
+	echo "Send S3 PutObject request: ";
+	
+	unlink($tempfile);
+	echo "Deleted tempfile: $tempfile";
 	
 
-echo "Send S3 PutObject request: ";
-*/
-
+}
 
 ?>
