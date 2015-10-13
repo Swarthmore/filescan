@@ -28,33 +28,47 @@ public function get_content() {
     $courseurl = course_get_url($COURSE);
 	
 	$filenames = "";
+	$output_html = "";
 	$file_listing = [];
+	$cmid = null;
 	
-	$cms = $cmid === null ? get_fast_modinfo($COURSE)->get_cms() : array(get_fast_modinfo($COURSE)->get_cm($cmid));
-    $fileitems = array();
+		
+	
+	$cms = ($cmid === null) ? get_fast_modinfo($COURSE)->get_cms() : array(get_fast_modinfo($COURSE)->get_cm($cmid));
 
+	
+
+
+	
+	
+    $fileitems = array();
+	$previousSectionName = "";
 	foreach ($cms as $cm) {
 		if ($cm->is_user_access_restricted_by_capability()) {
 			continue;
 		}
 		$cmtype = $cm->modname;
 		
-    	$module_name = $cm->name ."<BR>";
-		
+    	$module_name = $cm->name;
+    	
+		$section_no = $cm->get_course_module_record(true)->sectionnum;
+		$sectionName = get_section_name($COURSE->id, $section_no);
+		if ($sectionName != $previousSectionName) {
+			$output_html .= "<h4>" . $sectionName . "</h4>";
+		}
 		
 		// if resource is a folder
 		if ($cmtype === 'folder') {
 
 			$cmfiles = $fs->get_area_files($cm->context->id, 'mod_folder', 'content', false, 'timemodified', false);
-
+			$output_html .= "<span style='font-weight:bold'>Folder: " . $module_name . "</span></br>";
 
 			// Loop through all files in a folder
 			foreach ($cmfiles as $f) {
 				if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
-					$filenames .= "<BR>" . $f->get_filename();
-					$file_item = create_file_item($coursename, $courseshortname, $courseurl, $cm, $cmtype, $module_name, $f);
-					//echo (json_encode($file_item)."<BR><BR>");
-					array_push($file_listing, $file_item);
+					$file_item = create_file_item($coursename, $courseshortname, $courseurl, $cm, $cmtype, $module_name, $sectionName, $f);
+					$status = check_db_for_file($file_item, $f);
+					$output_html .= ($status ? '&#9989 ' :  '&#10060 ') . $f->get_filename()."<BR>";
 				}
 			}
 			
@@ -66,26 +80,26 @@ public function get_content() {
 			// Loop through each file
 			foreach ($files as $f) {
 				if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
-					//print_r($f);
-					$filenames .= "<BR>" . $cm->get_formatted_name() . " (" . $f->get_filename() . ")";
-					$file_item = create_file_item($coursename, $courseshortname, $courseurl, $cm, $cmtype, $module_name, $f);
-					array_push($file_listing, $file_item);
-					check_db_for_file($file_item, $f);
+					$file_item = create_file_item($coursename, $courseshortname, $courseurl, $cm, $cmtype, $module_name, $sectionName, $f);
+					$status = check_db_for_file($file_item, $f);
+					$output_html .= ($status ? '&#9989 ' :  '&#10060 ') . $f->get_filename()."<BR>";
 				}
 			}
-		}		
+		}	
+		
+		$previousSectionName = $sectionName;	
 	}
 				
 
     if ($this->content !== null) {
-      return $this->content ;//. "<BR>" . $coursename . "<BR>" . $courseshortname . "<BR>" . $courseurl . "<BR>" ;
+      return $this->content ;
     }
  
  
     $this->content         =  new stdClass;
-    $this->content->text   = 'The content of our SimpleHTML block!' . "<BR>". $coursename . "<BR>" . $courseshortname . "<BR>" . $courseurl . "<BR>" .$filenames . "<hr>" . json_encode($file_listing);
+    $this->content->text   = 'Status of each PDF file in the course: <BR>' . $output_html;
     
-    $this->content->footer = 'Footer here...';
+    //$this->content->footer = 'Footer here...';
  
     return $this->content;
   }
@@ -104,7 +118,7 @@ public function get_content() {
      * @return array describing a file item, used to create table items
      */
      
- function create_file_item($coursename, $courseshortname, $courseurl, $cm, $cmtype, $mod_name, $cmfile) {
+ function create_file_item($coursename, $courseshortname, $courseurl, $cm, $cmtype, $mod_name, $sectionName, $cmfile) {
 	return array(
 		'mod_id' => $cm->id,
 		'mod_name' => $mod_name,
@@ -114,6 +128,7 @@ public function get_content() {
 		//'courseurl' => $courseurl,
 		'coursename' => $coursename,
 		'courseshortname' => $courseshortname,
+		'sectionName' => $sectionName,
 		'timemodified' => $cmfile->get_timemodified(),
 		'filename' => $cmfile->get_filename(),
 		'contenthash' => $cmfile->get_contenthash(),

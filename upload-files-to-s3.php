@@ -8,8 +8,8 @@ $config = [];
 
 function init_aws_services() {
 
-	echo "Starting AWS script\n";
-	echo "KEY: " . getenv('AWS_ACCESS_KEY_ID');
+	//echo "Starting AWS script\n";
+	//echo "KEY: " . getenv('AWS_ACCESS_KEY_ID');
 
 	global $config;
 
@@ -22,11 +22,11 @@ function init_aws_services() {
 	// Create an SDK class used to share configuration across clients.
 	$config['sdk'] = new Aws\Sdk( $config['sharedConfig']);
 
-	echo "Created SDK class\n";
+	//echo "Created SDK class\n";
 
 	// Set up dynamodb
 	$config['dynamodb'] = $config['sdk']->createDynamoDb();
-	echo "Created DynamoDB client\n";
+	//echo "Created DynamoDB client\n";
 
 	$config['tableName'] = 'moodle-files';
 
@@ -41,7 +41,7 @@ function check_db_for_file($filedata, $file) {
 
 	global $config;
 
-	echo "Looking up contenthash in database";
+	//echo "Looking up contenthash in database";
 	
 	// Lookup contenthash in db
 	try {
@@ -66,15 +66,23 @@ function check_db_for_file($filedata, $file) {
 		echo $e->getAwsErrorCode() . "\n";
 	}	
 	
-	echo "Lookup data in database\n";
 
+	// If file exists in db and has a complete status, return the results.  If not, 
+	// upload the file to S3.
+	
 	if (isset($response['Item'])) {
-		echo "File already exists in db!";
-	} else {
-		echo "File does not exist in db!";
-		write_filedata_to_db($filedata);
-		upload_file_to_s3($filedata, $file);
+		
+		// Check to see if OCR status is known.  If so, report it.  If not, upload file to S3.
+		$file_status = json_decode($response['Item']['status']['S']);
+		
+		if (isset($file_status->ocr_status)) {
+			return $file_status->ocr_status;
+		} 		
 	}
+
+	write_filedata_to_db($filedata);
+	upload_file_to_s3($filedata, $file);
+	return false;	
 
 }
 
@@ -86,7 +94,7 @@ function check_db_for_file($filedata, $file) {
 function write_filedata_to_db($filedata) {
 
 	global $config;
-	echo "Writing file to db";
+	//echo "Writing file to db";
 
 	$contenthash = $filedata['contenthash'];
 	unset($filedata['contenthash']);		// Remove to avoid duplication
@@ -106,7 +114,7 @@ function write_filedata_to_db($filedata) {
 				],
 			],
 		]);
-		echo "done.\n";
+		//echo "done.\n";
 	} catch (DynamoDbException $e) {
 		echo $e->getMessage() . "\n";
 		exit ("Unable to load data into $tableName\n");
@@ -127,12 +135,12 @@ function upload_file_to_s3($filedata, $file) {
 	// Create an Amazon S3 client using the shared configuration data.
 	$s3Client = $config['sdk']->createS3();
 
-	echo "Created S3 client\n";
+	//echo "Created S3 client\n";
 
 	// Need to copy file locally (can't get direct access to Moodle files)
 	$tempfile = tempnam('./temp', 'pdf_');
 	$file->copy_content_to($tempfile);
-	echo "Temp file: " . $tempfile;
+	//echo "Temp file: " . $tempfile;
 
 
 	try {
@@ -144,7 +152,7 @@ function upload_file_to_s3($filedata, $file) {
 		));
 
 		// Print the URL to the object.
-		echo $result['ObjectURL'] . "\n";
+		//echo $result['ObjectURL'] . "\n";
 		
 	} catch (MultipartUploadException $e) {
 		echo $e->getMessage() . "\n";
@@ -160,10 +168,10 @@ function upload_file_to_s3($filedata, $file) {
 	}	
 	
 	
-	echo "Send S3 PutObject request: ";
+	//echo "Send S3 PutObject request: ";
 	
 	unlink($tempfile);
-	echo "Deleted tempfile: $tempfile";
+	//echo "Deleted tempfile: $tempfile";
 	
 
 }
