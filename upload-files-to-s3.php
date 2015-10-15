@@ -36,7 +36,7 @@ function init_aws_services() {
 
 
 
-function check_db_for_file($filedata, $file) {
+function check_db_for_file($contenthash, $file) {
 
 	global $config;
 
@@ -48,7 +48,7 @@ function check_db_for_file($filedata, $file) {
 		$response = $config['dynamodb']->getItem([
 			'TableName' => $config['tableName'],
 			'Key' => [
-				'contenthash' => [ 'S' => $filedata['contenthash'] ],
+				'contenthash' => [ 'S' => $contenthash ],
 			]
 		]);
 
@@ -74,14 +74,14 @@ function check_db_for_file($filedata, $file) {
 		// Check to see if OCR status is known.  If so, report it.  If not, upload file to S3.
 		$file_status = json_decode($response['Item']['status']['S']);
 		
-		if (isset($file_status->ocr_status)) {
-			return $file_status->ocr_status;
+		if (isset($file_status->ocr)) {
+			return array('ocr' => $file_status->ocr);
 		} 		
 	}
 
-	write_filedata_to_db($filedata);
-	upload_file_to_s3($filedata, $file);
-	return false;	
+	write_filedata_to_db($contenthash);
+	upload_file_to_s3($contenthash, $file);
+	return array('ocr_status' => 'pending');	
 
 }
 
@@ -90,13 +90,10 @@ function check_db_for_file($filedata, $file) {
 
 
 
-function write_filedata_to_db($filedata) {
+function write_filedata_to_db($contenthash) {
 
 	global $config;
 	//echo "Writing file to db";
-
-	$contenthash = $filedata['contenthash'];
-	unset($filedata['contenthash']);		// Remove to avoid duplication
 
 	try {
 		$response = $config['dynamodb']->batchWriteItem([
@@ -106,7 +103,7 @@ function write_filedata_to_db($filedata) {
 						'PutRequest' => [
 							'Item' => [
 								'contenthash'     => ['S' => $contenthash], 
-								'status'          => ['S' => json_encode($filedata)],      
+								'status'          => ['S' => json_encode(array('ocr' => 'pending'))],      
 							]
 						]
 					]
@@ -127,7 +124,7 @@ function write_filedata_to_db($filedata) {
 
 
 
-function upload_file_to_s3($filedata, $file) {
+function upload_file_to_s3($contenthash, $file) {
 
 	global $config;
 
@@ -146,7 +143,7 @@ function upload_file_to_s3($filedata, $file) {
 	    // Upload data.
 		$result = $s3Client->putObject(array(
 			'Bucket' => 'pdf-checker',
-			'Key'    => $filedata['contenthash'],
+			'Key'    => $contenthash,
 			'SourceFile'   => $tempfile
 		));
 
