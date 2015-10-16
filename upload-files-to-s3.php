@@ -81,7 +81,7 @@ function check_db_for_file($contenthash, $file) {
 
 	write_filedata_to_db($contenthash);
 	upload_file_to_s3($contenthash, $file);
-	return array('ocr_status' => 'pending');	
+	return array('ocr' => 'pending');	
 
 }
 

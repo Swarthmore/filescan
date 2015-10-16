@@ -116,7 +116,7 @@ foreach ($file_list as $f) {
 	if ($f['sectionNumber'] != $previous_section_number) {
 		if ($f['sectionNumber']  > 1) {$output_html .= "</table>";}	// Complete previous section's table
 		$output_html .= "<h4>" . $f['sectionName'] . "</h4>";
-		$output_html .= "<table><tr><th style='width:300px;'>Filename</th><th>OCR Status</th></tr>";
+		$output_html .= "<table><tr><th style='text-align:center;width:50px;'>Mod</th><th style='width:300px;'>Filename</th><th>OCR Status</th></tr>";
 	}
 	
 	switch($f['status']['ocr']) {
@@ -126,35 +126,84 @@ foreach ($file_list as $f) {
 		case "error":
 			$ocr_status = "&#10071";
 			break;			
-		case "text":
+		case "pass":
 			$ocr_status = "&#9989";
 			break;			
-		case "notext":
+		case "fail":
 			$ocr_status = "&#10060";
 			break;			
 		default:
 			$ocr_status = "&#10067";	
 	}
-						
+					
+	// Check to see if this is a folder
+	if ($f['mod_type'] == 'folder') {
+		$mod_link = "<a href=\"" . $f['mod_url'] . "\" title=\"" . $f['mod_name'] . "\">&#128194;</a>" ;
+	} else {
+		$mod_link = "<a href=\"" . $f['mod_url'] . "\" title=\"" . $f['mod_name'] . "\">&#128196;</a>" ;
+	}				
 
-	$output_html .= "<tr><td>" . $f['filename'] . "</td><td style='text-align:center'>" . $ocr_status . "</td></tr>";
+	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\">" . $f['filename'] . "</a></td><td style='text-align:center'><span title=\"" . $f['status']['ocr'] ."\">" . $ocr_status . "</span></td></tr>";
 	$previous_section_number = $f['sectionNumber'];
 }
 $output_html .= "</table>"; // Close out last table on last section
 
-//$output_html .= "<tr><th colspan=2 style='text-align:left'>Folder: " . $module_name . "</th></tr>";
+
+
+
+// Calculate summary information
+
+$processing = false;	// Assume no files are still processing.
+
+$ocr_summary = array('pending' => 0, 'pass' => 0, 'fail' => 0, 'error' => 0, 'unknown' => 0);
+foreach ($file_list as $f) {
+	switch($f['status']['ocr']) {
+		case "pending":
+			$ocr_summary['pending']++;
+			break;
+		case "error":
+			$ocr_summary['error']++;
+			break;			
+		case "pass":
+			$ocr_summary['pass']++;
+			break;			
+		case "fail":
+			$ocr_summary['fail']++;
+			break;			
+		default:
+			$ocr_summary['unknown']++;
+	}
+}
+
+// Check to see if there are any files still processing and update status flag as needed
+if ($ocr_summary['pending'] > 0) {
+	$processing = true;
+}
+
+$ocr_summary_array = array();
+foreach (array_keys($ocr_summary) as $s) {
+	if ($ocr_summary[$s] > 0) {
+		array_push($ocr_summary_array, $ocr_summary[$s] . " " . $s);
+	}
+}
+$ocr_summary_text = "OCR: " . join( ", ", $ocr_summary_array) . ".";
+
+$summary_text = count($file_list) . " total files.  ";
+$summary_text .= $ocr_summary_text;
+$summary_text .= "<BR>Last updated: " .userdate(time(), '%m/%d/%Y %r'); 
+// Prepend summary to top of content
+$output_html = "<h1>Summary</h1>" . $summary_text . "<BR><BR>" . $output_html;
 			
 
 echo $OUTPUT->header();
-print_r($file_list);
 echo $output_html;
 echo $OUTPUT->footer();
 
 
 
 	// Save data to database
-	$db_data->scanresults = "Not yet scanned";
-	$db_data->processing = true;
+	$db_data->scanresults = $summary_text;
+	$db_data->processing = $processing;
 	$db_data->blockid = $blockid;
 	
 	if (isset($db_data->id)) {
@@ -180,17 +229,20 @@ echo $OUTPUT->footer();
      * @return array describing a file item, used to create table items
      */
      
- function create_file_item($cm, $cmtype, $mod_name, $sectionName, $section_no, $cmfile, $status) {
+ function create_file_item($cm, $cmtype, $mod_name, $sectionName, $section_no, $file, $status) {
 	return array(
 		'mod_id' => $cm->id,
+		'mod_type' => $cmtype,
 		'mod_name' => $mod_name,
+		'mod_url' => $cm->get_url(),
 		'filename' => $cm->get_formatted_name(),
+		'fileurl' => moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename()),  //$cm->context->get_url(),
 		'sectionName' => $sectionName,
 		'sectionNumber' => $section_no, 
-		'timemodified' => $cmfile->get_timemodified(),
-		'filename' => $cmfile->get_filename(),
-		'contenthash' => $cmfile->get_contenthash(),
-		'filepath' => $cmfile->get_filepath(),
+		'timemodified' => $file->get_timemodified(),
+		'filename' => $file->get_filename(),
+		'contenthash' => $file->get_contenthash(),
+		'filepath' => $file->get_filepath(),
 		'status' => $status
 	);
 }

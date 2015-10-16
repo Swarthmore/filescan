@@ -45,18 +45,12 @@ public function get_content() {
 	$db_data = $DB->get_record('block_pdfcheck', array('blockid' => $this->instance->id));
 	
 	// If record doesn't exist, initialize the data array
-	if (!isset($db_data->id)) {$db_data= new stdClass;}
+	if (!isset($db_data->id)) {
+		$db_data= new stdClass;
+		$db_data->scanresults = "Not yet scanned";
+		$db_data->processing = true;
+		$db_data->blockid = $this->instance->id;
 	
-	// Save data to database
-	$db_data->scanresults = "Not yet scanned";
-	$db_data->processing = true;
-	$db_data->blockid = $this->instance->id;
-	
-	if (isset($db_data->id)) {
-		if (!$DB->update_record('block_pdfcheck', $db_data)) {
-			print_error('updateerror', 'block_pdfcheck');
-		}
-	} else {
 		if (!$DB->insert_record('block_pdfcheck', $db_data)) {
 			print_error('inserterror', 'block_pdfcheck');
 		}		
@@ -71,7 +65,7 @@ public function get_content() {
     
 
     $this->content         =  new stdClass;
-    $this->content->text   = 'Status of each PDF file in the course: <BR>' . $output_html;
+    $this->content->text   = '<h4>Summary</h4>' . $db_data->scanresults . "<BR><BR>";
     
 	$url = new moodle_url('/blocks/pdfcheck/view.php', array('blockid' => $this->instance->id, 'courseid' => $COURSE->id));
 	$this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_pdfcheck'));
