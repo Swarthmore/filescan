@@ -1,6 +1,7 @@
 <?php
 $string['pluginname'] = 'PDF Check';
 $string['pdfcheck'] = 'PDF Check';
-$string['pdfcheck:addinstance'] = 'Add a new PDF Check block';
-$string['pdfcheck:viewpages'] = 'View PDF Checker';
-$string['pdfcheck:managepages'] = 'Manage PDF Checker';
+$string['addinstance'] = 'Add a new PDF Check block';
+$string['viewpages'] = 'View PDF Checker';
+$string['managepages'] = 'Manage PDF Checker';
+$string['viewdetailspage'] = 'View Scan Details';
