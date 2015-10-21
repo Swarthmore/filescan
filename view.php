@@ -6,7 +6,7 @@ error_reporting(-1);
 
  
 require_once('../../config.php');
-require 'upload-files-to-s3.php';
+require 'aws.php';
 global $DB;
  
 // Check for all required variables.
@@ -87,8 +87,8 @@ foreach ($cms as $cm) {
 		foreach ($cmfiles as $f) {
 		
 			if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
-				$status = check_db_for_file($f->get_contenthash(), $f);
-				$file_item = create_file_item($cm, $cmtype, $module_name, $sectionName, $section_no, $f, $status);
+				//$status = check_db_for_file($f->get_contenthash(), $f);
+				$file_item = create_file_item($cm, $cmtype, $module_name, $sectionName, $section_no, $f, NULL);
 				array_push($file_list, $file_item);					
 			}
 		}
@@ -101,14 +101,19 @@ foreach ($cms as $cm) {
 		// Loop through each file
 		foreach ($files as $f) {
 			if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
-				$status = check_db_for_file($f->get_contenthash(), $f);
-				$file_item = create_file_item($cm, $cmtype, $module_name, $sectionName, $section_no, $f, $status);
+				//$status = check_db_for_file($f->get_contenthash(), $f);
+				$file_item = create_file_item($cm, $cmtype, $module_name, $sectionName, $section_no, $f, NULL);
 				array_push($file_list, $file_item);						
 			}
 		}
 	}	
 }
-	//$output_html .= "</table>"; // Close out last table on last section
+
+
+// Get status for all fileitems
+batchGetFileStatus($file_list);
+
+
 		
 // Loop through PDF listing to format the output into a table
 $previous_section_number = "";
@@ -118,7 +123,7 @@ foreach ($file_list as $f) {
 		$output_html .= "<h4>" . $f['sectionName'] . "</h4>";
 		$output_html .= "<table><tr><th style='text-align:center;width:50px;'>Mod</th><th style='width:300px;'>Filename</th><th>OCR Status</th></tr>";
 	}
-	
+
 	switch($f['status']['ocr']) {
 		case "pending":
 			$ocr_status = "&#10024";
@@ -132,8 +137,11 @@ foreach ($file_list as $f) {
 		case "fail":
 			$ocr_status = "&#10060";
 			break;			
+		case "processing":
+			$ocr_status = "&#9889";
+			break;
 		default:
-			$ocr_status = "&#10067";	
+			$ocr_status = "&#10067";	// Unknown
 	}
 					
 	// Check to see if this is a folder
@@ -243,7 +251,8 @@ echo $OUTPUT->footer();
 		'filename' => $file->get_filename(),
 		'contenthash' => $file->get_contenthash(),
 		'filepath' => $file->get_filepath(),
-		'status' => $status
+		'status' => $status,
+		'file' => $file
 	);
 }
 
