@@ -6,7 +6,7 @@ error_reporting(-1);
 
  
 require_once('../../config.php');
-require 'upload-files-to-s3.php';
+require 'aws.php';
 global $DB;
  
 // Check for all required variables.
@@ -137,8 +137,11 @@ foreach ($file_list as $f) {
 		case "fail":
 			$ocr_status = "&#10060";
 			break;			
+		case "processing":
+			$ocr_status = "&#9889";
+			break;
 		default:
-			$ocr_status = "&#10067";	
+			$ocr_status = "&#10067";	// Unknown
 	}
 					
 	// Check to see if this is a folder
@@ -248,7 +251,8 @@ echo $OUTPUT->footer();
 		'filename' => $file->get_filename(),
 		'contenthash' => $file->get_contenthash(),
 		'filepath' => $file->get_filepath(),
-		'status' => $status
+		'status' => $status,
+		'file' => $file
 	);
 }
 
