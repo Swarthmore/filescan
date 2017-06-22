@@ -1,7 +1,7 @@
 <?php
     $capabilities = array(
  
-    'block/pdfcheck:addinstance' => array(
+    'block/filescan:addinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
  
         'captype' => 'write',
@@ -15,7 +15,7 @@
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
     
-   'block/pdfcheck:viewpages' => array(
+   'block/filescan:viewpages' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'legacy' => array(
@@ -28,7 +28,7 @@
         )
     ),
  
-    'block/pdfcheck:managepages' => array(
+    'block/filescan:managepages' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'legacy' => array(
