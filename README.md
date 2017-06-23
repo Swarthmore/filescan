@@ -1,3 +1,22 @@
-# pdfchecker-block
-Moodle block to check PDF's for accessibility and quality
+# Moodle Accessibility File Scan Block
+Moodle block to check PDFs for accessibility and quality.  
+
+This Moodle block consists of two main functions: 
+* A scheduled task that looks for PDFs within courses, sends them to an external server to check for accessibilty, and saves the results to the Moodle database
+* A Moodle block that displays the accessibility status of the PDF files within the course.  On the Moodle course page, the block displays a summary with a link to a detailed view with all the files in the course. 
+
+# Requirements
+This Moodle plugin requires a separate server to process files: [https://github.com/Swarthmore/filescan-server]
+
+# Installation
+* Clone or download this repository into the `<moodle root>/blocks` directory
+* Rename the directory from `block-filescan` to `filescan`
+* Log into Moodle as an admin and update Moodle to add the block
+
+# Configuration
+This plugin configuration requires a URL for the File Scan Server.  
+
+By default, the scheduled task is set to scan an additional set of files every 5 minutes.  This can be adjusted in the Server --> Scheduled Tasks screen.
+
+
 
