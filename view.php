@@ -196,7 +196,8 @@ $ocr_summary_text = "OCR: " . join( ", ", $ocr_summary_array) . ".";
 
 $summary_text = count($file_list) . " total files.  ";
 $summary_text .= $ocr_summary_text;
-$summary_text .= "<BR>Last updated: " .userdate(time(), '%m/%d/%Y %r'); 
+$date = new DateTime();
+$summary_text .= "<BR>Last updated: " .  $date->format('m/d/Y g:i:sA');
 // Prepend summary to top of content
 $output_html = "<h1>Summary</h1>" . $summary_text . "<BR><BR>" . $output_html;
 			

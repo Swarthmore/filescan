@@ -92,8 +92,8 @@ private function get_file_list() {
 			}
 		}
 	
-		$format = 'There are %d PDF files.<BR>%d pass<BR>%d fail<BR>%d unknown<BR><BR>Last updated:%s';
-		$output = sprintf($format, count($filelist), $pass, $fail, $unknown, date("F j, Y, g:i a"));
+		$format = 'There are %d PDF files.<BR>%d pass<BR>%d fail<BR>%d unknown<BR><BR>Last updated: %s';
+		$output = sprintf($format, count($filelist), $pass, $fail, $unknown, date("m/d/Y g:iA"));
 		return $output;
 	}
 
