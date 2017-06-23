@@ -25,11 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 
 if ($hassiteconfig) {
-
-    $settings = new admin_settingpage('block_filescan', get_string('pluginname', 'block_filescan'));
     
-    $ADMIN->add('blockplugins', $settings);
-
 	$settings->add(new admin_setting_heading('filescan/config',
 											 get_string('headerconfig', 'block_filescan'),
 											 get_string('descconfig', 'block_filescan')));

@@ -163,8 +163,8 @@ public function get_content() {
   }
   
   
-  
-
+  	// Tell Moodle there is a global config
+ 	function has_config() {return true;}
   
   
   
