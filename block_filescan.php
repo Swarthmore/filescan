@@ -155,7 +155,7 @@ public function get_content() {
     $this->content         =  new stdClass;
     $this->content->text   = '<h4>Summary</h4>' . $filescan_summary;
     
-	$url = new moodle_url('/block/filescan/view.php', array('courseid' => $COURSE->id));
+	$url = new moodle_url('/blocks/filescan/view.php', array('courseid' => $COURSE->id));
 	$this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
 
  
