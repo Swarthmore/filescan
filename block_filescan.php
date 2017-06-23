@@ -82,7 +82,7 @@ private function get_file_list() {
 	
 		foreach($filelist as $f) {
 			// For each file, lookup file scan status
-			$record = $DB->get_record("local_filescan_files", array('contenthash'=>$f));
+			$record = $DB->get_record("block_filescan_files", array('contenthash'=>$f));
 			if ($record && $record->ocrstatus	== 'pass') {
 				$pass = $pass + 1;
 			} else if ($record && $record->ocrstatus == 'fail') {
@@ -155,7 +155,7 @@ public function get_content() {
     $this->content         =  new stdClass;
     $this->content->text   = '<h4>Summary</h4>' . $filescan_summary;
     
-	$url = new moodle_url('/local/filescan/view.php', array('courseid' => $COURSE->id));
+	$url = new moodle_url('/block/filescan/view.php', array('courseid' => $COURSE->id));
 	$this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
 
  
