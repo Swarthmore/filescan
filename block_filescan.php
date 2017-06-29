@@ -15,8 +15,9 @@ class block_filescan extends block_base {
         $this->title = get_string('filescan', 'block_filescan');
     }
 
-
-
+    public function applicable_formats() {
+        return array('site' => false, 'my' => false, 'course' => true);
+    }
 
 private function get_file_list() {
 
