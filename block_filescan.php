@@ -169,10 +169,3 @@ public function get_content() {
   
   
 }   // Here's the closing bracket for the class definition
-
-
-?>
-
-
-
-
