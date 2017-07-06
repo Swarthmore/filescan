@@ -8,10 +8,10 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="checked" TYPE="binary" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="checked" TYPE="binary" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="pagecount" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="ocrstatus" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        
+        <FIELD NAME="timechecked" TYPE="datetime" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
