@@ -1,12 +1,22 @@
 <?php
+
+// General
 $string['pluginname'] = 'Accessibility File Scan';
 $string['filescan'] = 'File Scan';
-$string['addinstance'] = 'Add a new File Scan block';
-$string['viewpages'] = 'View File Scan';
-$string['managepages'] = 'Manage File Scan';
+
+
+// Capabilities
+$string['filescan:addinstance'] = 'Add a new File Scan block';
+$string['filescan:myaddinstance'] = 'Add a new File Scan block to the Moodle Dashboard';
+$string['filescan:viewpages'] = 'View File Scan';
+$string['filescan:managepages'] = 'Manage File Scan';
+$string['filescan:scan'] = 'Request a file scan';
+
+// Navigation and notification
 $string['viewdetailspage'] = 'View File Details';
 $string['summaryview'] = 'File scan summary';
 $string['nofiles'] = 'There are no files to scan';
+
 
 // Cache
 $string['cachedef_filescan'] = 'Filescan results cache for each course';
