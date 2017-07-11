@@ -6,7 +6,7 @@ require(__DIR__.'/../../vendor/autoload.php');
 
 use GuzzleHttp\Pool;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Promise;
 
 
 
@@ -62,7 +62,6 @@ class scan_files extends \core\task\scheduled_task {
         		;
 		
         $files = $DB->get_records_sql($query);
-        //mtrace( print_r($files, true));
        
         if (!$files) {
         	mtrace("No files found");
@@ -79,85 +78,102 @@ class scan_files extends \core\task\scheduled_task {
     
         
        
-        
-        $requests = function ($files) use ($client) {
-        	 $fs = get_file_storage();
-			 foreach ($files as $f) {
-            	$file = $fs->get_file_by_hash($f->pathnamehash);
-            	yield function() use ($client, $file, $f) {
-					return $client->postAsync('/v1/file',[
-						'multipart' => [
-							[
-								'name'     => 'upfile',
-								'contents' => $file->get_content(),
-								'filename' => $f->contenthash,
-							],
-							[
-								'name'     => 'id',
-								'contents' => $f->contenthash
-							]
-						]
-					]);
-				};
-			}
-		};
-        
-        $pool = new Pool($client, $requests($files), [
-			'concurrency' => 2,
-			'fulfilled' => function ($response, $index) use ($DB) {
-					$response_code = $response->getStatusCode();
-					
-					
-					// Assume an unknown status -- correct as needed
-					// TODO: implement an incomplete entry if the conversion fails
-					$fileentry = new \stdClass();					
-					if ($response_code = 200) {
-					
-						$results = json_decode($response->getBody(), true);
-						$fileentry->contenthash = $results['application/json']['filename'];
-									
-						if ($results['application/json']['hasText']) {
-							$fileentry->ocrstatus = "pass";
-						} else {
-							$fileentry->ocrstatus = "fail";
-						}
-									
-						$fileentry->checked = 1;
-						$fileentry->pagecount = $results['application/json']['pages'];
-						
-					} else {
-						$fileentry->ocrstatus = "fail";
-						$fileentry->checked = 0;
-					}
-					
+       	// Add each concurrent request to an array
+		$promises = array();
+		$fs = get_file_storage();
+ 		foreach ($files as $f) {
+ 			mtrace("Checking file: " . $f->contenthash);
+			$file = $fs->get_file_by_hash($f->pathnamehash);
+		
 				
-					// Determine if there is already a record
-					$record = $DB->get_record("block_filescan_files", array('contenthash'=>$results['application/json']['filename']));
-					if ($record) {
-						$fileentry->id = $record->id;
-						$sql = $DB->update_record("block_filescan_files", $fileentry);
-						$sql ? mtrace("Updated record") : mtrace("Could not update record");
-					} else {
-						$sql = $DB->insert_record("block_filescan_files", $fileentry, $returnid=true, $bulk=false);
-						$sql ? mtrace("Inserted record") : mtrace("Could not insert record");
-					}
-					
-			},
-			'rejected' => function ($reason, $index) {
-				echo "Failed!";
-				echo $reason;
-			},
-		]);
+			// Make an async POST request		
+			$promise = $client->postAsync('/v1/file',[
+					'multipart' => [
+						[
+							'name'     => 'upfile',
+							'contents' => $file->get_content(),
+							'filename' => $f->contenthash,
+						],
+						[
+							'name'     => 'id',
+							'contents' => $f->contenthash
+						]
+					]
+				]);
+				
+				
+			// Process the results	
+			$promise->then(
+				function (ResponseInterface $res) {
+					echo $f->contenthash . " ==> " . $res->getStatusCode() . "\n";
+				},
+				function (RequestException $e) {
+					echo $f->contenthash . " ==> " . $e->getMessage() . "\n";
+					echo $e->getRequest()->getMethod();
+				}
+			);	
+			
+				
+		}		
+		
+/*		
+		
 
-		// Initiate the transfers and create a promise
-		$promise = $pool->promise();
+		
+		
 
-		// Force the pool of requests to complete.
-		$promise->wait();
+
+		// Wait for the requests to complete, even if some of them fail
+		$results = Promise\settle($promises)->wait();
+    
+
+		foreach($results as $r) {	
+				
+			$response = $r['value'];
+			
+			$response_code = $response->getStatusCode();
+			
+			// Assume an unknown status -- correct as needed
+			// TODO: implement an incomplete entry if the conversion fails
+			$fileentry = new \stdClass();					
+			if ($response_code = 200) {
+			
+				$results = json_decode($response->getBody(), true);
+				$fileentry->contenthash = $results['application/json']['filename'];
+							
+				if ($results['application/json']['hasText']) {
+					$fileentry->ocrstatus = "pass";
+				} else {
+					$fileentry->ocrstatus = "fail";
+				}
+							
+				$fileentry->checked = 1;
+				$fileentry->pagecount = $results['application/json']['pages'];
+				
+			} else {
+				$fileentry->ocrstatus = "fail";
+				$fileentry->checked = 0;
+			}
+			
+		
+			// Determine if there is already a record
+			$record = $DB->get_record("block_filescan_files", array('contenthash'=>$results['application/json']['filename']));
+			if ($record) {
+				$fileentry->id = $record->id;
+				$sql = $DB->update_record("block_filescan_files", $fileentry);
+				$sql ? mtrace("Updated record") : mtrace("Could not update record");
+			} else {
+				$sql = $DB->insert_record("block_filescan_files", $fileentry, $returnid=true, $bulk=false);
+				$sql ? mtrace("Inserted record") : mtrace("Could not insert record");
+			}
+			
+		}
 
  	}       
 
+
+*/
+
+	}
+	
 }
-
-
-
