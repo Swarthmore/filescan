@@ -14,6 +14,17 @@ ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 
+/* Per https://docs.moodle.org/dev/Task_API#Failures
+	A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network 
+	is temporarily down. This is handled by the task system automatically - all the failing task needs to do is throw 
+	an exception. The task will be retried after 1 minute. If the task keeps failing, the retry algorithm will add 
+	more time between each successive attempts up to a max of 24 hours.
+	
+	Will throw exceptions when fatal errors occur
+*/
+
+
+
 class scan_files extends \core\task\scheduled_task {
 
 
@@ -32,16 +43,13 @@ class scan_files extends \core\task\scheduled_task {
 		//$DB->set_debug(true);
 		
         mtrace( "Filescan cron script is running" );
-	/*
-        $api_url = get_config('filescan', 'api_url');
+
+        $api_url = get_config('filescan', 'apiurl');
 
 		// Only proceed if config parameters are defined
-		if (empty($api_url)) { mtrace("API key not defined");}
-        if (empty($api_url)) {
-        	return false;
-        }
-        */
-        
+		if (empty($api_url)) { throw new \RuntimeException("Moodle FileScan API URL not configured");}
+
+
 		mtrace("Looking up files to scan"); 
     
 
@@ -71,23 +79,22 @@ class scan_files extends \core\task\scheduled_task {
     
 		$client = new Client([
 			// Base URI is used with relative requests
-			'base_uri' => get_config('filescan', 'apiurl'),
+			'base_uri' => $api_url,
 			// You can set any number of default request options.
-			'timeout'  => 30.0,
+			'timeout'  => 3.0,
 		]);    
     
-        
-       
+    
        	// Add each concurrent request to an array
 		$promises = array();
 		$fs = get_file_storage();
+		
  		foreach ($files as $f) {
- 			mtrace("Checking file: " . $f->contenthash);
+ 			mtrace("Found file: " . $f->contenthash);
 			$file = $fs->get_file_by_hash($f->pathnamehash);
 		
-				
 			// Make an async POST request		
-			$promise = $client->postAsync('/v1/file',[
+			$promises[$f->contenthash] = $client->postAsync('/v1/file',[
 					'multipart' => [
 						[
 							'name'     => 'upfile',
@@ -101,79 +108,71 @@ class scan_files extends \core\task\scheduled_task {
 					]
 				]);
 				
-				
-			// Process the results	
-			$promise->then(
-				function (ResponseInterface $res) {
-					echo $f->contenthash . " ==> " . $res->getStatusCode() . "\n";
-				},
-				function (RequestException $e) {
-					echo $f->contenthash . " ==> " . $e->getMessage() . "\n";
-					echo $e->getRequest()->getMethod();
-				}
-			);	
-			
-				
 		}		
-		
-/*		
-		
-
-		
-		
 
 
 		// Wait for the requests to complete, even if some of them fail
 		$results = Promise\settle($promises)->wait();
-    
-
+		
+		
+		
 		foreach($results as $r) {	
+			
+			if ($r['state'] == 'fulfilled') {	
 				
-			$response = $r['value'];
+				$response = $r['value'];
+
+				$response_code = $response->getStatusCode();
 			
-			$response_code = $response->getStatusCode();
+				// Assume an unknown status -- correct as needed
+				// TODO: implement an incomplete entry if the conversion fails
+				if ($results['application/json']['filename']) {
+					mtrace("Saving results for " . $results['application/json']['filename']);
+				}
+				
+				$fileentry = new \stdClass();					
+				if ($response_code = 200) {
 			
-			// Assume an unknown status -- correct as needed
-			// TODO: implement an incomplete entry if the conversion fails
-			$fileentry = new \stdClass();					
-			if ($response_code = 200) {
-			
-				$results = json_decode($response->getBody(), true);
-				$fileentry->contenthash = $results['application/json']['filename'];
+					$results = json_decode($response->getBody(), true);
+					$fileentry->contenthash = $results['application/json']['filename'];
 							
-				if ($results['application/json']['hasText']) {
-					$fileentry->ocrstatus = "pass";
+					if ($results['application/json']['hasText']) {
+						$fileentry->ocrstatus = "pass";
+					} else {
+						$fileentry->ocrstatus = "fail";
+					}
+							
+					$fileentry->checked = 1;
+					$fileentry->pagecount = $results['application/json']['pages'];
+				
 				} else {
 					$fileentry->ocrstatus = "fail";
+					$fileentry->checked = 0;
 				}
-							
-				$fileentry->checked = 1;
-				$fileentry->pagecount = $results['application/json']['pages'];
-				
-			} else {
-				$fileentry->ocrstatus = "fail";
-				$fileentry->checked = 0;
-			}
 			
 		
-			// Determine if there is already a record
-			$record = $DB->get_record("block_filescan_files", array('contenthash'=>$results['application/json']['filename']));
-			if ($record) {
-				$fileentry->id = $record->id;
-				$sql = $DB->update_record("block_filescan_files", $fileentry);
-				$sql ? mtrace("Updated record") : mtrace("Could not update record");
-			} else {
-				$sql = $DB->insert_record("block_filescan_files", $fileentry, $returnid=true, $bulk=false);
-				$sql ? mtrace("Inserted record") : mtrace("Could not insert record");
+				// Determine if there is already a record
+				$record = $DB->get_record("block_filescan_files", array('contenthash'=>$results['application/json']['filename']));
+				if ($record) {
+					$fileentry->id = $record->id;
+					$sql = $DB->update_record("block_filescan_files", $fileentry);
+					$sql ? mtrace("Updated record") : mtrace("Could not update record");
+				} else {
+					$sql = $DB->insert_record("block_filescan_files", $fileentry, $returnid=true, $bulk=false);
+					$sql ? mtrace("Inserted record") : mtrace("Could not insert record");
+				}
+				
+			} else if ($r['state'] == 'rejected') {
+				// Not sure how to get the response based on the request.
+				
+			} else {	
+				mtrace("Unknown exception");	
 			}
 			
 		}
 
  	}       
 
-
-*/
-
-	}
-	
 }
+	
+
