@@ -81,7 +81,7 @@ class scan_files extends \core\task\scheduled_task {
 			// Base URI is used with relative requests
 			'base_uri' => $api_url,
 			// You can set any number of default request options.
-			'timeout'  => 3.0,
+			'timeout'  => 50.0,
 		]);    
     
     
@@ -123,27 +123,29 @@ class scan_files extends \core\task\scheduled_task {
 				$response = $r['value'];
 
 				$response_code = $response->getStatusCode();
+				$result = json_decode($response->getBody(), true);
 			
 				// Assume an unknown status -- correct as needed
 				// TODO: implement an incomplete entry if the conversion fails
-				if ($results['application/json']['filename']) {
-					mtrace("Saving results for " . $results['application/json']['filename']);
+				if (array_key_exists('filename', $result['application/json'])) {
+					mtrace("Saving results for " . $result['application/json']['filename']);
+				} else {
+					mtrace(print_r($r));
 				}
 				
 				$fileentry = new \stdClass();					
 				if ($response_code = 200) {
-			
-					$results = json_decode($response->getBody(), true);
-					$fileentry->contenthash = $results['application/json']['filename'];
+		
+					$fileentry->contenthash = $result['application/json']['filename'];
 							
-					if ($results['application/json']['hasText']) {
+					if ($result['application/json']['hasText']) {
 						$fileentry->ocrstatus = "pass";
 					} else {
 						$fileentry->ocrstatus = "fail";
 					}
 							
 					$fileentry->checked = 1;
-					$fileentry->pagecount = $results['application/json']['pages'];
+					$fileentry->pagecount = $result['application/json']['pages'];
 				
 				} else {
 					$fileentry->ocrstatus = "fail";
@@ -152,7 +154,7 @@ class scan_files extends \core\task\scheduled_task {
 			
 		
 				// Determine if there is already a record
-				$record = $DB->get_record("block_filescan_files", array('contenthash'=>$results['application/json']['filename']));
+				$record = $DB->get_record("block_filescan_files", array('contenthash'=>$result['application/json']['filename']));
 				if ($record) {
 					$fileentry->id = $record->id;
 					$sql = $DB->update_record("block_filescan_files", $fileentry);
@@ -164,6 +166,8 @@ class scan_files extends \core\task\scheduled_task {
 				
 			} else if ($r['state'] == 'rejected') {
 				// Not sure how to get the response based on the request.
+				mtrace("Request rejected");
+				mtrace($r['reason']);
 				
 			} else {	
 				mtrace("Unknown exception");	
