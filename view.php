@@ -119,28 +119,81 @@ foreach ($file_list as $f) {
 	if ($f['sectionNumber'] != $previous_section_number) {
 		if ($f['sectionNumber']  > 1) {$output_html .= "</table>";}	// Complete previous section's table
 		$output_html .= "<h4>" . $f['sectionName'] . "</h4>";
-		$output_html .= "<table><tr><th style='text-align:center;width:50px;'>Mod</th><th style='width:300px;'>Filename</th><th>OCR Status</th></tr>";
+		$output_html .= "<table><tr><th style='text-align:center;width:50px;'>Mod</th><th style='width:300px;'>Filename</th><th>Status</th><th>Has Text</th><th>Has Title</th><th>Has Language</th><th>Has Outline</th></tr>";
 	}
 
-	switch($f['status']['ocr']) {
-		case "pending":
-			$ocr_status = "&#10024";
-			break;
-		case "error":
-			$ocr_status = "&#10071";
+	switch($f['status']['hastext']) {
+		case -1:
+			$hastext = "&#10071";
+			break;			
+		case "1":
+			$hastext = "&#9989";		// Yes
+			break;			
+		case "0":
+			$hastext = "&#10060"; 	// No
+			break;			
+		default:
+			$hastext = "&#10067";	// Unknown
+	}
+
+	switch($f['status']['hastitle']) {
+		case -1:
+			$hastitle = "&#10071";
+			break;			
+		case "1":
+			$hastitle = "&#9989";		// Yes
+			break;			
+		case "0":
+			$hastitle = "&#10060"; 	// No
+			break;			
+		default:
+			$hastitle = "&#10067";	// Unknown
+	}
+		
+	switch($f['status']['haslanguage']) {
+		case -1:
+			$haslanguage = "&#10071";
+			break;			
+		case "1":
+			$haslanguage = "&#9989";		// Yes
+			break;			
+		case "0":
+			$haslanguage = "&#10060"; 	// No
+			break;			
+		default:
+			$haslanguage = "&#10067";	// Unknown
+	}		
+	
+	switch($f['status']['hasoutline']) {
+		case -1:
+			$hasoutline = "&#10071";
+			break;			
+		case "1":
+			$hasoutline = "&#9989";		// Yes
+			break;			
+		case "0":
+			$hasoutline = "&#10060"; 	// No
+			break;			
+		default:
+			$hasoutline = "&#10067";	// Unknown
+	}	
+		
+	# Determine overall status
+	switch($f['status']['status']) {
+		case "fail":
+			$overallstatus = "&#9785"; 	// Bad
 			break;			
 		case "pass":
-			$ocr_status = "&#9989";
+			$overallstatus = "&#9786;";		// Good 
 			break;			
-		case "fail":
-			$ocr_status = "&#10060";
+		case "check":
+			$overallstatus = "&#9888"; 	// check
 			break;			
-		case "processing":
-			$ocr_status = "&#9889";
-			break;
 		default:
-			$ocr_status = "&#10067";	// Unknown
-	}
+			$overallstatus = "&#10067";	// Unknown
+	}	
+	
+	
 					
 	// Check to see if this is a folder
 	if ($f['mod_type'] == 'folder') {
@@ -149,7 +202,14 @@ foreach ($file_list as $f) {
 		$mod_link = "<a href=\"" . $f['mod_url'] . "\" title=\"" . $f['mod_name'] . "\">&#128196;</a>" ;
 	}				
 
-	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\">" . $f['filename'] . "</a></td><td style='text-align:center'><span title=\"" . $f['status']['ocr'] ."\">" . $ocr_status . "</span></td></tr>";
+	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\">" . $f['filename'] . "</a></td>
+	<td style='text-align:center'><span title=\"status\">" . $overallstatus . "</span></td>
+	<td style='text-align:center'><span title=\"has text\">" . $hastext . "</span></td>
+	<td style='text-align:center'><span title=\"has title\">" . $hastitle . "</span></td>
+	<td style='text-align:center'><span title=\"has language\">" . $haslanguage . "</span></td>
+	<td style='text-align:center'><span title=\"has outline\">" . $hasoutline . "</span></td>
+	</tr>";
+	
 	$previous_section_number = $f['sectionNumber'];
 }
 $output_html .= "</table>"; // Close out last table on last section
@@ -161,9 +221,9 @@ $output_html .= "</table>"; // Close out last table on last section
 
 $processing = false;	// Assume no files are still processing.
 
-$ocr_summary = array('pending' => 0, 'pass' => 0, 'fail' => 0, 'error' => 0, 'unknown' => 0);
+$ocr_summary = array('pending' => 0, 'pass' => 0, 'fail' => 0, 'error' => 0, 'unknown' => 0, 'questionable' => 0);
 foreach ($file_list as $f) {
-	switch($f['status']['ocr']) {
+	switch($f['status']['status']) {
 		case "pending":
 			$ocr_summary['pending']++;
 			break;
@@ -175,7 +235,10 @@ foreach ($file_list as $f) {
 			break;			
 		case "fail":
 			$ocr_summary['fail']++;
-			break;			
+			break;	
+		case "check":
+			$ocr_summary['questionable']++;
+			break;							
 		default:
 			$ocr_summary['unknown']++;
 	}
@@ -192,10 +255,10 @@ foreach (array_keys($ocr_summary) as $s) {
 		array_push($ocr_summary_array, $ocr_summary[$s] . " " . $s);
 	}
 }
-$ocr_summary_text = "OCR: " . join( ", ", $ocr_summary_array) . ".";
+$summary_text = "Status: " . join( ", ", $ocr_summary_array) . ".";
 
 $summary_text = count($file_list) . " total files.  ";
-$summary_text .= $ocr_summary_text;
+$summary_text .= $summary_text;
 $date = new DateTime();
 $summary_text .= "<BR>Last updated: " .  $date->format('m/d/Y g:i:sA');
 // Prepend summary to top of content
@@ -247,7 +310,15 @@ echo $OUTPUT->footer();
  	 	// Assume no status -- correct if it exists
  	 	
  		if ( $results){
- 			$status = array("ocr"=>($results->ocrstatus));
+ 			$status = array(
+ 				"checked"=>($results->checked),
+ 				"status"=>($results->status),
+ 				"hastext"=>($results->hastext),
+ 				"hastitle"=>($results->hastitle),
+ 				"haslanguage"=>($results->haslanguage),
+ 				"hasoutline"=>($results->hasoutline),
+ 				"pagecount"=>($results->pagecount)
+ 			);
  		} else {
  			$status = null;
  		}

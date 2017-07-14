@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="block/filescan/db" VERSION="20170622" COMMENT="XMLDB file for Moodle block/filescan"
+<XMLDB PATH="block/filescan/db" VERSION="20170714" COMMENT="XMLDB file for Moodle block/filescan"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -8,9 +8,13 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="checked" TYPE="binary" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="checked" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="pagecount" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="ocrstatus" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="hastext" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF contains text (boolean)"/>
+        <FIELD NAME="hastitle" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF file contains title metadata"/>
+        <FIELD NAME="hasoutline" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF file contains outline (bookmarks)"/>
+        <FIELD NAME="haslanguage" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF file language is set"/>
         <FIELD NAME="timechecked" TYPE="datetime" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
