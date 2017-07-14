@@ -56,6 +56,9 @@ class scan_files extends \core\task\scheduled_task {
 		$max_files_to_check = (int)get_config('filescan', 'numfilespercron');
 		$max_files_to_check = (is_int($max_files_to_check) && $max_files_to_check > 0) ? $max_files_to_check : 2;
         
+        
+        # Find PDF files in course materials (not student files, stamps, etc) that haven't already been scanned
+        # Need to return contenthas and pathnamehash.  pathnamehash is used to retrieve the contents of the file.
         $query = "SELECT distinct f.contenthash, f.pathnamehash 
         		FROM {files} f, {context} c
         		WHERE c.id = f.contextid 
@@ -65,6 +68,7 @@ class scan_files extends \core\task\scheduled_task {
         			AND f.component != 'assignfeedback_editpdf' 
         			AND f.filearea != 'stamps'
         			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True)
+        			GROUP BY f.contenthash
         			ORDER BY f.timemodified DESC
         			LIMIT " . $max_files_to_check
         		;
@@ -133,17 +137,50 @@ class scan_files extends \core\task\scheduled_task {
 					mtrace(print_r($r));
 				}
 				
-				$fileentry = new \stdClass();					
+				$fileentry = new \stdClass();		
+				$fileentry->timechecked = date("Y-m-d H:i:s");
+							
 				if ($response_code = 200) {
 		
 					$fileentry->contenthash = $result['application/json']['filename'];
 							
 					if ($result['application/json']['hasText']) {
-						$fileentry->ocrstatus = "pass";
+						$fileentry->hastext = 1;
 					} else {
-						$fileentry->ocrstatus = "fail";
+						$fileentry->hastext = 0;
 					}
-							
+
+					if ($result['application/json']['title']) {
+						$fileentry->hastitle = 1;
+					} else {
+						$fileentry->hastitle = 0;
+					}
+
+					if ($result['application/json']['language']) {
+						$fileentry->haslanguage = 1;
+					} else {
+						$fileentry->haslanguage = 0;
+					}
+
+					if ($result['application/json']['hasOutline']) {
+						$fileentry->hasoutline = 1;
+					} else {
+						$fileentry->hasoutline = 0;
+					}
+				
+					# Determine overall status based on parameters above
+					# no text ==> fail
+					# has text, title, language, outline ==> pass
+					# has text but missing at least one of title, language, outline ==> check
+					if ($fileentry->hastext == 0) {
+						$fileentry->status = "fail";
+					} elseif (($fileentry->hastitle == 1) && ($fileentry->haslanguage == 1) && ($fileentry->hasoutline == 1)) {
+						$fileentry->status = "pass";
+					} else {
+						$fileentry->status = "check";
+					}
+
+				
 					$fileentry->checked = 1;
 					$fileentry->pagecount = $result['application/json']['numPages'];
 				
