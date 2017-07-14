@@ -124,7 +124,7 @@ class scan_files extends \core\task\scheduled_task {
 
 				$response_code = $response->getStatusCode();
 				$result = json_decode($response->getBody(), true);
-			
+
 				// Assume an unknown status -- correct as needed
 				// TODO: implement an incomplete entry if the conversion fails
 				if (array_key_exists('filename', $result['application/json'])) {
@@ -145,7 +145,7 @@ class scan_files extends \core\task\scheduled_task {
 					}
 							
 					$fileentry->checked = 1;
-					$fileentry->pagecount = $result['application/json']['pages'];
+					$fileentry->pagecount = $result['application/json']['numPages'];
 				
 				} else {
 					$fileentry->ocrstatus = "fail";
