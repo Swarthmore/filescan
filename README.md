@@ -1,12 +1,14 @@
 # Moodle Accessibility File Scan Block
-Moodle block to check PDFs for accessibility and quality.  
+Moodle block to check PDFs for accessibility.  
 
 This Moodle block consists of two main functions: 
 * A scheduled task that looks for PDFs within courses, sends them to an external server to check for accessibilty, and saves the results to the Moodle database
 * A Moodle block that displays the accessibility status of the PDF files within the course.  On the Moodle course page, the block displays a summary with a link to a detailed view with all the files in the course. 
 
 # Requirements
-This Moodle plugin requires a separate server to process files: [https://github.com/Swarthmore/filescan-server]
+* Moodle 3.1+
+* A server to process files: https://github.com/Swarthmore/filescan-server.  This software can be installed on the Moodle server.
+
 
 # Installation
 * Clone or download this repository into the `<moodle root>/blocks` directory
