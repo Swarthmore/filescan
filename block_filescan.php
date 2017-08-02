@@ -90,14 +90,32 @@ private function get_file_list() {
 			} else if ($record && $record->status == 'fail') {
 				$inaccessible = $inaccessible + 1;
 			} else if ($record && $record->status == 'check') {
-				$check = $partially_accessible + 1;
+				$partially_accessible = $partially_accessible + 1;
 			} else {
 				$unknown = $unknown + 1;
 			}
 		}
 	
-		$format = 'There are %d PDF files.<BR>%d Accessible<BR>%d Partially Accessible<BR>%d Inaccessible<BR>%d Unknown<BR><BR>Last updated: %s';
-		$output = sprintf($format, count($filelist), $accessible, $partially_accessible, $inaccessible, $unknown, date("m/d/Y g:iA"));
+		$output = sprintf("There are %d PDF files", count($filelist));
+		
+		if ($accessible > 0) {
+			$output .= sprintf('<BR><i class="fa fa-check text-success fa-fw" aria-hidden="true"></i> %d Accessible', $accessible);
+		}
+		
+		if ($partially_accessible > 0) {
+			$output .= sprintf('<BR><i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i> %d Partially Accessible', $partially_accessible);
+		}	
+		
+		if ($inaccessible > 0) {
+			$output .= sprintf('<BR><i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i> %d Inaccessible',$inaccessible);
+		}
+		
+		if ($unknown > 0) {
+			$output .= sprintf('<BR><i class="fa fa-question text-info fa-fw" aria-hidden="true"></i> %d Accessibility Unknown', $unknown);
+		}
+		
+		$output .= sprintf('<BR><BR>Last updated: %s', date("m/d/Y g:iA"));
+		
 		return $output;
 	}
 
@@ -141,12 +159,10 @@ public function get_content() {
  	if ($filescan_cache) {
  		// Cache was found.  Print out summary
  		$filescan_summary = $filescan_cache;
-		$filescan_summary .= "<BR>CACHE<BR>";
  	} else {
  		// No cache data found.  Generate summary and save to cache
  		$filescan_summary = $this->generate_summary($COURSE->id);
  		$result = $cache->set($COURSE->id, $filescan_summary);
- 		$filescan_summary .= "<BR>NO CACHE<BR>";
  	}		
 		
 
