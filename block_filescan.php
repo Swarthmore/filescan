@@ -77,27 +77,27 @@ private function get_file_list() {
 		global $DB;
 	
 		$filelist = $this->get_file_list();
-		$pass = 0;
-		$fail = 0;
-		$check = 0;
+		$accessible = 0;
+		$partially_accessible = 0;
+		$inaccessible = 0;
 		$unknown = 0;
 	
 		foreach($filelist as $f) {
 			// For each file, lookup file scan status
 			$record = $DB->get_record("block_filescan_files", array('contenthash'=>$f));
 			if ($record && $record->status	== 'pass') {
-				$pass = $pass + 1;
+				$accessible = $accessible + 1;
 			} else if ($record && $record->status == 'fail') {
-				$fail = $fail + 1;
+				$inaccessible = $inaccessible + 1;
 			} else if ($record && $record->status == 'check') {
-				$check = $check + 1;
+				$check = $partially_accessible + 1;
 			} else {
 				$unknown = $unknown + 1;
 			}
 		}
 	
-		$format = 'There are %d PDF files.<BR>%d pass<BR>%d fail<BR>%d check<BR>%d unknown<BR><BR>Last updated: %s';
-		$output = sprintf($format, count($filelist), $pass, $fail, $check, $unknown, date("m/d/Y g:iA"));
+		$format = 'There are %d PDF files.<BR>%d Accessible<BR>%d Partially Accessible<BR>%d Inaccessible<BR>%d Unknown<BR><BR>Last updated: %s';
+		$output = sprintf($format, count($filelist), $accessible, $partially_accessible, $inaccessible, $unknown, date("m/d/Y g:iA"));
 		return $output;
 	}
 
