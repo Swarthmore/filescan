@@ -39,7 +39,7 @@ if 	(!$canview) {
  		
 // Clear any existing cache data for this course 
 $cache = cache::make('block_filescan', 'filescan');
- $filescan_cache = $cache->delete($COURSE->id); 		
+$filescan_cache = $cache->delete($COURSE->id); 		
  		
  		
 // Determine course metadata
@@ -55,10 +55,6 @@ $cmid = null;
 
 
 // Get any existing data from db
-//$db_data = $DB->get_record('block_pdfcheck', array('blockid' => $blockid));
-
-// If record doesn't exist, initialize the data array
-//if (!isset($db_data->id)) {$db_data= new stdClass;}
 
 $cms = ($cmid === null) ? get_fast_modinfo($COURSE)->get_cms() : array(get_fast_modinfo($COURSE)->get_cm($cmid));
 
@@ -108,18 +104,24 @@ foreach ($cms as $cm) {
 }
 
 
-// Get status for all fileitems
-//batchGetFileStatus($file_list);
 
 
 		
 // Loop through PDF listing to format the output into a table
+
+$success_icon = '<i class="fa fa-check text-success fa-fw" aria-hidden="true"></i>';
+$unknown_icon = '<i class="fa fa-question text-info fa-fw" aria-hidden="true"></i>';
+$partial_success_icon = '<i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i>';
+$fail_icon = '<i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i>';
+
 $previous_section_number = "";
+
+$output_html .= "<table><tbody>";
+
 foreach ($file_list as $f) {
 	if ($f['sectionNumber'] != $previous_section_number) {
-		if ($f['sectionNumber']  > 1) {$output_html .= "</table>";}	// Complete previous section's table
-		$output_html .= "<h4>" . $f['sectionName'] . "</h4>";
-		$output_html .= "<table><tr><th style='text-align:center;width:50px;'>Mod</th><th style='width:300px;'>Filename</th><th>Status</th><th>Has Text</th><th>Has Title</th><th>Has Language</th><th>Has Outline</th></tr>";
+		$output_html .= "<tr><td colspan='7'><h4>" . $f['sectionName'] . "</h4></td></tr>";
+		$output_html .= "<tr><th style='text-align:center;width:50px;'>Mod</th><th style='width:300px;'>Filename</th><th>Status</th><th>Has Text</th><th>Has Title</th><th>Has Language</th><th>Has Outline</th></tr>";
 	}
 
 	switch($f['status']['hastext']) {
@@ -127,13 +129,13 @@ foreach ($file_list as $f) {
 			$hastext = "&#10071";
 			break;			
 		case "1":
-			$hastext = "&#9989";		// Yes
+			$hastext = $success_icon;		// Yes
 			break;			
 		case "0":
-			$hastext = "&#10060"; 	// No
+			$hastext = $fail_icon; 	// No
 			break;			
 		default:
-			$hastext = "&#10067";	// Unknown
+			$hastext = $unknown_icon;	// Unknown
 	}
 
 	switch($f['status']['hastitle']) {
@@ -141,13 +143,13 @@ foreach ($file_list as $f) {
 			$hastitle = "&#10071";
 			break;			
 		case "1":
-			$hastitle = "&#9989";		// Yes
+			$hastitle = $success_icon;		// Yes
 			break;			
 		case "0":
-			$hastitle = "&#10060"; 	// No
+			$hastitle = $fail_icon; 	// No
 			break;			
 		default:
-			$hastitle = "&#10067";	// Unknown
+			$hastitle = $unknown_icon;	// Unknown
 	}
 		
 	switch($f['status']['haslanguage']) {
@@ -155,13 +157,13 @@ foreach ($file_list as $f) {
 			$haslanguage = "&#10071";
 			break;			
 		case "1":
-			$haslanguage = "&#9989";		// Yes
+			$haslanguage = $success_icon;		// Yes
 			break;			
 		case "0":
-			$haslanguage = "&#10060"; 	// No
+			$haslanguage = $fail_icon; 	// No
 			break;			
 		default:
-			$haslanguage = "&#10067";	// Unknown
+			$haslanguage = $unknown_icon;	// Unknown
 	}		
 	
 	switch($f['status']['hasoutline']) {
@@ -169,28 +171,28 @@ foreach ($file_list as $f) {
 			$hasoutline = "&#10071";
 			break;			
 		case "1":
-			$hasoutline = "&#9989";		// Yes
+			$hasoutline = $success_icon;		// Yes
 			break;			
 		case "0":
-			$hasoutline = "&#10060"; 	// No
+			$hasoutline = $fail_icon; 	// No
 			break;			
 		default:
-			$hasoutline = "&#10067";	// Unknown
+			$hasoutline = $unknown_icon;	// Unknown
 	}	
 		
 	# Determine overall status
 	switch($f['status']['status']) {
 		case "fail":
-			$overallstatus = "&#9785"; 	// Bad
+			$overallstatus = $fail_icon; 	// Bad
 			break;			
 		case "pass":
-			$overallstatus = "&#9786;";		// Good 
+			$overallstatus = $success_icon;		// Good 
 			break;			
 		case "check":
-			$overallstatus = "&#9888"; 	// check
+			$overallstatus = $partial_success_icon; 	// check
 			break;			
 		default:
-			$overallstatus = "&#10067";	// Unknown
+			$overallstatus = $unknown_icon;	// Unknown
 	}	
 	
 	
@@ -212,7 +214,7 @@ foreach ($file_list as $f) {
 	
 	$previous_section_number = $f['sectionNumber'];
 }
-$output_html .= "</table>"; // Close out last table on last section
+$output_html .= "</tbody></table>"; // Close out last table on last section
 
 
 
@@ -221,26 +223,26 @@ $output_html .= "</table>"; // Close out last table on last section
 
 $processing = false;	// Assume no files are still processing.
 
-$ocr_summary = array('pending' => 0, 'pass' => 0, 'fail' => 0, 'error' => 0, 'unknown' => 0, 'questionable' => 0);
+$ocr_summary = array ('Accessible' => 0, 'Partially Accessible' => 0, 'Inaccessible' => 0, 'Pending' => 0, 'Error' => 0, 'Unknown' => 0);
 foreach ($file_list as $f) {
 	switch($f['status']['status']) {
 		case "pending":
-			$ocr_summary['pending']++;
+			$ocr_summary['Pending']++;
 			break;
 		case "error":
-			$ocr_summary['error']++;
+			$ocr_summary['Error']++;
 			break;			
 		case "pass":
-			$ocr_summary['pass']++;
+			$ocr_summary['Accessible']++;
 			break;			
 		case "fail":
-			$ocr_summary['fail']++;
+			$ocr_summary['Inaccessible']++;
 			break;	
 		case "check":
-			$ocr_summary['questionable']++;
+			$ocr_summary['Partially Accessible']++;
 			break;							
 		default:
-			$ocr_summary['unknown']++;
+			$ocr_summary['Unknown']++;
 	}
 }
 
@@ -255,12 +257,27 @@ foreach (array_keys($ocr_summary) as $s) {
 		array_push($ocr_summary_array, $ocr_summary[$s] . " " . $s);
 	}
 }
-$summary_text = "Status: " . join( ", ", $ocr_summary_array) . ".";
 
-$summary_text = count($file_list) . " total files.  ";
-$summary_text .= $summary_text;
-$date = new DateTime();
-$summary_text .= "<BR>Last updated: " .  $date->format('m/d/Y g:i:sA');
+$summary_text = count($file_list) . " total PDF files";
+
+
+if ($ocr_summary['Accessible'] > 0) {
+	$summary_text .= sprintf('<BR>' . $success_icon . ' %d Accessible', $ocr_summary['Accessible']);
+}
+
+if ($ocr_summary['Partially Accessible'] > 0) {
+	$summary_text .= sprintf('<BR>' . $partial_success_icon .' %d Partially Accessible', $ocr_summary['Partially Accessible']);
+}	
+
+if ($ocr_summary['Inaccessible'] > 0) {
+	$summary_text .= sprintf('<BR>' . $fail_icon . ' %d Inaccessible', $ocr_summary['Inaccessible']);
+}
+
+if ($ocr_summary['Unknown'] > 0) {
+	$summary_text .= sprintf('<BR>' . $unknown_icon . ' %d Accessibility Unknown', $ocr_summary['Unknown'] );
+}
+
+
 // Prepend summary to top of content
 $output_html = "<h1>Summary</h1>" . $summary_text . "<BR><BR>" . $output_html;
 			
@@ -270,22 +287,6 @@ echo $output_html;
 echo $OUTPUT->footer();
 
 
-/*
-	// Save data to database
-	$db_data->scanresults = $summary_text;
-	$db_data->processing = $processing;
-	$db_data->blockid = $blockid;
-	
-	if (isset($db_data->id)) {
-		if (!$DB->update_record('block_pdfcheck', $db_data)) {
-			print_error('updateerror', 'block_pdfcheck');
-		}
-	} else {
-		if (!$DB->insert_record('block_pdfcheck', $db_data)) {
-			print_error('inserterror', 'block_pdfcheck');
-		}		
-	}
-*/
 
 
 
