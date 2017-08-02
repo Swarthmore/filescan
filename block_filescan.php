@@ -96,7 +96,7 @@ private function get_file_list() {
 			}
 		}
 	
-		$output = sprintf("There are %d PDF files", count($filelist));
+		$output = sprintf("%d PDF files found", count($filelist));
 		
 		if ($accessible > 0) {
 			$output .= sprintf('<BR><i class="fa fa-check text-success fa-fw" aria-hidden="true"></i> %d Accessible', $accessible);

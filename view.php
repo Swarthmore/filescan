@@ -116,12 +116,12 @@ $fail_icon = '<i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i>';
 
 $previous_section_number = "";
 
-$output_html .= "<table><tbody>";
+$output_html .= "<table class='filescan-details table table-striped table-condensed'><tbody>";
 
 foreach ($file_list as $f) {
 	if ($f['sectionNumber'] != $previous_section_number) {
-		$output_html .= "<tr><td colspan='7'><h4>" . $f['sectionName'] . "</h4></td></tr>";
-		$output_html .= "<tr><th style='text-align:center;width:50px;'>Mod</th><th style='width:300px;'>Filename</th><th>Status</th><th>Has Text</th><th>Has Title</th><th>Has Language</th><th>Has Outline</th></tr>";
+		$output_html .= "<tr><td colspan='7' style='background-color: transparent;border:none;'><h4>" . $f['sectionName'] . "</h4></td></tr>";
+		$output_html .= "<tr><th style=''>Mod</th><th>Filename</th><th>Status</th><th style='border-left-width:2px;'>Has Text</th><th>Has Title</th><th>Has Language</th><th>Has Outline</th></tr>";
 	}
 
 	switch($f['status']['hastext']) {
@@ -205,8 +205,8 @@ foreach ($file_list as $f) {
 	}				
 
 	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\">" . $f['filename'] . "</a></td>
-	<td style='text-align:center'><span title=\"status\">" . $overallstatus . "</span></td>
-	<td style='text-align:center'><span title=\"has text\">" . $hastext . "</span></td>
+	<td style='text-align:center;'><span title=\"status\">" . $overallstatus . "</span></td>
+	<td style='text-align:center;border-left-width:2px;'><span title=\"has text\">" . $hastext . "</span></td>
 	<td style='text-align:center'><span title=\"has title\">" . $hastitle . "</span></td>
 	<td style='text-align:center'><span title=\"has language\">" . $haslanguage . "</span></td>
 	<td style='text-align:center'><span title=\"has outline\">" . $hasoutline . "</span></td>
