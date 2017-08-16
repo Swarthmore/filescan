@@ -65,7 +65,7 @@ class scan_files extends \core\task\scheduled_task {
         			AND c.contextlevel = 70 
         			AND f.filesize <> 0 
         			AND f.mimetype = 'application/pdf' 
-        			AND f.component != 'assignfeedback_editpdf' 
+        			AND f.component NOT IN ('assignfeedback_editpdf', 'assignsubmission_file','assignfeedback_file','assignsubmission_onlinetext','backup','tool_recyclebin','user') 
         			AND f.filearea != 'stamps'
         			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True)
         			GROUP BY f.contenthash
