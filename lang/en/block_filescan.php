@@ -33,4 +33,5 @@ $string['filescan_apiurl'] = "Filescan API URL";
 $string['filescan_apiurl_desc'] = "URL to post files for accessibility scanning (e.g. https://example.edu/filescan";
 $string['filescan_numfilespercron'] = "Max. files to scan";
 $string['filescan_numfilespercron_desc'] = "Maximum number of files to scan per cron job";
-
+$string['filescan_maxretries'] = "Max. retries";
+$string['filescan_maxretries_desc'] = "Maximum number of times to try scanning a file before giving up";

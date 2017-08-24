@@ -100,6 +100,25 @@ function xmldb_block_filescan_upgrade($oldversion) {
 
 
 
+    /// Add a new column newcol to the mdl_myqtype_options
+    if ($oldversion < 2017082410) {
+
+        // Define field id to be added to block_filescan_files.
+        $table = new xmldb_table('block_filescan_files');
+        $field = new xmldb_field('statuscode', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'status');
+
+        // Conditionally launch add field statuscode.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Filescan savepoint reached.
+        upgrade_block_savepoint(true, 2017082410, 'filescan');
+    }
+
+
+
+
     return true;
 } 
  
