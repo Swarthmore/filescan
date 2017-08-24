@@ -25,6 +25,10 @@ error_reporting(E_ALL);
 
 
 
+
+
+
+
 class scan_files extends \core\task\scheduled_task {
 
 
@@ -35,12 +39,40 @@ class scan_files extends \core\task\scheduled_task {
     }
 
 
+    private static function save_filescan_results($DB, $fileentry) {
+
+         $record = $DB->get_record("block_filescan_files", array('contenthash'=>$fileentry->contenthash));
+
+        if ($record) {
+                $fileentry->id = $record->id;
+
+                // If this is a failure, update the statuscode
+                if ($fileentry->checked == 0) {
+                        $fileentry->statuscode = $record->statuscode + 1;
+                }
+                $sql = $DB->update_record("block_filescan_files", $fileentry);
+                $sql ? mtrace("Updated record") : mtrace("Could not update record");
+
+        } else {
+                if ($fileentry->checked == 0) {
+                        $fileentry->statuscode =  1;
+                }
+
+                $sql = $DB->insert_record("block_filescan_files", $fileentry, $returnid=true, $bulk=false);
+                $sql ? mtrace("Inserted record") : mtrace("Could not insert record");
+        }
+  }
+
+
+
+
+
     public function execute() {
 
-		global $CFG, $DB;
+	global $CFG, $DB;
         require_once($CFG->libdir.'/filelib.php');
 		
-		//$DB->set_debug(true);
+	//$DB->set_debug(true);
 		
         mtrace( "Filescan cron script is running" );
 
@@ -56,25 +88,28 @@ class scan_files extends \core\task\scheduled_task {
 		$max_files_to_check = (int)get_config('filescan', 'numfilespercron');
 		$max_files_to_check = (is_int($max_files_to_check) && $max_files_to_check > 0) ? $max_files_to_check : 2;
         
+		$max_retries = (int)get_config('filescan', 'maxretries');
+
         
         # Find PDF files in course materials (not student files, stamps, etc) that haven't already been scanned
         # Need to return contenthas and pathnamehash.  pathnamehash is used to retrieve the contents of the file.
-        $query = "SELECT distinct f.contenthash, f.pathnamehash 
+        $query = 'SELECT distinct f.contenthash, f.pathnamehash 
         		FROM {files} f, {context} c
         		WHERE c.id = f.contextid 
         			AND c.contextlevel = 70 
         			AND f.filesize <> 0 
-        			AND f.mimetype = 'application/pdf' 
-        			AND f.component NOT IN ('assignfeedback_editpdf', 'assignsubmission_file','assignfeedback_file','assignsubmission_onlinetext','backup','tool_recyclebin','user') 
-        			AND f.filearea != 'stamps'
-        			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True)
-        			GROUP BY f.contenthash
+        			AND f.mimetype = "application/pdf"
+        			AND f.component != "assignfeedback_editpdf" 
+        			AND f.filearea != "stamps"
+        			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True or (checked=False and status="error" and statuscode >=' . $max_retries . ')) 	
+				GROUP BY f.contenthash
         			ORDER BY f.timemodified DESC
-        			LIMIT " . $max_files_to_check
-        		;
+        			LIMIT ' . $max_files_to_check;
+
 		
         $files = $DB->get_records_sql($query);
-       
+
+
         if (!$files) {
         	mtrace("No files found");
             return false;
@@ -97,12 +132,27 @@ class scan_files extends \core\task\scheduled_task {
  			mtrace("Found file: " . $f->contenthash);
 			$file = $fs->get_file_by_hash($f->pathnamehash);
 		
+				
+			$file_contents = $file->get_content();
+
+			if ($file_contents === FALSE) {
+				// Cannot get file contents -- report an error
+				$fileentry = new \stdClass();
+                        	$fileentry->timechecked = date("Y-m-d H:i:s");
+                        	$fileentry->contenthash = $f->contenthash;
+				$fileentry->status = "error";
+				$fileentry->checked = 0;
+				self::save_filescan_results($DB, $fileentry);
+				continue;	
+			}
+
+
 			// Make an async POST request		
 			$promises[$f->contenthash] = $client->postAsync('/v1/file',[
 					'multipart' => [
 						[
 							'name'     => 'upfile',
-							'contents' => $file->get_content(),
+							'contents' => $file_contents,
 							'filename' => $f->contenthash,
 						],
 						[
@@ -119,9 +169,14 @@ class scan_files extends \core\task\scheduled_task {
 		$results = Promise\settle($promises)->wait();
 		
 		
-		
-		foreach($results as $r) {	
+	        // Handle each the results.  They $key is the contenthash.	
+		foreach($results as $key => $r) {
 			
+			$fileentry = new \stdClass();
+                        $fileentry->timechecked = date("Y-m-d H:i:s");	
+			$fileentry->contenthash = $key;
+
+
 			if ($r['state'] == 'fulfilled') {	
 				
 				$response = $r['value'];
@@ -137,13 +192,8 @@ class scan_files extends \core\task\scheduled_task {
 					mtrace(print_r($r));
 				}
 				
-				$fileentry = new \stdClass();		
-				$fileentry->timechecked = date("Y-m-d H:i:s");
-							
-				if ($response_code = 200) {
+				if ($response_code == 200) {
 		
-					$fileentry->contenthash = $result['application/json']['filename'];
-							
 					if ($result['application/json']['hasText']) {
 						$fileentry->hastext = 1;
 					} else {
@@ -185,31 +235,29 @@ class scan_files extends \core\task\scheduled_task {
 					$fileentry->pagecount = $result['application/json']['numPages'];
 				
 				} else {
-					$fileentry->ocrstatus = "fail";
+					$fileentry->status = "error";
 					$fileentry->checked = 0;
 				}
 			
 		
-				// Determine if there is already a record
-				$record = $DB->get_record("block_filescan_files", array('contenthash'=>$result['application/json']['filename']));
-				if ($record) {
-					$fileentry->id = $record->id;
-					$sql = $DB->update_record("block_filescan_files", $fileentry);
-					$sql ? mtrace("Updated record") : mtrace("Could not update record");
-				} else {
-					$sql = $DB->insert_record("block_filescan_files", $fileentry, $returnid=true, $bulk=false);
-					$sql ? mtrace("Inserted record") : mtrace("Could not insert record");
-				}
 				
 			} else if ($r['state'] == 'rejected') {
 				// Not sure how to get the response based on the request.
-				mtrace("Request rejected");
+				mtrace("Request rejectedi for " . $fileentry->contenthash);
 				mtrace($r['reason']);
+				$fileentry->status = "error";
+                                $fileentry->checked = 0;
 				
 			} else {	
-				mtrace("Unknown exception");	
+				mtrace("Unknown exceptioni for " . $fileentry->contenthash);
+				$fileentry->status = "error";
+                                $fileentry->checked = 0;	
 			}
-			
+		
+			// Update the database with the results
+			save_filescan_results($DB, $fileentry);
+			 
+	
 		}
 
  	}       
