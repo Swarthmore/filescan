@@ -25,6 +25,10 @@ error_reporting(E_ALL);
 
 
 
+
+
+
+
 class scan_files extends \core\task\scheduled_task {
 
 
@@ -35,9 +39,37 @@ class scan_files extends \core\task\scheduled_task {
     }
 
 
+    private static function save_filescan_results($DB, $fileentry) {
+
+         $record = $DB->get_record("block_filescan_files", array('contenthash'=>$fileentry->contenthash));
+
+        if ($record) {
+                $fileentry->id = $record->id;
+
+                // If this is a failure, update the statuscode
+                if ($fileentry->checked == 0) {
+                        $fileentry->statuscode = $record->statuscode + 1;
+                }
+                $sql = $DB->update_record("block_filescan_files", $fileentry);
+                $sql ? mtrace("Updated record") : mtrace("Could not update record");
+
+        } else {
+                if ($fileentry->checked == 0) {
+                        $fileentry->statuscode =  1;
+                }
+
+                $sql = $DB->insert_record("block_filescan_files", $fileentry, $returnid=true, $bulk=false);
+                $sql ? mtrace("Inserted record") : mtrace("Could not insert record");
+        }
+  }
+
+
+
+
+
     public function execute() {
 
-		global $CFG, $DB;
+	global $CFG, $DB;
         require_once($CFG->libdir.'/filelib.php');
 		
 	//$DB->set_debug(true);
@@ -102,7 +134,15 @@ class scan_files extends \core\task\scheduled_task {
 		
 				
 			$file_contents = $file->get_content();
+
 			if ($file_contents === FALSE) {
+				// Cannot get file contents -- report an error
+				$fileentry = new \stdClass();
+                        	$fileentry->timechecked = date("Y-m-d H:i:s");
+                        	$fileentry->contenthash = $f->contenthash;
+				$fileentry->status = "error";
+				$fileentry->checked = 0;
+				self::save_filescan_results($DB, $fileentry);
 				continue;	
 			}
 
@@ -215,30 +255,8 @@ class scan_files extends \core\task\scheduled_task {
 			}
 		
 			// Update the database with the results
+			save_filescan_results($DB, $fileentry);
 			 
-			// Determine if there is already a record
-                        $record = $DB->get_record("block_filescan_files", array('contenthash'=>$fileentry->contenthash));
-                                if ($record) {
-                                        $fileentry->id = $record->id;
-                                
-					// If this is a failure, update the statuscode
-					if ($fileentry->checked == 0) {
-						$fileentry->statuscode = $record->statuscode + 1; 
-					}
-				        $sql = $DB->update_record("block_filescan_files", $fileentry);
-                                        $sql ? mtrace("Updated record") : mtrace("Could not update record");
-                                } else {
-
-                                        if ($fileentry->checked == 0) {
-                                                $fileentry->statuscode =  1;
-                                        }
-
-                                        $sql = $DB->insert_record("block_filescan_files", $fileentry, $returnid=true, $bulk=false);
-                                        $sql ? mtrace("Inserted record") : mtrace("Could not insert record");
-                                }
-
-
-
 	
 		}
 
