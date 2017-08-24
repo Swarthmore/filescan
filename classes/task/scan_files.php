@@ -255,7 +255,7 @@ class scan_files extends \core\task\scheduled_task {
 			}
 		
 			// Update the database with the results
-			save_filescan_results($DB, $fileentry);
+			self::save_filescan_results($DB, $fileentry);
 			 
 	
 		}
