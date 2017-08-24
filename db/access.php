@@ -14,6 +14,14 @@
  
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
+
+    'block/filescan:myaddinstance' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'user' => CAP_PREVENT
+        )
+    ),
     
    'block/filescan:viewpages' => array(
         'captype' => 'read',
@@ -39,5 +47,17 @@
             'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
-    )      
+    ),    
+    
+
+    'block/filescan:scan' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'moodle/course:update',
+    )   
 );

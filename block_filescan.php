@@ -15,8 +15,9 @@ class block_filescan extends block_base {
         $this->title = get_string('filescan', 'block_filescan');
     }
 
-
-
+    public function applicable_formats() {
+        return array('site' => false, 'my' => false, 'course' => true);
+    }
 
 private function get_file_list() {
 
@@ -76,24 +77,45 @@ private function get_file_list() {
 		global $DB;
 	
 		$filelist = $this->get_file_list();
-		$pass = 0;
-		$fail = 0;
+		$accessible = 0;
+		$partially_accessible = 0;
+		$inaccessible = 0;
 		$unknown = 0;
 	
 		foreach($filelist as $f) {
 			// For each file, lookup file scan status
-			$record = $DB->get_record("local_filescan_files", array('contenthash'=>$f));
-			if ($record && $record->ocrstatus	== 'pass') {
-				$pass = $pass + 1;
-			} else if ($record && $record->ocrstatus == 'fail') {
-				$fail = $fail + 1;
+			$record = $DB->get_record("block_filescan_files", array('contenthash'=>$f));
+			if ($record && $record->status	== 'pass') {
+				$accessible = $accessible + 1;
+			} else if ($record && $record->status == 'fail') {
+				$inaccessible = $inaccessible + 1;
+			} else if ($record && $record->status == 'check') {
+				$partially_accessible = $partially_accessible + 1;
 			} else {
 				$unknown = $unknown + 1;
 			}
 		}
 	
-		$format = 'There are %d PDF files.<BR>%d pass<BR>%d fail<BR>%d unknown<BR><BR>Last updated:%s';
-		$output = sprintf($format, count($filelist), $pass, $fail, $unknown, date("F j, Y, g:i a"));
+		$output = sprintf("%d PDF files found", count($filelist));
+		
+		if ($accessible > 0) {
+			$output .= sprintf('<BR><i class="fa fa-check text-success fa-fw" aria-hidden="true"></i> %d Accessible', $accessible);
+		}
+		
+		if ($partially_accessible > 0) {
+			$output .= sprintf('<BR><i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i> %d Partially Accessible', $partially_accessible);
+		}	
+		
+		if ($inaccessible > 0) {
+			$output .= sprintf('<BR><i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i> %d Inaccessible',$inaccessible);
+		}
+		
+		if ($unknown > 0) {
+			$output .= sprintf('<BR><i class="fa fa-question text-info fa-fw" aria-hidden="true"></i> %d Accessibility Unknown', $unknown);
+		}
+		
+		$output .= sprintf('<BR><BR>Last updated: %s', date("m/d/Y g:iA"));
+		
 		return $output;
 	}
 
@@ -137,12 +159,10 @@ public function get_content() {
  	if ($filescan_cache) {
  		// Cache was found.  Print out summary
  		$filescan_summary = $filescan_cache;
-		$filescan_summary .= "<BR>CACHE<BR>";
  	} else {
  		// No cache data found.  Generate summary and save to cache
  		$filescan_summary = $this->generate_summary($COURSE->id);
  		$result = $cache->set($COURSE->id, $filescan_summary);
- 		$filescan_summary .= "<BR>NO CACHE<BR>";
  	}		
 		
 
@@ -155,7 +175,7 @@ public function get_content() {
     $this->content         =  new stdClass;
     $this->content->text   = '<h4>Summary</h4>' . $filescan_summary;
     
-	$url = new moodle_url('/local/filescan/view.php', array('courseid' => $COURSE->id));
+	$url = new moodle_url('/blocks/filescan/view.php', array('courseid' => $COURSE->id));
 	$this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
 
  
@@ -163,16 +183,9 @@ public function get_content() {
   }
   
   
-  
-
+  	// Tell Moodle there is a global config
+ 	function has_config() {return true;}
   
   
   
 }   // Here's the closing bracket for the class definition
-
-
-?>
-
-
-
-
