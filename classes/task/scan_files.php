@@ -72,7 +72,7 @@ class scan_files extends \core\task\scheduled_task {
 	global $CFG, $DB;
         require_once($CFG->libdir.'/filelib.php');
 		
-	//$DB->set_debug(true);
+	$DB->set_debug(true);
 		
         mtrace( "Filescan cron script is running" );
 
@@ -91,9 +91,9 @@ class scan_files extends \core\task\scheduled_task {
 		$max_retries = (int)get_config('filescan', 'maxretries');
 
         
-        # Find PDF files in course materials (not student files, stamps, etc) that haven't already been scanned
-        # Need to return contenthas and pathnamehash.  pathnamehash is used to retrieve the contents of the file.
-        $query = 'SELECT distinct f.contenthash, f.pathnamehash 
+        // Find PDF files in course materials (not student files, stamps, etc) that haven't already been scanned
+        // Have to do 2 lookups because there can be multiple entries for each contenthash and need to ensure we get the latest updated contenthashes
+        $query = 'SELECT distinct f.contenthash 
         		FROM {files} f, {context} c
         		WHERE c.id = f.contextid 
         			AND c.contextlevel = 70 
@@ -102,10 +102,31 @@ class scan_files extends \core\task\scheduled_task {
         			AND f.component != "assignfeedback_editpdf" 
         			AND f.filearea != "stamps"
         			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True or (checked=False and status="error" and statuscode >=' . $max_retries . ')) 	
-				GROUP BY f.contenthash
-        			ORDER BY f.timemodified DESC
-        			LIMIT ' . $max_files_to_check;
+        		ORDER BY f.timemodified DESC
+        		LIMIT ' . $max_files_to_check;
 
+			
+        $contenthashes = $DB->get_records_sql($query);
+
+
+        if (!$contenthashes) {
+        	mtrace("No files found");
+            return false;
+        }
+    
+    	// Set up an array containing the latest contenthashes 
+    	$hash_array = array();
+    	foreach ($contenthashes as $c) {
+    		$hash_array[] = $c->contenthash;
+    	}
+    	$comma_separated_contenthashes = implode("','", $hash_array);
+	$comma_separated_contenthashes = "'" . $comma_separated_contenthashes . "'";   
+
+ 
+        $query = 'SELECT  f.contenthash, f.pathnamehash 
+        			FROM {files} f
+        			WHERE f.contenthash in (' . $comma_separated_contenthashes . ') 
+        			GROUP BY f.contenthash';	
 		
         $files = $DB->get_records_sql($query);
 
@@ -113,9 +134,8 @@ class scan_files extends \core\task\scheduled_task {
         if (!$files) {
         	mtrace("No files found");
             return false;
-        }
-    
-    
+        }  
+        
 		$client = new Client([
 			// Base URI is used with relative requests
 			'base_uri' => $api_url,
