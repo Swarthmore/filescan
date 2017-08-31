@@ -72,7 +72,7 @@ class scan_files extends \core\task\scheduled_task {
 	global $CFG, $DB;
         require_once($CFG->libdir.'/filelib.php');
 		
-	$DB->set_debug(true);
+	//$DB->set_debug(true);
 		
         mtrace( "Filescan cron script is running" );
 
