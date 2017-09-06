@@ -93,7 +93,7 @@ class scan_files extends \core\task\scheduled_task {
         
         // Find PDF files in course materials (not student files, stamps, etc) that haven't already been scanned
         // Have to do 2 lookups because there can be multiple entries for each contenthash and need to ensure we get the latest updated contenthashes
-        $query = 'SELECT distinct f.contenthash 
+        $query = 'SELECT distinct f.contenthash, f.timemodified 
         		FROM {files} f, {context} c
         		WHERE c.id = f.contextid 
         			AND c.contextlevel = 70 
