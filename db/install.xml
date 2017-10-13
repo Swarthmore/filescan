@@ -17,6 +17,7 @@
         <FIELD NAME="hasoutline" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF file contains outline (bookmarks)"/>
         <FIELD NAME="haslanguage" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF file language is set"/>
         <FIELD NAME="timechecked" TYPE="datetime" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="courseinfo" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Information about courses that use this file"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
