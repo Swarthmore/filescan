@@ -24,6 +24,7 @@ $string['cachedef_filescan'] = 'Filescan results cache for each course';
 
 // Scheduled tasks
 $string['filescan_task'] = 'Filescan task';
+$string['reportgeneration_task'] = 'Report generation task';
 
 
 // Config settings
