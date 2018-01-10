@@ -204,7 +204,7 @@ foreach ($file_list as $f) {
 		$mod_link = "<a href=\"" . $f['mod_url'] . "\" title=\"" . $f['mod_name'] . "\">&#128196;</a>" ;
 	}				
 
-	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\">" . $f['filename'] . "</a></td>
+	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\" target='_blank'>" . $f['filename'] . "</a></td>
 	<td style='text-align:center;'><span title=\"status\">" . $overallstatus . "</span></td>
 	<td style='text-align:center;border-left-width:2px;'><span title=\"has text\">" . $hastext . "</span></td>
 	<td style='text-align:center'><span title=\"has title\">" . $hastitle . "</span></td>
