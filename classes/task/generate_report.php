@@ -51,7 +51,7 @@ class generate_report extends \core\task\scheduled_task {
 f.component in ("course", "course", "block_html", "mod_assign", "mod_book", "mod_data", "mod_folder", "mod_forum", "mod_glossary","mod_label", "mod_lesson", "mod_page", "mod_publication", "mod_questionnaire", "mod_quiz", "mod_resource", "mod_scorm", "mod_url", "mod_workshop", "qtype_essay", "question") AND f.filesize <> 0  
 	AND f.mimetype = "application/pdf"
 	AND f.contextid = ctx.id
-	AND f.contenthash = fs.contenthash and fs.contenthash="1b39488b2822aacee50a9b17f87e261b6a1ad866" limit 1000';
+	AND f.contenthash = fs.contenthash';
 
 		// Get a number of records as a moodle_recordset using a SQL statement.		
 		$pdf_rs = $DB->get_recordset_sql($query);
