@@ -48,27 +48,31 @@ if ($hassiteconfig) {
 		get_string('filescan_text_check_help_desc', 'block_filescan'),
 		'',
 		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-		PARAM_TEXT
+		PARAM_TEXT,
+		60
 	));
 
 	$settings->add(new admin_setting_configtext('filescan/title_check_help',
 		get_string('filescan_title_check_help_desc', 'block_filescan'),
 		'',
 		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-		PARAM_TEXT
+		PARAM_TEXT,
+		60
 	));
 
 	$settings->add(new admin_setting_configtext('filescan/lang_check_help',
 		get_string('filescan_lang_check_help_desc', 'block_filescan'),
 		'',
 		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-		PARAM_TEXT
+		PARAM_TEXT,
+		60
 	));
 
 	$settings->add(new admin_setting_configtext('filescan/outline_check_help',
 		get_string('filescan_outline_check_help_desc', 'block_filescan'),
 		'',
 		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-		PARAM_TEXT
+		PARAM_TEXT,
+		60
 	));
 }
