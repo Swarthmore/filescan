@@ -48,7 +48,7 @@ if ($hassiteconfig) {
 		get_string('filescan_text_check_help_desc', 'block_filescan'),
 		'',
 		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-		PARAM_TEXT,
+		PARAM_URL,
 		60
 	));
 
@@ -56,7 +56,7 @@ if ($hassiteconfig) {
 		get_string('filescan_title_check_help_desc', 'block_filescan'),
 		'',
 		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-		PARAM_TEXT,
+		PARAM_URL,
 		60
 	));
 
@@ -64,7 +64,7 @@ if ($hassiteconfig) {
 		get_string('filescan_lang_check_help_desc', 'block_filescan'),
 		'',
 		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-		PARAM_TEXT,
+		PARAM_URL,
 		60
 	));
 
@@ -72,7 +72,7 @@ if ($hassiteconfig) {
 		get_string('filescan_outline_check_help_desc', 'block_filescan'),
 		'',
 		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-		PARAM_TEXT,
+		PARAM_URL,
 		60
 	));
 }
