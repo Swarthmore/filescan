@@ -118,11 +118,13 @@ $previous_section_number = "";
 
 $output_html .= "<table class='filescan-details table table-striped table-condensed'><tbody>";
 
-function get_help_icon($link, $title = null) {
+function get_help_icon($id) {
 	global $OUTPUT;
-	$title = isset($title) ? $title : get_string('helptitle', 'block_filescan');
-	$o = "<a href='$link' title='$title' aria-haspopup='true' target='_blank'>";
-	$o .= "<img class='icon iconhelp' alt='$title' title='$title' src='" . $OUTPUT->image_url('help') . "'></a>";
+	$header = get_string("table:header:$id");
+	$link = get_config('filescan', $id . '_help');
+	$title = get_string('helptitle', 'block_filescan');
+	$o = "<a href='$link' title='$title' aria_label='$header: $title' target='_blank'>";
+	$o .= "<img class='icon iconhelp' alt='Help icon' src='" . $OUTPUT->image_url('help') . "'></a>";
 	return $o;
 }
 
@@ -131,7 +133,7 @@ function get_table_header($id) {
 	$o .= get_string("table:{$id}_header", 'block_filescan');
 	$link = get_config('filescan', $id . '_help');
 	if (! empty($link)) {
-		$o .= get_help_icon($link);
+		$o .= get_help_icon($id);
 	}
 	$o .= '</th>';
 	return $o;
