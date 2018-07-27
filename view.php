@@ -120,7 +120,7 @@ $output_html .= "<table class='filescan-details table table-striped table-conden
 
 function get_help_icon($header, $link, $title) {
 	global $OUTPUT;
-	$o = "<a href='$link' title='$title' aria_label='$header: $title' target='_blank'>";
+	$o = "<a href='$link' title='$title' aria-label='$header: $title' target='_blank'>";
 	$o .= "<img class='icon iconhelp' alt='Help icon' src='" . $OUTPUT->image_url('help') . "'></a>";
 	return $o;
 }
