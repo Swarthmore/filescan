@@ -3,3 +3,7 @@ table.filescan-details th {
 	vertical-align:middle;
 	border:none;
 }
+
+table.filescan-details .fs-table-header-text_check {
+	border-left-width: 2px;
+}
