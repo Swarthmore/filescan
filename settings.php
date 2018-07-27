@@ -26,21 +26,21 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
 
-	$settings->add(new admin_setting_heading('filescan/config',
+	$settings->add(new admin_setting_heading('block_filescan/config',
 		get_string('headerconfig', 'block_filescan'),
 		get_string('descconfig', 'block_filescan')));
 
-	$settings->add(new admin_setting_configtext('filescan/apiurl',
+	$settings->add(new admin_setting_configtext('block_filescan/apiurl',
 		get_string('filescan_apiurl', 'block_filescan'),
 		get_string('filescan_apiurl_desc', 'block_filescan'),
 		'', PARAM_TEXT, 128));
 
-	$settings->add(new admin_setting_configtext('filescan/numfilespercron',
+	$settings->add(new admin_setting_configtext('block_filescan/numfilespercron',
 		get_string('filescan_numfilespercron', 'block_filescan'),
 		get_string('filescan_numfilespercron_desc', 'block_filescan'),
 		'5', PARAM_TEXT, 128));
 
-	$settings->add(new admin_setting_configtext('filescan/maxretries',
+	$settings->add(new admin_setting_configtext('block_filescan/maxretries',
 		get_string('filescan_maxretries', 'block_filescan'),
 		get_string('filescan_maxretries_desc', 'block_filescan'),
 		'3', PARAM_TEXT, 128));
