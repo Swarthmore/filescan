@@ -119,6 +119,7 @@ $previous_section_number = "";
 $output_html .= "<table class='filescan-details table table-striped table-condensed'><tbody>";
 
 function get_help_icon($link, $title = null) {
+	global $OUTPUT;
 	$title = isset($title) ? $title : get_string('helptitle', 'block_filescan');
 	$o = "<a href='$link' title='$title' aria-haspopup='true' target='_blank'>";
 	$o .= "<img class='icon iconhelp' alt='$title' title='$title' src='" . $OUTPUT->image_url('help') . "'></a>";
