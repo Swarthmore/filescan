@@ -4,7 +4,6 @@
 $string['pluginname'] = 'Accessibility File Scan';
 $string['filescan'] = 'File Scan';
 
-
 // Capabilities
 $string['filescan:addinstance'] = 'Add a new File Scan block';
 $string['filescan:myaddinstance'] = 'Add a new File Scan block to the Moodle Dashboard';
@@ -16,16 +15,29 @@ $string['filescan:scan'] = 'Request a file scan';
 $string['viewdetailspage'] = 'View File Details';
 $string['summaryview'] = 'File scan summary';
 $string['nofiles'] = 'There are no files to scan';
-
+$string['cannot_view'] = 'Not allowed to view page';
 
 // Cache
 $string['cachedef_filescan'] = 'Filescan results cache for each course';
 
+// Summary
+$string['summary:files_found'] = '{$a} PDF files found'; // Substituting integer.
+$string['summary:files_accessible'] = '{$a} Accessible'; // Substituting integer.
+$string['summary:files_partially_accessible'] = '{$a} Partially Accessible'; // Substituting integer.
+$string['summary:files_inaccessible'] = '{$a} Inaccessible'; // Substituting integer.
+$string['summary:files_accessibility_unknown'] = '{$a} Accessibility Unkown'; // Substituting integer.
+$string['summary:last_updated'] = 'Last updated: {$a}'; // Substituting string (date).
+$string['summary:title'] = 'Summary';
+
+// Table
+$string['table:text_check_header'] = 'Has Text';
+$string['table:title_check_header'] = 'Has Title';
+$string['table:lang_check_header'] = 'Has Language';
+$string['table:outline_check_header'] = 'Has Outline';
 
 // Scheduled tasks
 $string['filescan_task'] = 'Filescan task';
 $string['reportgeneration_task'] = 'Report generation task';
-
 
 // Config settings
 $string['headerconfig'] = "Configure file scan";
