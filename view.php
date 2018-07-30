@@ -212,7 +212,7 @@ foreach ($file_list as $f) {
 
 	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\" target='_blank'>" . $f['filename'] . "</a></td>
 	<td style='text-align:center;'><span title=\"" . get_string('table:status_header', 'block_filescan') . '">' . $overallstatus . "</span></td>
-	<td style='text-align:center;border-left-width:2px;'><span title=\"" . get_string('table:title_check_header', 'block_filescan') . '">' . $hastext . "</span></td>
+	<td style='text-align:center;border-left-width:2px;'><span title=\"" . get_string('table:text_check_header', 'block_filescan') . '">' . $hastext . "</span></td>
 	<td style='text-align:center'><span title=\"" . get_string('table:title_check_header', 'block_filescan') . '">' . $hastitle . "</span></td>
 	<td style='text-align:center'><span title=\"" . get_string('table:lang_check_header', 'block_filescan') . '">' . $haslanguage . "</span></td>
 	<td style='text-align:center'><span title=\"" . get_string('table:outline_check_header', 'block_filescan') . '">' . $hasoutline . "</span></td>
