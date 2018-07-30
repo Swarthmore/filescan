@@ -30,6 +30,9 @@ $string['summary:last_updated'] = 'Last updated: {$a}'; // Substituting string (
 $string['summary:title'] = 'Summary';
 
 // Table
+$string['table:mod_header'] = 'Has Text';
+$string['table:filename_header'] = 'Has Text';
+$string['table:status_header'] = 'Has Text';
 $string['table:text_check_header'] = 'Has Text';
 $string['table:title_check_header'] = 'Has Title';
 $string['table:lang_check_header'] = 'Has Language';

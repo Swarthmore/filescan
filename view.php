@@ -121,9 +121,9 @@ $output_html .= "<table class='filescan-details table table-striped table-conden
 foreach ($file_list as $f) {
 	if ($f['sectionNumber'] != $previous_section_number) {
 		$output_html .= "<tr><td colspan='7' style='background-color: transparent;border:none;'><h4>" . $f['sectionName'] . "</h4></td></tr>";
-		$output_html .= "<tr><th style=''>" . get_string('table:header:mod', 'block_filescan') . '</th>';
-		$output_html .= '<th>' . get_string('table:header:filename', 'block_filescan') . '</th>';
-		$output_html .= '<th>' . get_string('table:header:status', 'block_filescan') . '</th>';
+		$output_html .= "<tr><th style=''>" . get_string('table:mod_header', 'block_filescan') . '</th>';
+		$output_html .= '<th>' . get_string('table:filename_header', 'block_filescan') . '</th>';
+		$output_html .= '<th>' . get_string('table:status_header', 'block_filescan') . '</th>';
 		$output_html .= "<th style='border-left-width:2px;'>" . get_string('table:text_check_header', 'block_filescan') . "</th>";
 		$output_html .= '<th>' . get_string('table:title_check_header', 'block_filescan') . '</th>';
 		$output_html .= '<th>' . get_string('table:lang_check_header', 'block_filescan') . '</th>';
@@ -211,11 +211,11 @@ foreach ($file_list as $f) {
 	}				
 
 	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\" target='_blank'>" . $f['filename'] . "</a></td>
-	<td style='text-align:center;'><span title=\"status\">" . $overallstatus . "</span></td>
-	<td style='text-align:center;border-left-width:2px;'><span title" . get_string('table:title_check_header', 'block_filescan') . ">" . $hastext . "</span></td>
-	<td style='text-align:center'><span title=" . get_string('table:title_check_header', 'block_filescan') . ">" . $hastitle . "</span></td>
-	<td style='text-align:center'><span title=" . get_string('table:lang_check_header', 'block_filescan') . ">" . $haslanguage . "</span></td>
-	<td style='text-align:center'><span title=" . get_string('table:outline_check_header', 'block_filescan') . ">" . $hasoutline . "</span></td>
+	<td style='text-align:center;'><span title=\"" . get_string('table:status_header', 'block_filescan') . '">' . $overallstatus . "</span></td>
+	<td style='text-align:center;border-left-width:2px;'><span title=\"" . get_string('table:title_check_header', 'block_filescan') . '">' . $hastext . "</span></td>
+	<td style='text-align:center'><span title=\"" . get_string('table:title_check_header', 'block_filescan') . '">' . $hastitle . "</span></td>
+	<td style='text-align:center'><span title=\"" . get_string('table:lang_check_header', 'block_filescan') . '">' . $haslanguage . "</span></td>
+	<td style='text-align:center'><span title=\"" . get_string('table:outline_check_header', 'block_filescan') . '">' . $hasoutline . "</span></td>
 	</tr>";
 	
 	$previous_section_number = $f['sectionNumber'];
