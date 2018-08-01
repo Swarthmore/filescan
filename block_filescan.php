@@ -96,25 +96,25 @@ private function get_file_list() {
 			}
 		}
 	
-		$output = sprintf("%d PDF files found", count($filelist));
+		$output = get_string('summary:files_found', 'block_filescan', count($filelist));
 		
 		if ($accessible > 0) {
-			$output .= sprintf('<BR><i class="fa fa-check text-success fa-fw" aria-hidden="true"></i> %d Accessible', $accessible);
+			$output .= '<BR><i class="fa fa-check text-success fa-fw" aria-hidden="true"></i> ' . get_string('summary:files_accessible', 'block_filescan', $accessible);
 		}
 		
 		if ($partially_accessible > 0) {
-			$output .= sprintf('<BR><i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i> %d Partially Accessible', $partially_accessible);
+			$output .= '<BR><i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i> ' . get_string('summary:files_partially_accessible', 'block_filescan', $partially_accessible);
 		}	
 		
 		if ($inaccessible > 0) {
-			$output .= sprintf('<BR><i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i> %d Inaccessible',$inaccessible);
+			$output .= '<BR><i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i> ' . get_string('summary:files_inaccessible', 'block_filescan', $inaccessible);
 		}
 		
 		if ($unknown > 0) {
-			$output .= sprintf('<BR><i class="fa fa-question text-info fa-fw" aria-hidden="true"></i> %d Accessibility Unknown', $unknown);
+			$output .= '<BR><i class="fa fa-question text-info fa-fw" aria-hidden="true"></i> ' . get_string('summary:files_accessibility_unknown', 'block_filescan', $unknown);
 		}
 		
-		$output .= sprintf('<BR><BR>Last updated: %s', date("m/d/Y g:iA"));
+		$output .= '<BR><BR>' . get_string('summary:last_updated', 'block_filescan', date("m/d/Y g:iA"));
 		
 		return $output;
 	}
