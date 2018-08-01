@@ -128,7 +128,7 @@ function get_help_icon($header, $link, $title) {
 function get_table_header($id) {
 	// Params.
 	$header = get_string("table:{$id}_header", 'block_filescan');
-	$link = get_config('filescan', $id . '_help');
+	$link = get_config('block_filescan', $id . '_help');
 	$title = get_string('helptitle', 'block_filescan');
 	// Output.
 	$o = "<th class='fs-table-header fs-table-header-$id'>$header";

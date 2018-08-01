@@ -76,7 +76,7 @@ class scan_files extends \core\task\scheduled_task {
 		
         mtrace( "Filescan cron script is running" );
 
-        $api_url = get_config('filescan', 'apiurl');
+        $api_url = get_config('block_filescan', 'apiurl');
 
 		// Only proceed if config parameters are defined
 		if (empty($api_url)) { throw new \RuntimeException("Moodle FileScan API URL not configured");}
@@ -85,10 +85,10 @@ class scan_files extends \core\task\scheduled_task {
 		mtrace("Looking up files to scan"); 
     
 
-		$max_files_to_check = (int)get_config('filescan', 'numfilespercron');
+		$max_files_to_check = (int)get_config('block_filescan', 'numfilespercron');
 		$max_files_to_check = (is_int($max_files_to_check) && $max_files_to_check > 0) ? $max_files_to_check : 2;
         
-		$max_retries = (int)get_config('filescan', 'maxretries');
+		$max_retries = (int)get_config('block_filescan', 'maxretries');
 
         
         // Find PDF files in course materials (not student files, stamps, etc) that haven't already been scanned
@@ -284,4 +284,3 @@ class scan_files extends \core\task\scheduled_task {
 
 }
 	
-
