@@ -159,7 +159,7 @@ function xmldb_block_filescan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017101318, 'error', 'filescan');
     }
 
-    if (/*$oldversion < X*/1) {
+    if ($oldversion < 2018073100) {
         // Update settings names to use full frankenstyle plugin name.
         $settings = array(
             'apiurl',
