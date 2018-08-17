@@ -34,10 +34,10 @@ $string['summary:title'] = 'Summary';
 $string['table:mod_header'] = 'Mod';
 $string['table:filename_header'] = 'Filename';
 $string['table:status_header'] = 'Status';
-$string['table:text_check_header'] = 'Has Text';
-$string['table:title_check_header'] = 'Has Title';
-$string['table:lang_check_header'] = 'Has Language';
-$string['table:outline_check_header'] = 'Has Outline';
+$string['table:text_check_header'] = 'Text';
+$string['table:title_check_header'] = 'Title';
+$string['table:lang_check_header'] = 'Language';
+$string['table:outline_check_header'] = 'Outline';
 
 // Scheduled tasks
 $string['filescan_task'] = 'Filescan task';

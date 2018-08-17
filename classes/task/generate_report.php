@@ -20,48 +20,47 @@ error_reporting(E_ALL);
 
 
 
-
+ 
 
 class generate_report extends \core\task\scheduled_task {
 
 
 
-    public function get_name() {
-        // Shown in admin screens
-        return get_string('reportgeneration_task', 'block_filescan');
-    }
+	public function get_name() {
+		// Shown in admin screens
+		return get_string('reportgeneration_task', 'block_filescan');
+	}
 
 
 
 
-    public function execute() {
+	public function execute() {
 
 		global $CFG, $DB;
 		$teacher_role_id = $DB->get_record('role', array('shortname' => 'editingteacher'))->id;
 		
+		//$DB->set_debug(true);
 		
-	 //$DB->set_debug(true);
-		
-        mtrace( "Acessibility report generation script is running" );
+		mtrace( "Acessibility report generation script is running" );
 
 		// Start by clearing out the old couseinfo entries.  They could contain information that is outdated
 		$DB->execute("update {block_filescan_files} set courseinfo=NULL");
-       
-        // Select all PDF files in the system
-        $query = 'select f.contenthash as contenthash, ctx.path as path, fs.id as filescanid, fs.courseinfo as courseinfo from {files} f, {context} ctx, {block_filescan_files} fs where
+
+		// Select all PDF files in the system
+		$query = 'select f.contenthash as contenthash, ctx.path as path, fs.id as filescanid from {files} f, {context} ctx, {block_filescan_files} fs where
 f.component in ("course", "course", "block_html", "mod_assign", "mod_book", "mod_data", "mod_folder", "mod_forum", "mod_glossary","mod_label", "mod_lesson", "mod_page", "mod_publication", "mod_questionnaire", "mod_quiz", "mod_resource", "mod_scorm", "mod_url", "mod_workshop", "qtype_essay", "question") AND f.filesize <> 0  
 	AND f.mimetype = "application/pdf"
 	AND f.contextid = ctx.id
 	AND f.contenthash = fs.contenthash';
-        		
-        // Get a number of records as a moodle_recordset using a SQL statement.		
+
+		// Get a number of records as a moodle_recordset using a SQL statement.		
 		$pdf_rs = $DB->get_recordset_sql($query);
 		  
 		if (!$pdf_rs->valid()) {
 			mtrace("No files found");
-            return false;
-        }
-    		
+			return false;
+		}
+
 		// The recordset contains records.
 		$index = 0;
 		foreach($pdf_rs as $key => $file) {
@@ -90,6 +89,11 @@ f.component in ("course", "course", "block_html", "mod_assign", "mod_book", "mod
 				continue;
 			}
 			
+			// Get any course info that has already been set for this file
+			// Ideally this would be part of the recordset but the recordset results seemed to be cached and didn't
+			// reflect updates to courseinfo during this script execution.  
+			$courseinfo_results =  $DB->get_record('block_filescan_files', array('id'=>$file->filescanid), 'courseinfo');
+			$courseinfo = json_decode($courseinfo_results->courseinfo);
 			
 			// Lookup course info for this entry
 			// Build a course object than can be serialized.
@@ -98,41 +102,33 @@ f.component in ("course", "course", "block_html", "mod_assign", "mod_book", "mod
 			$course = get_course($courseid);	
 			$num_users = count(get_enrolled_users($context,'',0));
 			$teachers = get_role_users($teacher_role_id, $context,NULL , "u.id, u.firstname, u.lastname, u.email");
-			
+
 			$course_object->fullname = $course->fullname;
 			$course_object->shortname = $course->shortname;
 			$course_object->courseid = $courseid;
 			$course_object->teachers = $teachers;
 			$course_object->student_enrollment = $num_users - count($teachers);
-				
-			$courseinfo = [];
-			if ($file->courseinfo) {
-				// There is already a course info entry for this file.  
-				$courseinfo = json_decode($file->courseinfo);
-			}
 
-			
 			// Add the new course info to the end of the array
 			$courseinfo[] = $course_object;
-			
+
 			// Save the updated course info back to the filescan table
 			$update_filescan = $DB->update_record('block_filescan_files', array('id'=>$file->filescanid, 'courseinfo'=>json_encode($courseinfo)), false);
-						
 			$index += 1;
-			
+
 			if (($index % 1000) == 0) {
 				mtrace("Processed ". $index . " files");
 			}
 			
 		}
-    		
 		
 		$pdf_rs->close();
 		if (($index % 1000) != 0) {
 			mtrace("Processed ". $index . " files");
 		}
- 	}       
-
+	}
+	
 }
 	
+
 
