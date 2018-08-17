@@ -25,24 +25,52 @@ defined('MOODLE_INTERNAL') || die();
 
 
 if ($hassiteconfig) {
-    
-	$settings->add(new admin_setting_heading('filescan/config',
-											 get_string('headerconfig', 'block_filescan'),
-											 get_string('descconfig', 'block_filescan')));
 
-	$settings->add(new admin_setting_configtext('filescan/apiurl',
-													get_string('filescan_apiurl', 'block_filescan'),
-													get_string('filescan_apiurl_desc', 'block_filescan'),
-													'', PARAM_TEXT, 128));
+	$settings->add(new admin_setting_configtext('block_filescan/apiurl',
+		get_string('filescan_apiurl', 'block_filescan'),
+		get_string('filescan_apiurl_desc', 'block_filescan'),
+		'', PARAM_TEXT, 128));
 													
-	$settings->add(new admin_setting_configtext('filescan/numfilespercron',
-													get_string('filescan_numfilespercron', 'block_filescan'),
-													get_string('filescan_numfilespercron_desc', 'block_filescan'),
-													'5', PARAM_TEXT, 128));
-        $settings->add(new admin_setting_configtext('filescan/maxretries',
-                                                                                                        get_string('filescan_maxretries', 'block_filescan'),
-                                                                                                        get_string('filescan_maxretries_desc', 'block_filescan'),
-                                                                                                        '3', PARAM_TEXT, 128));												
+	$settings->add(new admin_setting_configtext('block_filescan/numfilespercron',
+		get_string('filescan_numfilespercron', 'block_filescan'),
+		get_string('filescan_numfilespercron_desc', 'block_filescan'),
+		'5', PARAM_TEXT, 128));
+													
+	$settings->add(new admin_setting_configtext('block_filescan/maxretries',
+		get_string('filescan_maxretries', 'block_filescan'),
+		get_string('filescan_maxretries_desc', 'block_filescan'),
+		'3', PARAM_TEXT, 128));												
                                                 
-}
+	$settings->add(new admin_setting_configtext('block_filescan/text_check_help',
+		get_string('filescan_text_check_help_desc', 'block_filescan'),
+		'',
+		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+		PARAM_URL,
+		60
+	));
 
+	$settings->add(new admin_setting_configtext('block_filescan/title_check_help',
+		get_string('filescan_title_check_help_desc', 'block_filescan'),
+		'',
+		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+		PARAM_URL,
+		60
+	));
+
+	$settings->add(new admin_setting_configtext('block_filescan/lang_check_help',
+		get_string('filescan_lang_check_help_desc', 'block_filescan'),
+		'',
+		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+		PARAM_URL,
+		60
+	));
+
+	$settings->add(new admin_setting_configtext('block_filescan/outline_check_help',
+		get_string('filescan_outline_check_help_desc', 'block_filescan'),
+		'',
+		'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+		PARAM_URL,
+		60
+	));
+
+}

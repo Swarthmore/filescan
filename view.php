@@ -33,7 +33,7 @@ $canview = has_capability('block/filescan:viewpages', $context);
 // If the role can't view the block, return an empty string for the content
 // and exit (blocks with no content aren't shown)
 if 	(!$canview) {
-	echo "Not allowed to view page";
+	echo get_string('cannot_view', 'block_filescan');
 	return;
 }
  		
@@ -118,10 +118,38 @@ $previous_section_number = "";
 
 $output_html .= "<table class='filescan-details table table-striped table-condensed'><tbody>";
 
+function get_help_icon($header, $link, $title) {
+	global $OUTPUT;
+	$o = "<a href='$link' title='$title' aria-label='$header: $title' target='_blank'>";
+	$o .= "<img class='icon iconhelp' alt='' aria-hidden='true' src='" . $OUTPUT->image_url('help') . "'></a>";
+	return $o;
+}
+
+function get_table_header($id) {
+	// Params.
+	$header = get_string("table:{$id}_header", 'block_filescan');
+	$link = get_config('block_filescan', $id . '_help');
+	$title = get_string('helptitle', 'block_filescan');
+	// Output.
+	$o = "<th class='fs-table-header fs-table-header-$id'>$header";
+	if (! empty($link)) {
+		$o .= get_help_icon($header, $link, $title);
+	}
+	$o .= '</th>';
+	return $o;
+}
+
 foreach ($file_list as $f) {
 	if ($f['sectionNumber'] != $previous_section_number) {
 		$output_html .= "<tr><td colspan='7' style='background-color: transparent;border:none;'><h4>" . $f['sectionName'] . "</h4></td></tr>";
-		$output_html .= "<tr><th style=''>Mod</th><th>Filename</th><th>Status</th><th style='border-left-width:2px;'>Has Text</th><th>Has Title</th><th>Has Language</th><th>Has Outline</th></tr>";
+		$output_html .= "<tr><th style=''>" . get_string('table:mod_header', 'block_filescan') . '</th>';
+		$output_html .= '<th>' . get_string('table:filename_header', 'block_filescan') . '</th>';
+		$output_html .= '<th>' . get_string('table:status_header', 'block_filescan') . '</th>';
+		$output_html .= get_table_header('text_check');
+		$output_html .= get_table_header('title_check');
+		$output_html .= get_table_header('lang_check');
+		$output_html .= get_table_header('outline_check');
+		$output_html .= "</tr>";
 	}
 
 	switch($f['status']['hastext']) {
@@ -205,11 +233,11 @@ foreach ($file_list as $f) {
 	}				
 
 	$output_html .= "<tr><td style='text-align:center'>" . $mod_link ."<td><a href=\"" . $f['fileurl']  . "\" target='_blank'>" . $f['filename'] . "</a></td>
-	<td style='text-align:center;'><span title=\"status\">" . $overallstatus . "</span></td>
-	<td style='text-align:center;border-left-width:2px;'><span title=\"has text\">" . $hastext . "</span></td>
-	<td style='text-align:center'><span title=\"has title\">" . $hastitle . "</span></td>
-	<td style='text-align:center'><span title=\"has language\">" . $haslanguage . "</span></td>
-	<td style='text-align:center'><span title=\"has outline\">" . $hasoutline . "</span></td>
+	<td style='text-align:center;'><span title=\"" . get_string('table:status_header', 'block_filescan') . '">' . $overallstatus . "</span></td>
+	<td style='text-align:center;border-left-width:2px;'><span title=\"" . get_string('table:text_check_header', 'block_filescan') . '">' . $hastext . "</span></td>
+	<td style='text-align:center'><span title=\"" . get_string('table:title_check_header', 'block_filescan') . '">' . $hastitle . "</span></td>
+	<td style='text-align:center'><span title=\"" . get_string('table:lang_check_header', 'block_filescan') . '">' . $haslanguage . "</span></td>
+	<td style='text-align:center'><span title=\"" . get_string('table:outline_check_header', 'block_filescan') . '">' . $hasoutline . "</span></td>
 	</tr>";
 	
 	$previous_section_number = $f['sectionNumber'];
@@ -262,24 +290,24 @@ $summary_text = count($file_list) . " total PDF files";
 
 
 if ($ocr_summary['Accessible'] > 0) {
-	$summary_text .= sprintf('<BR>' . $success_icon . ' %d Accessible', $ocr_summary['Accessible']);
+	$summary_text .= '<BR>' . $success_icon . get_string('summary:files_accessible', 'block_filescan', $ocr_summary['Accessible']);
 }
 
 if ($ocr_summary['Partially Accessible'] > 0) {
-	$summary_text .= sprintf('<BR>' . $partial_success_icon .' %d Partially Accessible', $ocr_summary['Partially Accessible']);
+	$summary_text .= '<BR>' . $partial_success_icon . get_string('summary:files_partially_accessible', 'block_filescan', $ocr_summary['Partially Accessible']);
 }	
 
 if ($ocr_summary['Inaccessible'] > 0) {
-	$summary_text .= sprintf('<BR>' . $fail_icon . ' %d Inaccessible', $ocr_summary['Inaccessible']);
+	$summary_text .= '<BR>' . $fail_icon . get_string('summary:files_inaccessible', 'block_filescan', $ocr_summary['Inaccessible']);
 }
 
 if ($ocr_summary['Unknown'] > 0) {
-	$summary_text .= sprintf('<BR>' . $unknown_icon . ' %d Accessibility Unknown', $ocr_summary['Unknown'] );
+	$summary_text .= '<BR>' . $unknown_icon . get_string('summary:files_accessibility_unknown', 'block_filescan', $ocr_summary['Unknown']);
 }
 
 
 // Prepend summary to top of content
-$output_html = "<h1>Summary</h1>" . $summary_text . "<BR><BR>" . $output_html;
+$output_html = "<h1>" . get_string('summary:title', 'block_filescan') . "</h1>" . $summary_text . "<BR><BR>" . $output_html;
 			
 
 echo $OUTPUT->header();

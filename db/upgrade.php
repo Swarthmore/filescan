@@ -7,7 +7,7 @@ function xmldb_block_filescan_upgrade($oldversion) {
 
     /// Add a new column newcol to the mdl_myqtype_options
     if ($oldversion < 2017062810) {
-    
+
         // Define field id to be added to block_filescan_files.
         $table = new xmldb_table('block_filescan_files');
         $field = new xmldb_field('timechecked', XMLDB_TYPE_DATETIME, null, null, XMLDB_NOTNULL, null, 0, null);
@@ -24,45 +24,45 @@ function xmldb_block_filescan_upgrade($oldversion) {
 
     /// Add a new column newcol to the mdl_myqtype_options
     if ($oldversion < 2017071414) {
-    
+
         // Define field id to be added to block_filescan_files.
         $table = new xmldb_table('block_filescan_files');
-   
-   
+
+
    		$field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'pagecount');
 
         // Conditionally launch add field id.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         } else {
-        	$dbman->change_field_type($table, $field);	
+        	$dbman->change_field_type($table, $field);
         }
-   
+
    		// Remove ocr status field
   	 	$field = new xmldb_field('ocrstatus');
        // Conditionally launch add field id.
         if ($dbman->field_exists($table, $field)) {
             $dbman->drop_field($table, $field);
-        } 
-   
-   
+        }
+
+
 		$field = new xmldb_field('checked', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'status');
 
         // Conditionally launch add field id.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         } else {
-        	$dbman->change_field_type($table, $field);	
+        	$dbman->change_field_type($table, $field);
         }
-   
-        
+
+
  		$field = new xmldb_field('hastext', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'checked');
 
         // Conditionally launch add field id.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         } else {
-        	$dbman->change_field_type($table, $field);	
+        	$dbman->change_field_type($table, $field);
         }
 
   		$field = new xmldb_field('hastitle', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'hastext');
@@ -71,7 +71,7 @@ function xmldb_block_filescan_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         } else {
-        	$dbman->change_field_type($table, $field);	
+        	$dbman->change_field_type($table, $field);
         }
 
         $field = new xmldb_field('hasoutline', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'hastitle');
@@ -80,7 +80,7 @@ function xmldb_block_filescan_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         } else {
-        	$dbman->change_field_type($table, $field);	
+        	$dbman->change_field_type($table, $field);
         }
 
         $field = new xmldb_field('haslanguage', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'hasoutline');
@@ -89,7 +89,7 @@ function xmldb_block_filescan_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         } else {
-        	$dbman->change_field_type($table, $field);	
+        	$dbman->change_field_type($table, $field);
         }
 
 
@@ -159,6 +159,20 @@ function xmldb_block_filescan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017101318, 'error', 'filescan');
     }
 
+    if ($oldversion < 2018073100) {
+        // Update settings names to use full frankenstyle plugin name.
+        $settings = array(
+            'apiurl',
+            'numfilespercron',
+            'maxretries'
+        );
+
+        foreach ($settings as $name) {
+            $value = get_config('filescan', $name);
+            set_config($name, $value, 'block_filescan');
+            unset_config($name, 'filescan');
+        }
+    }
+
     return true;
-} 
- 
+}
