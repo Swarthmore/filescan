@@ -1,32 +1,40 @@
 <?php
 
+// enable php errors
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 error_reporting(-1);
 
 class block_filescan extends block_base {
-	
+
 	public function init() {
 		$this->title = get_string('filescan', 'block_filescan');
 	}
-	
+
+	// This function controls where the block is able to be viewed within moodle
 	public function applicable_formats() {
-		// sitewide			dashboard				per course
-		return array('site' => true, 'my' => true, 'course' => true);
+		return [
+		  'site'    => true,
+      'my'      => true,
+      'course'  => true
+    ];
 	}
-	
+
 	// when you enter a course, this pulls the files for the selected course
 	// there's a caching mechanism for this -- this is only called when there's
 	// not a cache summary in place
 	
 	private function get_course_files() {
+
+		global $COURSE;
+		global $CFG;
+		global $DB;
+
+    require_once($CFG->dirroot . '/course/lib.php');
 		
-		global $COURSE, $CFG, $DB;
-		require_once($CFG->dirroot . '/course/lib.php');
-		
-		$cms = get_fast_modinfo($COURSE)->get_cms();
-		$file_list = array();	// Array containing detailed file info
-		$fs = get_file_storage();
+		$cms        = get_fast_modinfo($COURSE)->get_cms();
+		$file_list  = array();	                                  // Array containing detailed file info
+		$fs         = get_file_storage();
 		
 		// Loop through each module in the course looking for files
 		foreach ($cms as $cm) {
@@ -35,29 +43,25 @@ class block_filescan extends block_base {
 				continue;
 			}
 			
-			$cmtype = $cm->modname;
-			$module_name = $cm->name;
+			$cmtype         = $cm->modname;
+			$module_name    = $cm->name;
+			$section_no     = $cm->get_course_module_record(true)->sectionnum;
+			$sectionName    = get_section_name($COURSE->id, $section_no);
 			
-			$section_no = $cm->get_course_module_record(true)->sectionnum;
-			$sectionName = get_section_name($COURSE->id, $section_no);
-			
-			// if resource is a folder
+			// Check if the resource is a folder. If it is a folder, then get all files with a mime type
+      // of application/pdf and push them to $file_list
+      // If the resourse is a file, then get all pdf files in the "file" resource
 			if ($cmtype === 'folder') {
 				$cmfiles = $fs->get_area_files($cm->context->id, 'mod_folder', 'content', false, 'timemodified', false);
-				
-				// Loop through all files in a folder
 				foreach ($cmfiles as $f) {
 					if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
-						array_push($file_list, $f->get_contenthash());					
+						array_push($file_list, $f->get_contenthash());
 					}
 				}
-				
-			} else if ($cmtype === 'resource') { // if resource is a file.
-				
-				// Get files in "file" resource 
+			} else if ($cmtype === 'resource') { // Check if the resource is a file
+
+				// Get files in "file" resource
 				$files = $fs->get_area_files($cm->context->id, 'mod_resource', 'content', false, 'timemodified', false);
-				
-				// Loop through each file
 				foreach ($files as $f) {
 					if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
 						array_push($file_list, $f->get_contenthash());						
@@ -65,15 +69,15 @@ class block_filescan extends block_base {
 				}
 			}	
 		}
-		
 		return $file_list;
-		
 	}
-	
-	
+
 	private function generate_summary($courseid) {
 		global $DB;
 		
+		// TODO: Do this for the admin "overall" view
+		// $allfiles = $this->get_all_files();
+
 		$filelist = $this->get_course_files();
 		$accessible = 0;
 		$partially_accessible = 0;
@@ -123,13 +127,17 @@ class block_filescan extends block_base {
 
 	public function get_content() {
 		
-		global $COURSE, $CFG, $DB;
+		global $COURSE;
+    global $CFG;
+		global $DB;
+
 		require_once($CFG->dirroot . '/course/lib.php');
 		
 		$systemcontext = context_system::instance();
 
 		var_dump($systemcontext);
-		
+		echo '<h1>test</h1>';
+
 		$context = context_course::instance($COURSE->id);
 		$canview = has_capability('block/filescan:viewpages', $context);
 		
@@ -163,15 +171,15 @@ class block_filescan extends block_base {
 		}
 		
 		$this->content         =  new stdClass;
-		$this->content->text   = '<h4>Summary</h4>' . $filescan_summary;
+		$this->content->text   = '<h4>Summary</h4>' . $filescan_summary . print_r($this->page, TRUE);
 		
 		$url = new moodle_url('/blocks/filescan/view.php', array('courseid' => $COURSE->id));
 		$this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
 		
 		return $this->content;
 	}
-	
-	// Tell Moodle there is a global config
+
+	// Tell Moodle there is a configuration file in settings.php (default)
 	function has_config() {return true;}
 
 }

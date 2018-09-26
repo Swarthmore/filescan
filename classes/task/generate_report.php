@@ -2,10 +2,8 @@
 
 namespace block_filescan\task;
 
-
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
-
 
 /* Per https://docs.moodle.org/dev/Task_API#Failures
 	A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network 
@@ -16,23 +14,12 @@ error_reporting(E_ALL);
 	Will throw exceptions when fatal errors occur
 */
 
-
-
-
-
- 
-
 class generate_report extends \core\task\scheduled_task {
-
-
 
 	public function get_name() {
 		// Shown in admin screens
 		return get_string('reportgeneration_task', 'block_filescan');
 	}
-
-
-
 
 	public function execute() {
 
