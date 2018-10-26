@@ -15,6 +15,7 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 }
 
 require_login($course);
+
 $PAGE->set_url('/block/filescan/view.php', array('id' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_heading(get_string('viewdetailspage', 'block_filescan'));
@@ -34,18 +35,18 @@ if 	(!$canview) {
 }
 
 // Clear any existing cache data for this course 
-$cache = cache::make('block_filescan', 'filescan');
-$filescan_cache = $cache->delete($COURSE->id); 		
+$cache 						= cache::make('block_filescan', 'filescan');
+$filescan_cache 	= $cache->delete($COURSE->id);
 
 // Determine course metadata
-$coursename = $COURSE->fullname;
-$courseshortname = $COURSE->shortname;
-$courseurl = course_get_url($COURSE);
+$coursename 			= $COURSE->fullname;
+$courseshortname 	= $COURSE->shortname;
+$courseurl 				= course_get_url($COURSE);
 
-$filenames = "";
-$output_html = "";
-$file_listing = [];
-$cmid = null;
+$filenames 			= "";
+$output_html	  = "";
+$file_listing   = [];
+$cmid 				  = null;
 
 // Get any existing data from db
 $cms = ($cmid === null) ? get_fast_modinfo($COURSE)->get_cms() : array(get_fast_modinfo($COURSE)->get_cm($cmid));
@@ -59,11 +60,11 @@ foreach ($cms as $cm) {
 		continue;
 	}
 	
-	$cmtype = $cm->modname;
-	$module_name = $cm->name;
+	$cmtype 			= $cm->modname;
+	$module_name 	= $cm->name;
 	
-	$section_no = $cm->get_course_module_record(true)->sectionnum;
-	$sectionName = get_section_name($COURSE->id, $section_no);
+	$section_no 	= $cm->get_course_module_record(true)->sectionnum;
+	$sectionName 	= get_section_name($COURSE->id, $section_no);
 	
 	// if resource is a folder
 	if ($cmtype === 'folder') {
@@ -76,6 +77,7 @@ foreach ($cms as $cm) {
 				$file_item = create_file_item($DB, $cm, $cmtype, $module_name, $sectionName, $section_no, $f);
 				array_push($file_list, $file_item);					
 			}
+
 		}
 		
 	} else if ($cmtype === 'resource') { // if resource is a file.
@@ -88,7 +90,7 @@ foreach ($cms as $cm) {
 			if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
 				//$status = check_db_for_file($f->get_contenthash(), $f);
 				$file_item = create_file_item($DB, $cm, $cmtype, $module_name, $sectionName, $section_no, $f);
-				array_push($file_list, $file_item);						
+				array_push($file_list, $file_item);
 			}
 		}
 	}	
@@ -96,10 +98,10 @@ foreach ($cms as $cm) {
 
 // Loop through PDF listing to format the output into a table
 
-$success_icon = '<i class="fa fa-check text-success fa-fw" aria-hidden="true"></i>';
-$unknown_icon = '<i class="fa fa-question text-info fa-fw" aria-hidden="true"></i>';
-$partial_success_icon = '<i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i>';
-$fail_icon = '<i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i>';
+$success_icon 				= '<i class="fa fa-check text-success fa-fw" aria-hidden="true"></i>';
+$unknown_icon 				= '<i class="fa fa-question text-info fa-fw" aria-hidden="true"></i>';
+$partial_success_icon 		= '<i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i>';
+$fail_icon 					= '<i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i>';
 
 $previous_section_number = "";
 
@@ -107,7 +109,7 @@ $output_html .= "<table class='filescan-details table table-striped table-conden
 
 function get_help_icon($header, $link, $title) {
 	global $OUTPUT;
-	$o = "<a href='$link' title='$title' aria-label='$header: $title' target='_blank'>";
+	$o  = "<a href='$link' title='$title' aria-label='$header: $title' target='_blank'>";
 	$o .= "<img class='icon iconhelp' alt='' aria-hidden='true' src='" . $OUTPUT->image_url('help') . "'></a>";
 	return $o;
 }
@@ -115,11 +117,12 @@ function get_help_icon($header, $link, $title) {
 function get_table_header($id) {
 	// Params.
 	$header = get_string("table:{$id}_header", 'block_filescan');
-	$link = get_config('block_filescan', $id . '_help');
-	$title = get_string('helptitle', 'block_filescan');
+	$link 	= get_config('block_filescan', $id . '_help');
+	$title 	= get_string('helptitle', 'block_filescan');
+
 	// Output.
 	$o = "<th class='fs-table-header fs-table-header-$id'>$header";
-	if (! empty($link)) {
+	if (!empty($link)) {
 		$o .= get_help_icon($header, $link, $title);
 	}
 	$o .= '</th>';
@@ -141,73 +144,73 @@ foreach ($file_list as $f) {
 	
 	switch($f['status']['hastext']) {
 		case -1:
-		$hastext = "&#10071";
-		break;			
+			$hastext = "&#10071";
+			break;
 		case "1":
-		$hastext = $success_icon;		// Yes
-		break;			
+			$hastext = $success_icon;		// Yes
+			break;
 		case "0":
-		$hastext = $fail_icon; 	// No
-		break;			
+			$hastext = $fail_icon; 	// No
+			break;
 		default:
-		$hastext = $unknown_icon;	// Unknown
+			$hastext = $unknown_icon;	// Unknown
 	}
 	
 	switch($f['status']['hastitle']) {
 		case -1:
-		$hastitle = "&#10071";
-		break;			
+			$hastitle = "&#10071";
+			break;
 		case "1":
-		$hastitle = $success_icon;		// Yes
-		break;			
+			$hastitle = $success_icon;		// Yes
+			break;
 		case "0":
-		$hastitle = $fail_icon; 	// No
-		break;			
+			$hastitle = $fail_icon; 	// No
+			break;
 		default:
-		$hastitle = $unknown_icon;	// Unknown
+			$hastitle = $unknown_icon;	// Unknown
 	}
 	
 	switch($f['status']['haslanguage']) {
 		case -1:
-		$haslanguage = "&#10071";
-		break;			
+			$haslanguage = "&#10071";
+			break;
 		case "1":
-		$haslanguage = $success_icon;		// Yes
-		break;			
+			$haslanguage = $success_icon;		// Yes
+			break;
 		case "0":
-		$haslanguage = $fail_icon; 	// No
-		break;			
+			$haslanguage = $fail_icon; 	// No
+			break;
 		default:
-		$haslanguage = $unknown_icon;	// Unknown
+			$haslanguage = $unknown_icon;	// Unknown
 	}		
 	
 	switch($f['status']['hasoutline']) {
 		case -1:
-		$hasoutline = "&#10071";
-		break;			
+			$hasoutline = "&#10071";
+			break;
 		case "1":
-		$hasoutline = $success_icon;		// Yes
-		break;			
+			$hasoutline = $success_icon;		// Yes
+			break;
 		case "0":
-		$hasoutline = $fail_icon; 	// No
-		break;			
+			$hasoutline = $fail_icon; 	// No
+			break;
 		default:
-		$hasoutline = $unknown_icon;	// Unknown
+			$hasoutline = $unknown_icon;	// Unknown
 	}	
 	
 	# Determine overall status
 	switch($f['status']['status']) {
 		case "fail":
-		$overallstatus = $fail_icon; 	// Bad
-		break;			
+			$overallstatus = $fail_icon; 	// Bad
+			break;
 		case "pass":
-		$overallstatus = $success_icon;		// Good 
-		break;			
+			$overallstatus = $success_icon;		// Good
+			break;
 		case "check":
-		$overallstatus = $partial_success_icon; 	// check
-		break;			
+			$overallstatus = $partial_success_icon; 	// check
+			break;
 		default:
-		$overallstatus = $unknown_icon;	// Unknown
+			$overallstatus = $unknown_icon;	// Unknown
 	}	
 	
 	

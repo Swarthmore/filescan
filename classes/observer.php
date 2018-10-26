@@ -27,12 +27,12 @@ class block_filescan_observer {
        		(isset($event_data["eventname"]) && isset($event_data["other"]) && isset($event_data["other"]["modulename"]) && $event_data["eventname"]=="\\core\\event\\course_module_created" && $event_data["other"]["modulename"]=="folder") ||
        		(isset($event_data["eventname"]) && isset($event_data["other"]) && isset($event_data["other"]["modulename"]) && $event_data["eventname"]=="\\core\\event\\course_module_deleted" && $event_data["other"]["modulename"]=="resource") ||
        		(isset($event_data["eventname"]) && isset($event_data["other"]) && isset($event_data["other"]["modulename"]) && $event_data["eventname"]=="\\core\\event\\course_module_created" && $event_data["other"]["modulename"]=="resource") ||
-			(isset($event_data["eventname"]) && isset($event_data["other"]) && isset($event_data["other"]["modulename"]) && $event_data["eventname"]=="\\core\\event\\course_module_updated" && $event_data["other"]["modulename"]=="resource") )
- 		{	
- 			// Clear any existing cache data for this course 
-			$cache = cache::make('block_filescan', 'filescan');
-			$filescan_cache = $cache->delete($event_data["courseid"]); 	
-		}   
+			    (isset($event_data["eventname"]) && isset($event_data["other"]) && isset($event_data["other"]["modulename"]) && $event_data["eventname"]=="\\core\\event\\course_module_updated" && $event_data["other"]["modulename"]=="resource") )
+          {
+            // Clear any existing cache data for this course
+            $cache = cache::make('block_filescan', 'filescan');
+            $filescan_cache = $cache->delete($event_data["courseid"]);
+          }
        	
     } 
 

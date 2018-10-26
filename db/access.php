@@ -59,5 +59,15 @@
             'manager' => CAP_ALLOW
         ),
         'clonepermissionsfrom' => 'moodle/course:update',
-    )   
+    ),
+
+      'block/filescan:viewadminreport' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => [
+          'editingteacher' => CAP_ALLOW,
+          'manager' => CAP_ALLOW
+        ]
+      ]
+
 );

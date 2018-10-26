@@ -10,9 +10,12 @@ $string['filescan:myaddinstance'] = 'Add a new File Scan block to the Moodle Das
 $string['filescan:viewpages'] = 'View File Scan';
 $string['filescan:managepages'] = 'Manage File Scan';
 $string['filescan:scan'] = 'Request a file scan';
+$string['filescan:canviewadmin'] = 'View Access Admin Report';
+$string['filescan:viewadminreport'] = 'View Access Admin Report';
 
 // Navigation and notification
 $string['viewdetailspage'] = 'View File Details';
+$string['adminsonly'] = 'Access Admin Dashboard';
 $string['summaryview'] = 'File scan summary';
 $string['nofiles'] = 'There are no files to scan';
 $string['cannot_view'] = 'Not allowed to view page';
@@ -60,3 +63,4 @@ $string['filescan_text_check_help_desc'] = "Text Check Help Link";
 $string['filescan_text_check_help_subdesc'] = "Link to help documentation for the text check";
 $string['filescan_title_check_help_desc'] = "Title Check Help Link";
 $string['filescan_title_check_help_subdesc'] = "Link to help documentation for the title check";
+
