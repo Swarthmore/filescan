@@ -1,21 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="80558861-1ca5-49de-9b9b-6a546760030e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/amd/src/charts.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/block_filescan.php" beforeDir="false" afterPath="$PROJECT_DIR$/block_filescan.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/observer.php" beforeDir="false" afterPath="$PROJECT_DIR$/classes/observer.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/access.php" beforeDir="false" afterPath="$PROJECT_DIR$/db/access.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lang/en/block_filescan.php" beforeDir="false" afterPath="$PROJECT_DIR$/lang/en/block_filescan.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/version.php" beforeDir="false" afterPath="$PROJECT_DIR$/version.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/view.php" beforeDir="false" afterPath="$PROJECT_DIR$/view.php" afterDir="false" />
-    </list>
+    <list default="true" id="80558861-1ca5-49de-9b9b-6a546760030e" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -263,9 +249,10 @@
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
     </include_path>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="1">
+    <option name="x" value="-1" />
     <option name="y" value="23" />
-    <option name="width" value="840" />
+    <option name="width" value="1680" />
     <option name="height" value="1027" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
@@ -380,12 +367,12 @@
       <workItem from="1540490900605" duration="5894000" />
       <workItem from="1540566383919" duration="1028000" />
       <workItem from="1540567809484" duration="3410000" />
-      <workItem from="1540579219282" duration="5870000" />
+      <workItem from="1540579219282" duration="5992000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="83631000" />
+    <option name="totallyTimeSpent" value="83753000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
