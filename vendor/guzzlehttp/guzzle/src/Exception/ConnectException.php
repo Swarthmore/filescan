@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp\Exception;
 
 use Psr\Http\Message\RequestInterface;
@@ -10,28 +11,29 @@ use Psr\Http\Message\RequestInterface;
  */
 class ConnectException extends RequestException
 {
-    public function __construct(
-        $message,
-        RequestInterface $request,
-        \Exception $previous = null,
-        array $handlerContext = []
-    ) {
-        parent::__construct($message, $request, null, $previous, $handlerContext);
-    }
+  public function __construct(
+    $message,
+    RequestInterface $request,
+    \Exception $previous = null,
+    array $handlerContext = []
+  )
+  {
+    parent::__construct($message, $request, null, $previous, $handlerContext);
+  }
 
-    /**
-     * @return null
-     */
-    public function getResponse()
-    {
-        return null;
-    }
+  /**
+   * @return null
+   */
+  public function getResponse()
+  {
+    return null;
+  }
 
-    /**
-     * @return bool
-     */
-    public function hasResponse()
-    {
-        return false;
-    }
+  /**
+   * @return bool
+   */
+  public function hasResponse()
+  {
+    return false;
+  }
 }

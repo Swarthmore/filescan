@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp\Psr7;
 
 use InvalidArgumentException;
@@ -11,132 +12,133 @@ use Psr\Http\Message\UriInterface;
  */
 class Request implements RequestInterface
 {
-    use MessageTrait;
+  use MessageTrait;
 
-    /** @var string */
-    private $method;
+  /** @var string */
+  private $method;
 
-    /** @var null|string */
-    private $requestTarget;
+  /** @var null|string */
+  private $requestTarget;
 
-    /** @var UriInterface */
-    private $uri;
+  /** @var UriInterface */
+  private $uri;
 
-    /**
-     * @param string                               $method  HTTP method
-     * @param string|UriInterface                  $uri     URI
-     * @param array                                $headers Request headers
-     * @param string|null|resource|StreamInterface $body    Request body
-     * @param string                               $version Protocol version
-     */
-    public function __construct(
-        $method,
-        $uri,
-        array $headers = [],
-        $body = null,
-        $version = '1.1'
-    ) {
-        if (!($uri instanceof UriInterface)) {
-            $uri = new Uri($uri);
-        }
-
-        $this->method = strtoupper($method);
-        $this->uri = $uri;
-        $this->setHeaders($headers);
-        $this->protocol = $version;
-
-        if (!$this->hasHeader('Host')) {
-            $this->updateHostFromUri();
-        }
-
-        if ($body !== '' && $body !== null) {
-            $this->stream = stream_for($body);
-        }
+  /**
+   * @param string $method HTTP method
+   * @param string|UriInterface $uri URI
+   * @param array $headers Request headers
+   * @param string|null|resource|StreamInterface $body Request body
+   * @param string $version Protocol version
+   */
+  public function __construct(
+    $method,
+    $uri,
+    array $headers = [],
+    $body = null,
+    $version = '1.1'
+  )
+  {
+    if (!($uri instanceof UriInterface)) {
+      $uri = new Uri($uri);
     }
 
-    public function getRequestTarget()
-    {
-        if ($this->requestTarget !== null) {
-            return $this->requestTarget;
-        }
+    $this->method = strtoupper($method);
+    $this->uri = $uri;
+    $this->setHeaders($headers);
+    $this->protocol = $version;
 
-        $target = $this->uri->getPath();
-        if ($target == '') {
-            $target = '/';
-        }
-        if ($this->uri->getQuery() != '') {
-            $target .= '?' . $this->uri->getQuery();
-        }
-
-        return $target;
+    if (!$this->hasHeader('Host')) {
+      $this->updateHostFromUri();
     }
 
-    public function withRequestTarget($requestTarget)
-    {
-        if (preg_match('#\s#', $requestTarget)) {
-            throw new InvalidArgumentException(
-                'Invalid request target provided; cannot contain whitespace'
-            );
-        }
+    if ($body !== '' && $body !== null) {
+      $this->stream = stream_for($body);
+    }
+  }
 
-        $new = clone $this;
-        $new->requestTarget = $requestTarget;
-        return $new;
+  public function getRequestTarget()
+  {
+    if ($this->requestTarget !== null) {
+      return $this->requestTarget;
     }
 
-    public function getMethod()
-    {
-        return $this->method;
+    $target = $this->uri->getPath();
+    if ($target == '') {
+      $target = '/';
+    }
+    if ($this->uri->getQuery() != '') {
+      $target .= '?' . $this->uri->getQuery();
     }
 
-    public function withMethod($method)
-    {
-        $new = clone $this;
-        $new->method = strtoupper($method);
-        return $new;
+    return $target;
+  }
+
+  public function withRequestTarget($requestTarget)
+  {
+    if (preg_match('#\s#', $requestTarget)) {
+      throw new InvalidArgumentException(
+        'Invalid request target provided; cannot contain whitespace'
+      );
     }
 
-    public function getUri()
-    {
-        return $this->uri;
+    $new = clone $this;
+    $new->requestTarget = $requestTarget;
+    return $new;
+  }
+
+  public function getMethod()
+  {
+    return $this->method;
+  }
+
+  public function withMethod($method)
+  {
+    $new = clone $this;
+    $new->method = strtoupper($method);
+    return $new;
+  }
+
+  public function getUri()
+  {
+    return $this->uri;
+  }
+
+  public function withUri(UriInterface $uri, $preserveHost = false)
+  {
+    if ($uri === $this->uri) {
+      return $this;
     }
 
-    public function withUri(UriInterface $uri, $preserveHost = false)
-    {
-        if ($uri === $this->uri) {
-            return $this;
-        }
+    $new = clone $this;
+    $new->uri = $uri;
 
-        $new = clone $this;
-        $new->uri = $uri;
-
-        if (!$preserveHost) {
-            $new->updateHostFromUri();
-        }
-
-        return $new;
+    if (!$preserveHost) {
+      $new->updateHostFromUri();
     }
 
-    private function updateHostFromUri()
-    {
-        $host = $this->uri->getHost();
+    return $new;
+  }
 
-        if ($host == '') {
-            return;
-        }
+  private function updateHostFromUri()
+  {
+    $host = $this->uri->getHost();
 
-        if (($port = $this->uri->getPort()) !== null) {
-            $host .= ':' . $port;
-        }
-
-        if (isset($this->headerNames['host'])) {
-            $header = $this->headerNames['host'];
-        } else {
-            $header = 'Host';
-            $this->headerNames['host'] = 'Host';
-        }
-        // Ensure Host is the first header.
-        // See: http://tools.ietf.org/html/rfc7230#section-5.4
-        $this->headers = [$header => [$host]] + $this->headers;
+    if ($host == '') {
+      return;
     }
+
+    if (($port = $this->uri->getPort()) !== null) {
+      $host .= ':' . $port;
+    }
+
+    if (isset($this->headerNames['host'])) {
+      $header = $this->headerNames['host'];
+    } else {
+      $header = 'Host';
+      $this->headerNames['host'] = 'Host';
+    }
+    // Ensure Host is the first header.
+    // See: http://tools.ietf.org/html/rfc7230#section-5.4
+    $this->headers = [$header => [$host]] + $this->headers;
+  }
 }

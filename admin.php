@@ -1,47 +1,42 @@
 <?php
 
-const env = 'development';
+require_once('../../config.php'); // global config
 
-if (env === 'development') {
-    ini_set('display_errors',1);
-    ini_set('display_startup_errors',1);
-    ini_set('memory_limit', '1024M');
-    error_reporting(-1);
+$config = include_once('config/config.php'); // plugin config
+
+// if config indicates development mode, then allow errors to be thrown to the dom
+if ($config['env'] === 'development') {
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  ini_set('memory_limit', '1024M');
+  error_reporting(-1);
 }
-
-require_once('../../config.php');
 
 global $OUTPUT;
 global $PAGE;
 
-$colors = array(
-  'pass'  => 'rgb(76, 175, 80, 1)',
-  'check' => 'rgb(255, 193, 7, 1)',
-  'error' => 'rgb(244, 67, 54, 1)',
-  'fail'  => 'rgb(255, 87, 34, 1)'
-);
-
-function has($option) {
+function has($option)
+{
   global $DB;
   $table = 'block_filescan_files';
 
   switch ($option) {
-      case 'text':
-        return $DB->count_records($table, ['hastext' => 1]);
-        break;
-      case 'title':
-        return $DB->count_records($table, ['hastitle' => 1]);
-        break;
-      case 'outline':
-        return $DB->count_records($table, ['hasoutline' => 1]);
-        break;
+    case 'text':
+      return $DB->count_records($table, ['hastext' => 1]);
+      break;
+    case 'title':
+      return $DB->count_records($table, ['hastitle' => 1]);
+      break;
+    case 'outline':
+      return $DB->count_records($table, ['hasoutline' => 1]);
+      break;
     case 'language':
-        return $DB->count_records($table, ['haslanguage' => 1]);
-        break;
+      return $DB->count_records($table, ['haslanguage' => 1]);
+      break;
     default:
       return 0;
       break;
-    }
+  }
 }
 
 // This function will generate a report encapsulating all files within the plugin table
@@ -53,100 +48,127 @@ function generateOverallReport($status)
 
   switch ($status) {
     case 'passing':
-      return $DB->count_records($table, [ 'status'=> 'pass' ]);
+      return $DB->count_records($table, ['status' => 'pass']);
       break;
     case 'fails':
-      return $DB->count_records($table, [ 'status'=> 'fail' ]);
+      return $DB->count_records($table, ['status' => 'fail']);
       break;
     case 'errors':
-      return $DB->count_records($table, [ 'status'=> 'error' ]);
+      return $DB->count_records($table, ['status' => 'error']);
       break;
     case 'checks':
-      return $DB->count_records($table, [ 'status'=> 'check' ]);
+      return $DB->count_records($table, ['status' => 'check']);
       break;
-    default: break;
+    default:
+      break;
   }
-
 }
 
-function getFiles() {
+function getFiles()
+{
   global $DB;
   $table = 'block_filescan_files';
   return $DB->get_records_list($table, 'status', array('check', 'fail', 'error'));
 }
 
 $PAGE->set_url('/block/filescan/admin.php', null);
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('base');
 $PAGE->set_heading(get_string('adminsonly', 'block_filescan'));
 
-// Define data to pass to our chart function
-$params = array(
-  'passing'     => generateOverallReport('passing'),
-  'checks'      => generateOverallReport('checks'),
-  'errors'      => generateOverallReport('errors'),
-  'failures'    => generateOverallReport('fails'),
-  'hasText'     => has('text'),
-  'hasTitle'    => has('title'),
-  'hasOutline'  => has('outline'),
-  'hasLanguage' => has('language')
-);
+$token = array('token' => $config['token']);
 
-// Call our javascript modules
-
-// todo: moodle call to get user's token
-$token = '';
-
-$PAGE->requires->js_call_amd('block_filescan/charts', 'draw', $params);
-$PAGE->requires->js_call_amd('block_filescan/mog', 'make', $token);
+$PAGE->requires->js_call_amd('block_filescan/dt', 'make', $token);
 
 echo $OUTPUT->header();
 
-echo '<h2>Totals</h2>';
-echo '<h5>Passing: '  . generateOverallReport('passing') . '</h5>';
-echo '<h5>Checks: '   . generateOverallReport('checks' ) . '</h5>';
-echo '<h5>Errors: '   . generateOverallReport('errors' ) . '</h5>';
-echo '<h5>Fails: '    . generateOverallReport('fails'  ) . '</h5>';
+// TODO: make this a class function
+function getTotalRecords($table)
+{
+  global $DB;
+  return $DB->count_records($table, $conditions = null);
+}
 
-// TODO: Write this with HTML Writer
-echo '
-  <div id="app">
-    <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="card mx-2 my-3">
-              <div id="c1" class="card-body"></div>
-            </div>
-          </div>
-          
-          <div class="col-md-6">
-            <div class="card mx-2 my-3">
-              <div id="c2" class="card-body"></div>
-            </div>
-          </div>
-          
-        </div>
-    </div>
-  </div>
-';
+// TODO: move all this output junk into a function or class
+// generate the dashboard totals
+$checks         = array('title', 'text', 'outline', 'language');
+$totalRecords   = getTotalRecords('block_filescan_files');
 
+// use this variable to scale the bars under the displayed percentages
+$scale = array(
+  'x' => 1.5,
+  'y' => 1.0
+);
 
-echo '
-<table class="table table-striped table-bordered" id="mog">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Pages</th>
-            <th>Status</th>
-            <th>Checked</th>
-            <th>Text</th>
-            <th>Title</th>
-            <th>Outline</th>
-            <th>Language</th>
-            <th>Checked On</th>
-            <th>Courses</th>
-        </tr>
-    </thead>
-</table>
-';
+$progressBar = array(
+  'width'   => 100 * $scale['x'],
+  'height'  => 16  * $scale['y']
+);
+
+// generate the title, text, outline and language card row
+echo html_writer::start_tag('div', array('class' => 'card-group'), null);
+
+foreach ($checks as $check) {
+  $fileHas    = has($check); // do this so we dont kill the db
+  $completed  = round($fileHas / $totalRecords * 100,2);
+
+  $fillArray = array(
+    'style' => 'width: ' . $completed * $scale['x'] . 'px; height: ' . $progressBar['height'] . 'px;',
+    'class' => 'bg-success'
+  );
+
+  echo html_writer::start_tag('div', array('class' => 'card text-white bg-dark m-3 p-3'), null);
+  echo html_writer::start_tag('div', array('class' => 'card-body'), null);
+  echo html_writer::tag('p', ucfirst($check), array('class' => 'lead'));
+
+  echo html_writer::tag('h3', $completed . '%', array('class' => 'text-white display-4'));
+  echo html_writer::start_tag('div', array('style' => 'width: ' . $progressBar['width'] . 'px;', 'class' => 'bg-danger'), null);
+  echo html_writer::tag('div', null, $fillArray);
+
+  echo html_writer::end_tag('div');
+
+  echo html_writer::tag('p', $fileHas . ' / ' . $totalRecords, array('class' => 'text-muted'));
+
+  echo html_writer::end_tag('div');
+  echo html_writer::end_tag('div');
+}
+
+echo html_writer::end_tag('div');
+
+// Generate the middle content area
+echo html_writer::start_tag('div', array('class' => 'card-group'), null);
+
+//card 1
+echo html_writer::start_tag('div', array('class' => 'card bg-dark text-white m-3 p-3'), null);
+echo html_writer::start_tag('div', array('class' => 'card-body'), null);
+echo html_writer::tag('h1', 'What goes here? It is a mystery', array('class' => 'display-3'));
+echo html_writer::end_tag('div');
+echo html_writer::end_tag('div');
+
+// card 2
+echo html_writer::start_tag('div', array('class' => 'card bg-dark text-white m-3 p-3 text-center'), null);
+echo html_writer::start_tag('div', array('class' => 'card-body'), null);
+echo html_writer::tag('p', 'Total Passing Files', array('class' => 'lead'));
+echo html_writer::tag('h1', generateOverallReport('passing'), array('class' => 'display-1'));
+echo html_writer::end_tag('div');
+echo html_writer::end_tag('div');
+
+echo html_writer::end_tag('div');
+
+// Generate the datatable
+$columns = array('Id', 'Pages', 'Status', 'Checked', 'Text', 'Title', 'Outline', 'Language', 'Last Checked', 'Courses', 'Path');
+
+echo html_writer::start_tag('div', array('class' => 'table-responsive'), null);
+echo html_writer::start_tag('table', array('id' => 'dt', 'class' => 'table table-dark text-white table-sm', 'style' => 'width: 100%;'), null);
+echo html_writer::start_tag('thead', array('class' => 'thead-dark'));
+echo html_writer::start_tag('tr', null, null);
+
+foreach($columns as $column) {
+  echo html_writer::tag('th', $column, array('score' => 'col'));
+}
+
+echo html_writer::end_tag('tr');
+echo html_writer::end_tag('thead');
+echo html_writer::end_tag('table');
+echo html_writer::end_tag('div');
 
 echo $OUTPUT->footer();

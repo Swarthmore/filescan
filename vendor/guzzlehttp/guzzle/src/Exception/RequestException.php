@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp\Exception;
 
 use Psr\Http\Message\RequestInterface;
@@ -11,200 +12,202 @@ use Psr\Http\Message\UriInterface;
  */
 class RequestException extends TransferException
 {
-    /** @var RequestInterface */
-    private $request;
+  /** @var RequestInterface */
+  private $request;
 
-    /** @var ResponseInterface */
-    private $response;
+  /** @var ResponseInterface */
+  private $response;
 
-    /** @var array */
-    private $handlerContext;
+  /** @var array */
+  private $handlerContext;
 
-    public function __construct(
-        $message,
-        RequestInterface $request,
-        ResponseInterface $response = null,
-        \Exception $previous = null,
-        array $handlerContext = []
-    ) {
-        // Set the code of the exception if the response is set and not future.
-        $code = $response && !($response instanceof PromiseInterface)
-            ? $response->getStatusCode()
-            : 0;
-        parent::__construct($message, $code, $previous);
-        $this->request = $request;
-        $this->response = $response;
-        $this->handlerContext = $handlerContext;
+  public function __construct(
+    $message,
+    RequestInterface $request,
+    ResponseInterface $response = null,
+    \Exception $previous = null,
+    array $handlerContext = []
+  )
+  {
+    // Set the code of the exception if the response is set and not future.
+    $code = $response && !($response instanceof PromiseInterface)
+      ? $response->getStatusCode()
+      : 0;
+    parent::__construct($message, $code, $previous);
+    $this->request = $request;
+    $this->response = $response;
+    $this->handlerContext = $handlerContext;
+  }
+
+  /**
+   * Wrap non-RequestExceptions with a RequestException
+   *
+   * @param RequestInterface $request
+   * @param \Exception $e
+   *
+   * @return RequestException
+   */
+  public static function wrapException(RequestInterface $request, \Exception $e)
+  {
+    return $e instanceof RequestException
+      ? $e
+      : new RequestException($e->getMessage(), $request, null, $e);
+  }
+
+  /**
+   * Factory method to create a new exception with a normalized error message
+   *
+   * @param RequestInterface $request Request
+   * @param ResponseInterface $response Response received
+   * @param \Exception $previous Previous exception
+   * @param array $ctx Optional handler context.
+   *
+   * @return self
+   */
+  public static function create(
+    RequestInterface $request,
+    ResponseInterface $response = null,
+    \Exception $previous = null,
+    array $ctx = []
+  )
+  {
+    if (!$response) {
+      return new self(
+        'Error completing request',
+        $request,
+        null,
+        $previous,
+        $ctx
+      );
     }
 
-    /**
-     * Wrap non-RequestExceptions with a RequestException
-     *
-     * @param RequestInterface $request
-     * @param \Exception       $e
-     *
-     * @return RequestException
-     */
-    public static function wrapException(RequestInterface $request, \Exception $e)
-    {
-        return $e instanceof RequestException
-            ? $e
-            : new RequestException($e->getMessage(), $request, null, $e);
+    $level = (int)floor($response->getStatusCode() / 100);
+    if ($level === 4) {
+      $label = 'Client error';
+      $className = __NAMESPACE__ . '\\ClientException';
+    } elseif ($level === 5) {
+      $label = 'Server error';
+      $className = __NAMESPACE__ . '\\ServerException';
+    } else {
+      $label = 'Unsuccessful request';
+      $className = __CLASS__;
     }
 
-    /**
-     * Factory method to create a new exception with a normalized error message
-     *
-     * @param RequestInterface  $request  Request
-     * @param ResponseInterface $response Response received
-     * @param \Exception        $previous Previous exception
-     * @param array             $ctx      Optional handler context.
-     *
-     * @return self
-     */
-    public static function create(
-        RequestInterface $request,
-        ResponseInterface $response = null,
-        \Exception $previous = null,
-        array $ctx = []
-    ) {
-        if (!$response) {
-            return new self(
-                'Error completing request',
-                $request,
-                null,
-                $previous,
-                $ctx
-            );
-        }
+    $uri = $request->getUri();
+    $uri = static::obfuscateUri($uri);
 
-        $level = (int) floor($response->getStatusCode() / 100);
-        if ($level === 4) {
-            $label = 'Client error';
-            $className = __NAMESPACE__ . '\\ClientException';
-        } elseif ($level === 5) {
-            $label = 'Server error';
-            $className = __NAMESPACE__ . '\\ServerException';
-        } else {
-            $label = 'Unsuccessful request';
-            $className = __CLASS__;
-        }
+    // Server Error: `GET /` resulted in a `404 Not Found` response:
+    // <html> ... (truncated)
+    $message = sprintf(
+      '%s: `%s` resulted in a `%s` response',
+      $label,
+      $request->getMethod() . ' ' . $uri,
+      $response->getStatusCode() . ' ' . $response->getReasonPhrase()
+    );
 
-        $uri = $request->getUri();
-        $uri = static::obfuscateUri($uri);
+    $summary = static::getResponseBodySummary($response);
 
-        // Server Error: `GET /` resulted in a `404 Not Found` response:
-        // <html> ... (truncated)
-        $message = sprintf(
-            '%s: `%s` resulted in a `%s` response',
-            $label,
-            $request->getMethod() . ' ' . $uri,
-            $response->getStatusCode() . ' ' . $response->getReasonPhrase()
-        );
-
-        $summary = static::getResponseBodySummary($response);
-
-        if ($summary !== null) {
-            $message .= ":\n{$summary}\n";
-        }
-
-        return new $className($message, $request, $response, $previous, $ctx);
+    if ($summary !== null) {
+      $message .= ":\n{$summary}\n";
     }
 
-    /**
-     * Get a short summary of the response
-     *
-     * Will return `null` if the response is not printable.
-     *
-     * @param ResponseInterface $response
-     *
-     * @return string|null
-     */
-    public static function getResponseBodySummary(ResponseInterface $response)
-    {
-        $body = $response->getBody();
+    return new $className($message, $request, $response, $previous, $ctx);
+  }
 
-        if (!$body->isSeekable()) {
-            return null;
-        }
+  /**
+   * Get a short summary of the response
+   *
+   * Will return `null` if the response is not printable.
+   *
+   * @param ResponseInterface $response
+   *
+   * @return string|null
+   */
+  public static function getResponseBodySummary(ResponseInterface $response)
+  {
+    $body = $response->getBody();
 
-        $size = $body->getSize();
-        $summary = $body->read(120);
-        $body->rewind();
-
-        if ($size > 120) {
-            $summary .= ' (truncated...)';
-        }
-
-        // Matches any printable character, including unicode characters:
-        // letters, marks, numbers, punctuation, spacing, and separators.
-        if (preg_match('/[^\pL\pM\pN\pP\pS\pZ\n\r\t]/', $summary)) {
-            return null;
-        }
-
-        return $summary;
+    if (!$body->isSeekable()) {
+      return null;
     }
 
-    /**
-     * Obfuscates URI if there is an username and a password present
-     *
-     * @param UriInterface $uri
-     *
-     * @return UriInterface
-     */
-    private static function obfuscateUri($uri)
-    {
-        $userInfo = $uri->getUserInfo();
+    $size = $body->getSize();
+    $summary = $body->read(120);
+    $body->rewind();
 
-        if (false !== ($pos = strpos($userInfo, ':'))) {
-            return $uri->withUserInfo(substr($userInfo, 0, $pos), '***');
-        }
-
-        return $uri;
+    if ($size > 120) {
+      $summary .= ' (truncated...)';
     }
 
-    /**
-     * Get the request that caused the exception
-     *
-     * @return RequestInterface
-     */
-    public function getRequest()
-    {
-        return $this->request;
+    // Matches any printable character, including unicode characters:
+    // letters, marks, numbers, punctuation, spacing, and separators.
+    if (preg_match('/[^\pL\pM\pN\pP\pS\pZ\n\r\t]/', $summary)) {
+      return null;
     }
 
-    /**
-     * Get the associated response
-     *
-     * @return ResponseInterface|null
-     */
-    public function getResponse()
-    {
-        return $this->response;
+    return $summary;
+  }
+
+  /**
+   * Obfuscates URI if there is an username and a password present
+   *
+   * @param UriInterface $uri
+   *
+   * @return UriInterface
+   */
+  private static function obfuscateUri($uri)
+  {
+    $userInfo = $uri->getUserInfo();
+
+    if (false !== ($pos = strpos($userInfo, ':'))) {
+      return $uri->withUserInfo(substr($userInfo, 0, $pos), '***');
     }
 
-    /**
-     * Check if a response was received
-     *
-     * @return bool
-     */
-    public function hasResponse()
-    {
-        return $this->response !== null;
-    }
+    return $uri;
+  }
 
-    /**
-     * Get contextual information about the error from the underlying handler.
-     *
-     * The contents of this array will vary depending on which handler you are
-     * using. It may also be just an empty array. Relying on this data will
-     * couple you to a specific handler, but can give more debug information
-     * when needed.
-     *
-     * @return array
-     */
-    public function getHandlerContext()
-    {
-        return $this->handlerContext;
-    }
+  /**
+   * Get the request that caused the exception
+   *
+   * @return RequestInterface
+   */
+  public function getRequest()
+  {
+    return $this->request;
+  }
+
+  /**
+   * Get the associated response
+   *
+   * @return ResponseInterface|null
+   */
+  public function getResponse()
+  {
+    return $this->response;
+  }
+
+  /**
+   * Check if a response was received
+   *
+   * @return bool
+   */
+  public function hasResponse()
+  {
+    return $this->response !== null;
+  }
+
+  /**
+   * Get contextual information about the error from the underlying handler.
+   *
+   * The contents of this array will vary depending on which handler you are
+   * using. It may also be just an empty array. Relying on this data will
+   * couple you to a specific handler, but can give more debug information
+   * when needed.
+   *
+   * @return array
+   */
+  public function getHandlerContext()
+  {
+    return $this->handlerContext;
+  }
 }

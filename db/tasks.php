@@ -18,23 +18,23 @@
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
-    array(
-        'classname' => 'block_filescan\task\scan_files',
-        'blocking' => 0,
-        'minute' => '*/5',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
+  array(
+    'classname' => 'block_filescan\task\scan_files',
+    'blocking' => 0,
+    'minute' => '*/5',
+    'hour' => '*',
+    'day' => '*',
+    'dayofweek' => '*',
+    'month' => '*'
+  ),
 
-    array(
-        'classname' => 'block_filescan\task\generate_report',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '4',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-	)
+  array(
+    'classname' => 'block_filescan\task\generate_report',
+    'blocking' => 0,
+    'minute' => '0',
+    'hour' => '4',
+    'day' => '*',
+    'dayofweek' => '*',
+    'month' => '*'
+  )
 );

@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <XMLDB PATH="blocks/filescan/db" VERSION="20170824" COMMENT="XMLDB file for Moodle block/filescan"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
-  <TABLES>
-    <TABLE NAME="block_filescan_files" COMMENT="Filescan results">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="checked" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="pagecount" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="statuscode" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Field to store code about errors or other status-related information"/>
-        <FIELD NAME="hastext" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF contains text (boolean)"/>
-        <FIELD NAME="hastitle" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF file contains title metadata"/>
-        <FIELD NAME="hasoutline" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF file contains outline (bookmarks)"/>
-        <FIELD NAME="haslanguage" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="PDF file language is set"/>
-        <FIELD NAME="timechecked" TYPE="datetime" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="courseinfo" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Information about courses that use this file"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-  </TABLES>
+    <TABLES>
+        <TABLE NAME="block_filescan_files" COMMENT="Filescan results">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="checked" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="pagecount" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="statuscode" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
+                       COMMENT="Field to store code about errors or other status-related information"/>
+                <FIELD NAME="hastext" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="PDF contains text (boolean)"/>
+                <FIELD NAME="hastitle" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="PDF file contains title metadata"/>
+                <FIELD NAME="hasoutline" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="PDF file contains outline (bookmarks)"/>
+                <FIELD NAME="haslanguage" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="PDF file language is set"/>
+                <FIELD NAME="timechecked" TYPE="datetime" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="courseinfo" TYPE="text" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Information about courses that use this file"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+    </TABLES>
 </XMLDB>

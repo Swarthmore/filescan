@@ -1,9 +1,14 @@
 <?php
 
-// enable php errors
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+$config = include_once('config/config.php'); // plugin config
+
+// if config indicates development mode, then allow errors to be thrown to the dom
+if ($config['env'] === 'development') {
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  ini_set('memory_limit', '1024M');
+  error_reporting(-1);
+}
 
 class block_filescan extends block_base
 {
@@ -88,10 +93,10 @@ class block_filescan extends block_base
     global $DB;
     $table = 'block_filescan_files';
 
-    $results['pass']    = $DB->count_records($table, ['status' => 'pass']);
-    $results['fails']   = $DB->count_records($table, ['status' => 'fail']);
-    $results['errors']  = $DB->count_records($table, ['status' => 'error']);
-    $results['checks']  = $DB->count_records($table, ['status' => 'check']);
+    $results['pass'] = $DB->count_records($table, ['status' => 'pass']);
+    $results['fails'] = $DB->count_records($table, ['status' => 'fail']);
+    $results['errors'] = $DB->count_records($table, ['status' => 'error']);
+    $results['checks'] = $DB->count_records($table, ['status' => 'check']);
 
     return $results;
   }
@@ -100,11 +105,11 @@ class block_filescan extends block_base
   {
     global $DB;
 
-    $filelist             = $this->get_course_files();
-    $accessible           = 0;
+    $filelist = $this->get_course_files();
+    $accessible = 0;
     $partially_accessible = 0;
-    $inaccessible         = 0;
-    $unknown              = 0;
+    $inaccessible = 0;
+    $unknown = 0;
 
     foreach ($filelist as $f) {
       // For each file, lookup file scan status
@@ -148,7 +153,7 @@ class block_filescan extends block_base
     if ($accessible > 0) {
 
       $output .= html_writer::tag('br', null);
-      $output .= html_writer::tag('i', null, [ 'class' => 'fa fa-check text-success fa-fw', 'aria-hidden' => 'true' ]);
+      $output .= html_writer::tag('i', null, ['class' => 'fa fa-check text-success fa-fw', 'aria-hidden' => 'true']);
       $output .= html_writer::tag('span', get_string('summary:files_accessible', 'block_filescan', $accessible));
 
     }
@@ -156,7 +161,7 @@ class block_filescan extends block_base
     if ($partially_accessible > 0) {
 
       $output .= html_writer::tag('br', null);
-      $output .= html_writer::tag('i', null, [ 'class' => 'fa fa-check text-success fa-fw', 'aria-hidden' => 'true' ]);
+      $output .= html_writer::tag('i', null, ['class' => 'fa fa-check text-success fa-fw', 'aria-hidden' => 'true']);
       $output .= html_writer::tag('span', get_string('summary:files_partially_accessible', 'block_filescan',
         $partially_accessible));
 
@@ -164,13 +169,13 @@ class block_filescan extends block_base
 
     if ($inaccessible > 0) {
       $output .= html_writer::tag('br', null);
-      $output .= html_writer::tag('i', null, [ 'class' => 'fa fa-check text-success fa-fw', 'aria-hidden' => 'true' ]);
+      $output .= html_writer::tag('i', null, ['class' => 'fa fa-check text-success fa-fw', 'aria-hidden' => 'true']);
       $output .= html_writer::tag('span', get_string('summary:files_inaccessible', 'block_filescan', $inaccessible));
     }
 
     if ($unknown > 0) {
       $output .= html_writer::tag('br', null);
-      $output .= html_writer::tag('i', null, [ 'class' => 'fa fa-check', 'aria-hidden' => 'true' ]);
+      $output .= html_writer::tag('i', null, ['class' => 'fa fa-check', 'aria-hidden' => 'true']);
       $output .= html_writer::tag('span', get_string('summary:files_accessibility_unknown', 'block_filescan', $unknown));
     }
 
@@ -194,15 +199,15 @@ class block_filescan extends block_base
 
     $table = 'block_filescan_files';
 
-    $results['pass']    = $DB->count_records($table, ['status' => 'pass']);
-    $results['fails']   = $DB->count_records($table, ['status' => 'fail']);
-    $results['errors']  = $DB->count_records($table, ['status' => 'error']);
-    $results['checks']  = $DB->count_records($table, ['status' => 'check']);
+    $results['pass'] = $DB->count_records($table, ['status' => 'pass']);
+    $results['fails'] = $DB->count_records($table, ['status' => 'fail']);
+    $results['errors'] = $DB->count_records($table, ['status' => 'error']);
+    $results['checks'] = $DB->count_records($table, ['status' => 'check']);
 
     require_once($CFG->dirroot . '/course/lib.php');
 
-    $context      = context_course::instance($COURSE->id);
-    $canview      = has_capability('block/filescan:viewpages', $context);
+    $context = context_course::instance($COURSE->id);
+    $canview = has_capability('block/filescan:viewpages', $context);
     $canviewadmin = has_capability('block/filescan:viewadminreport', $this->page->context);
 
     // If the role can't view the block, return an empty string for the content
@@ -215,19 +220,19 @@ class block_filescan extends block_base
     }
 
     // Determine course metadata
-    $coursename       = $COURSE->fullname;
-    $courseshortname  = $COURSE->shortname;
-    $courseurl        = course_get_url($COURSE);
+    $coursename = $COURSE->fullname;
+    $courseshortname = $COURSE->shortname;
+    $courseurl = course_get_url($COURSE);
 
     // Determine if the file scan has been previously cached or not
-    $cache          = cache::make('block_filescan', 'filescan');
+    $cache = cache::make('block_filescan', 'filescan');
     $filescan_cache = $cache->get($COURSE->id);
 
     if ($filescan_cache) {
       $filescan_summary = $filescan_cache;
     } else {
       $filescan_summary = $this->generate_summary($COURSE->id);
-      $result           = $cache->set($COURSE->id, $filescan_summary);
+      $result = $cache->set($COURSE->id, $filescan_summary);
     }
 
     if ($this->content !== null) {
@@ -243,21 +248,24 @@ class block_filescan extends block_base
 
       $this->content->text = '<h4>Adm Summary</h4>'
         . html_writer::tag('p', 'Passing: ' . $results['pass'], null)
-        . html_writer::tag('p', 'Fails: '   . $results['fails'], null)
+        . html_writer::tag('p', 'Fails: ' . $results['fails'], null)
         . html_writer::tag('p', 'Errors: ' . $results['errors'], null)
         . html_writer::tag('p', 'Checks: ' . $results['checks'], null);
 
       $this->content->footer = html_writer::link($url, get_string('adminsonly', 'block_filescan'));
 
     } else {
-      $url                    = new moodle_url('/blocks/filescan/view.php', ['courseid' => $COURSE->id] );
-      $this->content->text    = '<h4>Summary</h4>' . $filescan_summary;
-      $this->content->footer  = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
+      $url = new moodle_url('/blocks/filescan/view.php', ['courseid' => $COURSE->id]);
+      $this->content->text = '<h4>Summary</h4>' . $filescan_summary;
+      $this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
     }
 
   }
 
-  // Tell Moodle there is a configuration file in settings.php (default)
-  function has_config() { return true; }
+  // Tell Moodle there is a configuration file in settings.php
+  function has_config()
+  {
+    return true;
+  }
 
 }
