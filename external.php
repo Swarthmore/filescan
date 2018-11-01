@@ -12,22 +12,20 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . "/externallib.php");
 
+/**
+ * returns the total records in $table
+ *
+ * @param $table
+ * @return int
+ */
 function getTotalRecords($table)
 {
   global $DB;
 
-  return $DB->count_records($table, $conditions = null);
-}
-
-// This should allow for easier debugging
-if (!function_exists('dd')) {
-  function dd()
-  {
-    echo '<pre>';
-    array_map(function ($x) {
-      var_dump($x);
-    }, func_get_args());
-    die;
+  if ($DB->count_records($table, $conditions = null)) {
+    return $DB->count_records($table, $conditions = null);
+  } else {
+    return 0;
   }
 }
 
@@ -40,7 +38,7 @@ class block_filescan_external extends external_api
    * @return external_function_parameters
    */
 
-  public static function get_access_files_parameters()
+  public static function request_files_parameters()
   {
 
     return new external_function_parameters (
@@ -81,14 +79,14 @@ class block_filescan_external extends external_api
   }
 
   /**
-   * Returns access file information (set foo to something to test)
+   * Returns access file information
    *
    * @param $start
    * @param $length
    * @return array
    */
 
-  public static function get_access_files($draw, $start, $length, $search, $order, $columns)
+  public static function request_files($draw, $start, $length, $search, $order, $columns)
   {
 
     global $DB;
@@ -96,44 +94,46 @@ class block_filescan_external extends external_api
     $table = 'block_filescan_files';
 
     $p = array(
-      'draw' => $draw,
-      'start' => $start,
-      'length' => $length,
-      'search' => $search,
-      'order' => $order,
-      'columns' => $columns
+      'draw'      => $draw,
+      'start'     => $start,
+      'length'    => $length,
+      'search'    => $search,
+      'order'     => $order,
+      'columns'   => $columns
     );
 
     //$params = self::validate_parameters(self::get_access_files_parameters(), $p);
 
     // these are the columns (db) that we want to select, along with a datatables id (dt) for the column
     $columns = array(
-      array('db' => 'pagecount', 'dt' => 0),
-      array('db' => 'status', 'dt' => 1),
-      array('db' => 'checked', 'dt' => 2),
-      array('db' => 'hastext', 'dt' => 3),
-      array('db' => 'hastitle', 'dt' => 4),
-      array('db' => 'hasoutline', 'dt' => 5),
-      array('db' => 'haslanguage', 'dt' => 6),
-      array('db' => 'timechecked', 'dt' => 7),
-      array('db' => 'courseinfo', 'dt' => 8)
+      array('db' => 'pagecount',    'dt' => 0),
+      array('db' => 'status',       'dt' => 1),
+      array('db' => 'checked',      'dt' => 2),
+      array('db' => 'hastext',      'dt' => 3),
+      array('db' => 'hastitle',     'dt' => 4),
+      array('db' => 'hasoutline',   'dt' => 5),
+      array('db' => 'haslanguage',  'dt' => 6),
+      array('db' => 'timechecked',  'dt' => 7),
+      array('db' => 'courseinfo',   'dt' => 8),
+      array('db' => 'filepath',     'dt' => 9)
     );
 
     // construct sql clauses
-    // $limit = limit($start, $length);
-
     $select = 'id >=' . $p['start'] . ' and id <= ' . ($p['start'] + $p['length']);
+
+    $limit = self::limit($p['start'], $p['length']);
+    $order = self::order('DESC');
 
     $results = $DB->get_records_select($table, $select);
 
     $warnings = [];
 
     return array(
-      'draw' => (int)$draw,
-      'recordsTotal' => getTotalRecords($table),
-      'recordsFiltered' => getTotalRecords($table),
-      'data' => $results,
-      'warnings' => $warnings
+      'draw'              => (int)$draw,
+      'recordsTotal'      => getTotalRecords($table),
+      'recordsFiltered'   => getTotalRecords($table),
+      'data'              => $results,
+      'warnings'          => $warnings
     );
   }
 
@@ -159,13 +159,57 @@ class block_filescan_external extends external_api
   }
 
   /**
+   * returns the order clause for the sql statement
+   * @param $dir
+   * @return string
+   */
+
+  public static function order($dir) {
+
+    if ($dir != 'ASC' || $dir != 'DESC') {
+      return 'you blew it. please pass ASC or DESC into this function';
+    }
+
+    $order = '';
+
+  }
+
+  /**
+   * returns the where clause for the sql statement
+   * @param $search
+   * @return string
+   */
+
+  public static function filter($search) {
+    if(!$search) {
+      return ''; // do not return a where clause
+    }
+
+    $where = '';
+    return $where;
+  }
+
+  /**
+   * This function should return a filepath given a filehash
+   *
+   * @param $filehash
+   * @return string
+   */
+
+  public static function get_file_from_hash($filehash) {
+    global $DB;
+    $table = 'files';
+    return $DB->get_records($table, array('contenthash' => $filehash));
+  }
+
+  /**
    * Describes the fields returned from get_access_files
    * In this case, these are columns in the block_filescan_files table
    *
    * @return external_single_structure
    */
 
-  public static function get_access_files_returns()
+  public static function request_files_returns()
   {
     return new external_single_structure(
       array(

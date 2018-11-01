@@ -1,8 +1,7 @@
 <?php
 
-require_once('../../config.php'); // global config
-
-$config = include_once('config/config.php'); // plugin config
+require_once('../../config.php');             // global config
+$config = include_once('config/config.php');  // plugin config
 
 // if config indicates development mode, then allow errors to be thrown to the dom
 if ($config['env'] === 'development') {
@@ -15,6 +14,37 @@ if ($config['env'] === 'development') {
 global $OUTPUT;
 global $PAGE;
 
+// meta stuff
+$PAGE->set_context(context_system::instance());
+$PAGE->set_title('Moodle Accessibility File Checker');
+$PAGE->set_url('/block/filescan/admin.php', null);
+$PAGE->set_pagelayout('base');
+$PAGE->set_heading(get_string('adminsonly', 'block_filescan'));
+$PAGE->set_cacheable($config['cacheable']);
+
+// a valid token is required to access the web service.
+// see: https://docs.moodle.org/35/en/Using_web_services
+$token = array('token' => $config['token']);
+
+// use this variable to scale the bars under the displayed percentages
+$scale = array(
+  'x' => 2,
+  'y' => 1
+);
+
+// use this variable to define the width and height (in pixels) of the progress bars
+// located in each card
+$progressBar = array(
+  'width'   => 100 * $scale['x'],
+  'height'  => 16  * $scale['y']
+);
+
+/**
+ * This counts how many records have the passed in option
+ *
+ * @param $option
+ * @return int
+ */
 function has($option)
 {
   global $DB;
@@ -33,13 +63,19 @@ function has($option)
     case 'language':
       return $DB->count_records($table, ['haslanguage' => 1]);
       break;
-    default:
+    default: // catch all
       return 0;
       break;
   }
 }
 
-// This function will generate a report encapsulating all files within the plugin table
+/**
+ * This function will generate a report encapsulating all files within the plugin table
+ *
+ * @param $status
+ * @return int
+ */
+
 function generateOverallReport($status)
 {
   global $DB;
@@ -59,29 +95,35 @@ function generateOverallReport($status)
     case 'checks':
       return $DB->count_records($table, ['status' => 'check']);
       break;
-    default:
+    default: // catch all
+      return 0;
       break;
   }
 }
 
-function getFiles()
-{
+/**
+ * This function should return a filepath given a filehash
+ *
+ * @param $filehash
+ * @return string
+ */
+
+function get_file_from_hash($filehash) {
   global $DB;
-  $table = 'block_filescan_files';
-  return $DB->get_records_list($table, 'status', array('check', 'fail', 'error'));
+  $table = 'files';
+  return $DB->get_records($table, array('contenthash' => $filehash));
 }
 
-$PAGE->set_url('/block/filescan/admin.php', null);
-$PAGE->set_pagelayout('base');
-$PAGE->set_heading(get_string('adminsonly', 'block_filescan'));
+// call the datatables module
+$PAGE->requires->js_call_amd('block_filescan/dataTableModule', 'make', $token);
 
-$token = array('token' => $config['token']);
+/**
+ * This function returns the total records within $table
+ *
+ * @param $table
+ * @return int
+ */
 
-$PAGE->requires->js_call_amd('block_filescan/dt', 'make', $token);
-
-echo $OUTPUT->header();
-
-// TODO: make this a class function
 function getTotalRecords($table)
 {
   global $DB;
@@ -93,16 +135,8 @@ function getTotalRecords($table)
 $checks         = array('title', 'text', 'outline', 'language');
 $totalRecords   = getTotalRecords('block_filescan_files');
 
-// use this variable to scale the bars under the displayed percentages
-$scale = array(
-  'x' => 1.5,
-  'y' => 1.0
-);
-
-$progressBar = array(
-  'width'   => 100 * $scale['x'],
-  'height'  => 16  * $scale['y']
-);
+// start outputting our page
+echo $OUTPUT->header();
 
 // generate the title, text, outline and language card row
 echo html_writer::start_tag('div', array('class' => 'card-group'), null);
@@ -111,18 +145,26 @@ foreach ($checks as $check) {
   $fileHas    = has($check); // do this so we dont kill the db
   $completed  = round($fileHas / $totalRecords * 100,2);
 
-  $fillArray = array(
+  $fillAttributes = array(
     'style' => 'width: ' . $completed * $scale['x'] . 'px; height: ' . $progressBar['height'] . 'px;',
     'class' => 'bg-success'
   );
 
-  echo html_writer::start_tag('div', array('class' => 'card text-white bg-dark m-3 p-3'), null);
+  $cardAttributes = array(
+    'class' => 'card text-white bg-dark m-3 p-3 text-center'
+  );
+
+  $primaryCard = array(
+    'class' => 'card text-white bg-primary m-3 p-3 text-center'
+  );
+
+  echo html_writer::start_tag('div', $cardAttributes, null);
   echo html_writer::start_tag('div', array('class' => 'card-body'), null);
   echo html_writer::tag('p', ucfirst($check), array('class' => 'lead'));
 
   echo html_writer::tag('h3', $completed . '%', array('class' => 'text-white display-4'));
-  echo html_writer::start_tag('div', array('style' => 'width: ' . $progressBar['width'] . 'px;', 'class' => 'bg-danger'), null);
-  echo html_writer::tag('div', null, $fillArray);
+  echo html_writer::start_tag('div', array('style' => 'margin: 0 auto; width: ' . $progressBar['width'] . 'px;', 'class' => 'mb-2 bg-danger'), null);
+  echo html_writer::tag('div', null, $fillAttributes);
 
   echo html_writer::end_tag('div');
 
@@ -138,28 +180,36 @@ echo html_writer::end_tag('div');
 echo html_writer::start_tag('div', array('class' => 'card-group'), null);
 
 //card 1
-echo html_writer::start_tag('div', array('class' => 'card bg-dark text-white m-3 p-3'), null);
+echo html_writer::start_tag('div', $cardAttributes, null);
 echo html_writer::start_tag('div', array('class' => 'card-body'), null);
-echo html_writer::tag('h1', 'What goes here? It is a mystery', array('class' => 'display-3'));
+echo html_writer::tag('h1', 'What goes here?', array('class' => 'display-3'));
+echo '<iframe width="560" height="315" src="https://www.youtube.com/embed/fq3abPnEEGE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('div');
 
 // card 2
-echo html_writer::start_tag('div', array('class' => 'card bg-dark text-white m-3 p-3 text-center'), null);
-echo html_writer::start_tag('div', array('class' => 'card-body'), null);
+// card 2 variables
+$passingFiles = generateOverallReport('passing');
+$pctFixed = round($passingFiles / $totalRecords, 4);
+
+// card 2 output
+echo html_writer::start_tag('div', $primaryCard, null);
+echo html_writer::start_tag('div', array('class' => 'card-body mt-5'), null);
 echo html_writer::tag('p', 'Total Passing Files', array('class' => 'lead'));
-echo html_writer::tag('h1', generateOverallReport('passing'), array('class' => 'display-1'));
+echo html_writer::tag('h1', $pctFixed . '%', array('class' => 'display-1'));
+echo html_writer::tag('p', $passingFiles . ' / ' . $totalRecords, array('class' => 'text-white'));
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('div');
 
+// end our card div
 echo html_writer::end_tag('div');
 
 // Generate the datatable
-$columns = array('Id', 'Pages', 'Status', 'Checked', 'Text', 'Title', 'Outline', 'Language', 'Last Checked', 'Courses', 'Path');
+$columns = array('Id', 'Pages', 'Status', 'Checked', 'Text', 'Title', 'Outline', 'Language', 'Last Checked', 'Courses', 'FP', 'Action');
 
-echo html_writer::start_tag('div', array('class' => 'table-responsive'), null);
-echo html_writer::start_tag('table', array('id' => 'dt', 'class' => 'table table-dark text-white table-sm', 'style' => 'width: 100%;'), null);
-echo html_writer::start_tag('thead', array('class' => 'thead-dark'));
+echo html_writer::start_tag('div', array('class' => 'table-responsive dataTable'), null);
+echo html_writer::start_tag('table', array('id' => 'dt', 'class' => 'm-3 table table-md'), null);
+echo html_writer::start_tag('thead', null);
 echo html_writer::start_tag('tr', null, null);
 
 foreach($columns as $column) {

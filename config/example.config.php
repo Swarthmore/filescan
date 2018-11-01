@@ -3,6 +3,7 @@
 return array(
   'token' => '', // this is the token used to access the web service
   'env' => '',  // set this top development to log errors to the dom
+  'cacheable' => false,
   'colors' => array(
     'pass'  => 'rgb(r,g,b,a)',
     'check' => 'rgb(r,g,b,a)',

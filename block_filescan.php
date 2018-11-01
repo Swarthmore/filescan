@@ -136,16 +136,6 @@ class block_filescan extends block_base
         }
       }
 
-//      if ($record && $record->status == 'pass') {
-//        $accessible += 1;
-//      } else if ($record && $record->status == 'fail') {
-//        $inaccessible += 1;
-//      } else if ($record && $record->status == 'check') {
-//        $partially_accessible += 1;
-//      } else {
-//        $unknown += 1;
-//      }
-
     }
 
     $output = get_string('summary:files_found', 'block_filescan', count($filelist));

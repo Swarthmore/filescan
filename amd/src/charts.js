@@ -1,3 +1,5 @@
+// this is mostly old code and can probably be deleted
+
 define(['core/chartjs', 'jquery', 'theme_boost/dataTables'], (Chart, $) => {
 
     let colors = {

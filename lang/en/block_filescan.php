@@ -15,7 +15,7 @@ $string['filescan:viewadminreport'] = 'View Access Admin Report';
 
 // Navigation and notification
 $string['viewdetailspage'] = 'View File Details';
-$string['adminsonly'] = 'Access Admin Dashboard';
+$string['adminsonly'] = 'Moodle Accessible PDF Dashboard';
 $string['summaryview'] = 'File scan summary';
 $string['nofiles'] = 'There are no files to scan';
 $string['cannot_view'] = 'Not allowed to view page';

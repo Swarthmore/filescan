@@ -10,13 +10,12 @@ function ConvertDateFromDiv(divTimeStr) {
     return time.toLocaleDateString();
 }
 
-// todo: import datatables from npm or elsewhere
 define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
     return {
         make: (token) => {
 
             const domain = 'https://mappt.swarthmore.edu/'
-            const f = 'block_filescan_get_access_files'
+            const f = 'block_filescan_request_files'
 
             const api = domain + '/webservice/rest/server.php' + '?wstoken=' + token + '&wsfunction=' + f + '&moodlewsrestformat=' + 'json'
 
@@ -129,6 +128,22 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
                                 } else {
                                     return 'NA'
                                 }
+                            }
+                        },
+                        {
+                            "data": "filepath",
+                            "render": () => {
+                                return "filepath"
+                            }
+                        },
+                        {
+                            "data": "action",
+                            "render": () => {
+                                let fixButton = document.createElement('button')
+                                fixButton.innerText = 'Fix'
+                                fixButton.setAttribute('type', 'button')
+                                fixButton.classList.add('btn', 'btn-primary', 'btn-sm')
+                                return fixButton.outerHTML
                             }
                         }
                     ],
