@@ -14,7 +14,7 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
     return {
         make: (token) => {
 
-            const domain = 'https://mappt.swarthmore.edu/'
+            const domain = 'https://mappt.swarthmore.edu'
             const f = 'block_filescan_request_files'
 
             const api = domain + '/webservice/rest/server.php' + '?wstoken=' + token + '&wsfunction=' + f + '&moodlewsrestformat=' + 'json'
@@ -38,11 +38,11 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
                             "data": "status",
                             "render": (data) => {
                                 if (data == 'check') {
-                                    return '<i class="fa fa-check-circle text-success fa-fw"></i>'
+                                    return '<i class="fa fa-check text-success fa-fw"></i>'
                                 } else if (data == 'fail') {
-                                    return '<i class="fa fa-exclamation-circle text-warning fa-fw" aria-hidden="true"></i>'
+                                    return '<i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i>'
                                 } else if (data == 'error') {
-                                    return '<i class="fa fa-times-circle text-danger fa-fw" aria-hidden="true"></i>'
+                                    return '<i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i>'
                                 } else {
                                     return '<strong>Error</strong>' // catch all in case all else fails
                                 }
@@ -52,9 +52,9 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
                             "data": "checked",
                             "render": (data) => {
                                 if (data) {
-                                    return '<i class="fa fa-check-circle text-success"></i>'
+                                    return '<i class="fa fa-check text-success"></i>'
                                 } else {
-                                    return '<i class="fa fa-times-circle text-danger"></i>'
+                                    return '<i class="fa fa-times text-danger"></i>'
                                 }
                             }
                         },
@@ -62,9 +62,9 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
                             "data": "hastext",
                             "render": (data) => {
                                 if (data) {
-                                    return '<i class="fa fa-check-circle text-success"></i>'
+                                    return '<i class="fa fa-check text-success"></i>'
                                 } else {
-                                    return '<i class="fa fa-times-circle text-danger"></i>'
+                                    return '<i class="fa fa-times text-danger"></i>'
                                 }
                             }
                         },
@@ -72,9 +72,9 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
                             "data": "hastitle",
                             "render": (data) => {
                                 if (data) {
-                                    return '<i class="fa fa-check-circle text-success"></i>'
+                                    return '<i class="fa fa-check text-success"></i>'
                                 } else {
-                                    return '<i class="fa fa-times-circle text-danger"></i>'
+                                    return '<i class="fa fa-times text-danger"></i>'
                                 }
                             }
                         },
@@ -82,9 +82,9 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
                             "data": "hasoutline",
                             "render": (data) => {
                                 if (data) {
-                                    return '<i class="fa fa-check-circle text-success"></i>'
+                                    return '<i class="fa fa-check text-success"></i>'
                                 } else {
-                                    return '<i class="fa fa-times-circle text-danger"></i>'
+                                    return '<i class="fa fa-times text-danger"></i>'
                                 }
                             }
                         },
@@ -92,9 +92,9 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
                             "data": "haslanguage",
                             "render": (data) => {
                                 if (data) {
-                                    return '<i class="fa fa-check-circle text-success"></i>'
+                                    return '<i class="fa fa-check text-success"></i>'
                                 } else {
-                                    return '<i class="fa fa-times-circle text-danger"></i>'
+                                    return '<i class="fa fa-times text-danger"></i>'
                                 }
                             }
                         },
@@ -117,14 +117,33 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
 
                                     d.forEach(course => {
                                         let courseUrl = url + course.courseid
+                                        let teachersObj = course.teachers // could have multiple teachers
+                                        let teacher
+                                        let enrolled = course.student_enrollment
+
+                                        // check the teacher object
+                                        if (teachersObj) {
+                                            teacher =  Object.values(teachersObj)[0]
+
+                                            if(!teacher){
+                                                teacher = 'No teacher'
+                                            } else {
+                                                teacher = `<a href="#">${teacher.firstname} ${teacher.lastname}</a>`
+                                            }
+                                        }
 
                                         if (course) {
-                                            courses.push('<a href="' + courseUrl + '">' + course.shortname + '</a>')
+                                            courses.push(
+                                                '<a href="' + courseUrl + '">' + course.shortname + '</a>' + '<br>' +
+                                                teacher + '<br>' +
+                                                enrolled + ' Students Enrolled' + '<br>' +
+                                                `<strong><a href="https://mappt.swarthmore.edu/mod/resource/view.php?id=${course.file_id}">` + course.file_id + '</a></strong>'
+                                            )
                                         } else {
                                             courses.push('NA')
                                         }
                                     })
-                                    return courses.join('<br>')
+                                    return courses.join('<hr>')
                                 } else {
                                     return 'NA'
                                 }
@@ -133,17 +152,15 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
                         {
                             "data": "filepath",
                             "render": () => {
-                                return "filepath"
+                                return '<i class="fa fa-file text-info fa-2x mt-2"></i>'
                             }
                         },
                         {
                             "data": "action",
-                            "render": () => {
-                                let fixButton = document.createElement('button')
-                                fixButton.innerText = 'Fix'
-                                fixButton.setAttribute('type', 'button')
-                                fixButton.classList.add('btn', 'btn-primary', 'btn-sm')
-                                return fixButton.outerHTML
+                            "render": (data) => {
+                                return (
+                                    `<a class="btn btn-primary btn-block btn-sm mt-2" href="#" role="button">Fix</a>`
+                                );
                             }
                         }
                     ],

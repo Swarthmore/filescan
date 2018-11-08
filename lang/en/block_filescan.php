@@ -45,6 +45,7 @@ $string['table:outline_check_header'] = 'Outline';
 // Scheduled tasks
 $string['filescan_task'] = 'Filescan task';
 $string['reportgeneration_task'] = 'Report generation task';
+$string['cleanup_task'] = 'Cleanup Filescan Table Task';
 
 // Config settings
 $string['headerconfig'] = "Configure file scan";

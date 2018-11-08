@@ -1,5 +1,10 @@
 <?php
 
+// filename
+// course name
+// teachers
+// # enrolled
+
 require_once('../../config.php');             // global config
 $config = include_once('config/config.php');  // plugin config
 
@@ -38,6 +43,52 @@ $progressBar = array(
   'width'   => 100 * $scale['x'],
   'height'  => 16  * $scale['y']
 );
+
+/**
+ * This function should return a filepath given a filehash
+ *
+ * @param $filehash
+ * @return string
+ */
+
+//function get_file_from_hash($filehash) {
+//  global $DB;
+//
+//  $fs = get_file_storage();
+//
+//  // get the row
+//  $fileinfo = $DB->get_records('files', $conditions = array('contenthash' => $filehash), $sort='', $fields='*', $limitfrom=0, $limitnum=0);
+//
+//  // reset internal pointer to first item
+//  reset($fileinfo);
+//
+//  // return the current element at the internal pointer
+//  $f = current($fileinfo);
+//
+//  $component = 'mod';
+//  $filearea = 'resource';
+//
+////    // join contenthash on files table
+////    // grab that contextid
+////    // join the contextid on the context table
+////
+////    return $DB->get_records($table, array('contenthash' => $filehash));
+//
+//  $file = $fs->get_file(
+//    $f->contextid,
+//    $component,
+//    $filearea,
+//    $f->itemid,
+//    $f->filepath,
+//    $f->filename
+//  );
+//
+//  if (!$file) {
+//    return 'File not found';
+//  } else {
+//    return $file;
+//  }
+//}
 
 /**
  * This counts how many records have the passed in option
@@ -101,19 +152,6 @@ function generateOverallReport($status)
   }
 }
 
-/**
- * This function should return a filepath given a filehash
- *
- * @param $filehash
- * @return string
- */
-
-function get_file_from_hash($filehash) {
-  global $DB;
-  $table = 'files';
-  return $DB->get_records($table, array('contenthash' => $filehash));
-}
-
 // call the datatables module
 $PAGE->requires->js_call_amd('block_filescan/dataTableModule', 'make', $token);
 
@@ -137,6 +175,9 @@ $totalRecords   = getTotalRecords('block_filescan_files');
 
 // start outputting our page
 echo $OUTPUT->header();
+
+// testing area
+//echo '<p class="debug">' . print_r(get_file_from_hash('5eb368ec30c2952742fa67eaf26e36b0b75a7598'), true) . '</p>';
 
 // generate the title, text, outline and language card row
 echo html_writer::start_tag('div', array('class' => 'card-group'), null);

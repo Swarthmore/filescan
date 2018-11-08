@@ -4,14 +4,12 @@
     <list default="true" id="80558861-1ca5-49de-9b9b-6a546760030e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/amd/src/charts.js" beforeDir="false" afterPath="$PROJECT_DIR$/amd/src/charts.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/amd/src/dt.js" beforeDir="false" afterPath="$PROJECT_DIR$/amd/src/dataTableModule.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/block_filescan.php" beforeDir="false" afterPath="$PROJECT_DIR$/block_filescan.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/example.config.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/example.config.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/services.php" beforeDir="false" afterPath="$PROJECT_DIR$/db/services.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/amd/src/dataTableModule.js" beforeDir="false" afterPath="$PROJECT_DIR$/amd/src/dataTableModule.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/task/generate_report.php" beforeDir="false" afterPath="$PROJECT_DIR$/classes/task/generate_report.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/tasks.php" beforeDir="false" afterPath="$PROJECT_DIR$/db/tasks.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/external.php" beforeDir="false" afterPath="$PROJECT_DIR$/external.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lang/en/block_filescan.php" beforeDir="false" afterPath="$PROJECT_DIR$/lang/en/block_filescan.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/version.php" beforeDir="false" afterPath="$PROJECT_DIR$/version.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -102,12 +100,13 @@
     <session id="794815400">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="14" />
+          <entry key="project.closed" value="19" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.open.time.4" value="4" />
-          <entry key="project.open.time.5" value="7" />
-          <entry key="project.open.time.6" value="2" />
-          <entry key="project.opened" value="14" />
+          <entry key="project.open.time.4" value="6" />
+          <entry key="project.open.time.5" value="8" />
+          <entry key="project.open.time.6" value="4" />
+          <entry key="project.open.time.7" value="1" />
+          <entry key="project.opened" value="20" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -115,37 +114,40 @@
           <entry key="css" value="1" />
           <entry key="gitignore" value="3" />
           <entry key="har" value="1" />
-          <entry key="js" value="10" />
+          <entry key="js" value="11" />
           <entry key="json" value="2" />
           <entry key="md" value="2" />
-          <entry key="php" value="37" />
+          <entry key="php" value="66" />
+          <entry key="xml" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="CSS" value="1" />
           <entry key="JSON" value="2" />
-          <entry key="JavaScript" value="10" />
+          <entry key="JavaScript" value="11" />
           <entry key="Markdown" value="2" />
-          <entry key="PHP" value="37" />
+          <entry key="PHP" value="66" />
           <entry key="PLAIN_TEXT" value="4" />
+          <entry key="XML" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="gitignore" value="63" />
-          <entry key="js" value="3512" />
+          <entry key="js" value="4916" />
           <entry key="md" value="79" />
-          <entry key="php" value="20764" />
+          <entry key="php" value="29592" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="HTML" value="36" />
-          <entry key="JavaScript" value="3511" />
+          <entry key="JavaScript" value="4915" />
           <entry key="Markdown" value="79" />
-          <entry key="PHP" value="20729" />
+          <entry key="PHP" value="29550" />
           <entry key="PLAIN_TEXT" value="63" />
+          <entry key="SQL" value="7" />
         </counts>
       </usages-collector>
     </session>
@@ -153,60 +155,31 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/amd/src/dataTableModule.js">
+        <entry file="file://$PROJECT_DIR$/classes/task/scan_files.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-788">
-              <caret line="17" column="51" selection-start-line="17" selection-start-column="23" selection-end-line="17" selection-end-column="51" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/admin.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-909">
-              <caret line="138" column="23" lean-forward="true" selection-start-line="138" selection-start-column="23" selection-end-line="138" selection-end-column="23" />
+            <state relative-caret-position="975">
+              <caret line="138" column="35" selection-start-line="138" selection-start-column="19" selection-end-line="138" selection-end-column="35" />
               <folding>
-                <element signature="n#has#0;n#!!top" />
-                <element signature="n#generateOverallReport#0;n#!!top" />
+                <element signature="e#88#108#0#PHP" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/block_filescan.php">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/classes/task/cleanup_filescan_table.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="275">
-              <caret line="103" column="46" selection-start-line="103" selection-start-column="46" selection-end-line="103" selection-end-column="46" />
-              <folding>
-                <element signature="n#get_course_files#0;n#block_filescan#0;n#!!top" />
-                <element signature="n#generate_admin_summary#0;n#block_filescan#0;n#!!top" />
-                <element signature="n#generate_summary#0;n#block_filescan#0;n#!!top" />
-                <element signature="n#get_content#0;n#block_filescan#0;n#!!top" />
-              </folding>
+            <state relative-caret-position="632">
+              <caret line="42" column="35" lean-forward="true" selection-start-line="42" selection-start-column="35" selection-end-line="42" selection-end-column="35" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config/config.php">
+        <entry file="file://$PROJECT_DIR$/classes/task/generate_report.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="115">
-              <caret line="5" column="2" lean-forward="true" selection-start-line="5" selection-start-column="2" selection-end-line="5" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/external.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-987">
-              <caret line="175" selection-start-line="175" selection-end-line="175" />
-              <folding>
-                <element signature="e#262#344#0#PHP" />
-                <element signature="n#getTotalRecords#0;n#!!top" />
-              </folding>
+            <state relative-caret-position="315">
+              <caret line="53" column="38" lean-forward="true" selection-start-line="53" selection-start-column="38" selection-end-line="53" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -214,8 +187,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/classes/observer.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="588">
-              <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
+            <state relative-caret-position="851">
+              <caret line="37" selection-start-line="37" selection-end-line="37" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/db/access.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1449">
+              <caret line="63" column="33" selection-start-line="63" selection-start-column="18" selection-end-line="63" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -224,16 +206,19 @@
         <entry file="file://$PROJECT_DIR$/db/services.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="253">
-              <caret line="11" column="2" lean-forward="true" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="2" />
+              <caret line="11" column="2" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="2" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/classes/Card.php">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/db/tasks.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
-              <caret line="18" column="1" lean-forward="true" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
+            <state relative-caret-position="690">
+              <caret line="41" column="62" selection-start-line="41" selection-start-column="40" selection-end-line="41" selection-end-column="62" />
+              <folding>
+                <element signature="e#7#58#0#PHP" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -241,8 +226,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lang/en/block_filescan.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="23">
-              <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+            <state relative-caret-position="1081">
+              <caret line="47" selection-start-line="47" selection-end-line="47" selection-end-column="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/db/upgrade.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="276">
+              <caret line="12" column="53" selection-start-line="12" selection-start-column="53" selection-end-line="12" selection-end-column="53" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/version.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="69">
+              <caret line="3" column="29" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -266,10 +269,14 @@
       <find>moodle_url</find>
       <find>html</find>
       <find>server.php</find>
-      <find>getTotalRecords</find>
       <find>scale</find>
       <find>getFiles</find>
       <find>Access Ad</find>
+      <find>getTotalRecords</find>
+      <find>$table</find>
+      <find>File not</find>
+      <find>courseinfo</find>
+      <find>$file</find>
     </findStrings>
     <replaceStrings>
       <replace>h5</replace>
@@ -282,13 +289,10 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/classes/task/scan_files.php" />
-        <option value="$PROJECT_DIR$/classes/task/generate_report.php" />
-        <option value="$PROJECT_DIR$/classes/observer.php" />
         <option value="$PROJECT_DIR$/amd/src/test.js" />
         <option value="$PROJECT_DIR$/amd/src/helloworld.js" />
         <option value="$PROJECT_DIR$/db/access.php" />
         <option value="$PROJECT_DIR$/styles.css" />
-        <option value="$PROJECT_DIR$/version.php" />
         <option value="$PROJECT_DIR$/class/client.php" />
         <option value="$PROJECT_DIR$/test/res.php" />
         <option value="$PROJECT_DIR$/classes/client.php" />
@@ -301,14 +305,20 @@
         <option value="$PROJECT_DIR$/classes/Card.php" />
         <option value="$PROJECT_DIR$/classes/ProgressBar.php" />
         <option value="$PROJECT_DIR$/amd/src/charts.js" />
-        <option value="$PROJECT_DIR$/lang/en/block_filescan.php" />
-        <option value="$PROJECT_DIR$/amd/src/dataTableModule.js" />
         <option value="$PROJECT_DIR$/block_filescan.php" />
+        <option value="$PROJECT_DIR$/config/example.config.php" />
+        <option value="$PROJECT_DIR$/db/services.php" />
         <option value="$PROJECT_DIR$/admin.php" />
         <option value="$PROJECT_DIR$/config/config.php" />
-        <option value="$PROJECT_DIR$/config/example.config.php" />
         <option value="$PROJECT_DIR$/external.php" />
-        <option value="$PROJECT_DIR$/db/services.php" />
+        <option value="$PROJECT_DIR$/amd/src/dataTableModule.js" />
+        <option value="$PROJECT_DIR$/classes/task/generate_report.php" />
+        <option value="$PROJECT_DIR$/lang/en/block_filescan.php" />
+        <option value="$PROJECT_DIR$/classes/task/cleanup.php" />
+        <option value="$PROJECT_DIR$/classes/observer.php" />
+        <option value="$PROJECT_DIR$/db/tasks.php" />
+        <option value="$PROJECT_DIR$/version.php" />
+        <option value="$PROJECT_DIR$/classes/task/cleanup_filescan_table.php" />
       </list>
     </option>
   </component>
@@ -327,11 +337,9 @@
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
     </include_path>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="-1" />
-    <option name="y" value="23" />
-    <option name="width" value="1680" />
-    <option name="height" value="1027" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="width" value="1920" />
+    <option name="height" value="1200" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -355,7 +363,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -382,6 +389,12 @@
             <path>
               <item name="filescan" type="b2602c69:ProjectViewProjectNode" />
               <item name="filescan" type="462c0819:PsiDirectoryNode" />
+              <item name="classes" type="462c0819:PsiDirectoryNode" />
+              <item name="task" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="filescan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="filescan" type="462c0819:PsiDirectoryNode" />
               <item name="config" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -404,10 +417,11 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="SearchEverywhereHistoryKey" value=".gitignore&#9;FILE&#9;file:///Users/tony/projects/repos/filescan/.gitignore&#10;admin.php&#9;FILE&#9;file:///Users/tony/Dev/block-filescan/admin.php" />
+    <property name="SearchEverywhereHistoryKey" value="admin.php&#9;FILE&#9;file:///Users/tony/projects/repos/filescan/admin.php&#10;external&#9;FILE&#9;file:///Users/tony/projects/repos/filescan/external.php&#10;.gitignore&#9;FILE&#9;file:///Users/tony/projects/repos/filescan/.gitignore" />
     <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="jsx.switch.disabled" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -473,11 +487,17 @@
       <workItem from="1540994182105" duration="15548000" />
       <workItem from="1541081160216" duration="4910000" />
       <workItem from="1541093279318" duration="6832000" />
+      <workItem from="1541165745296" duration="6806000" />
+      <workItem from="1541427488442" duration="10000" />
+      <workItem from="1541427508943" duration="9336000" />
+      <workItem from="1541514018794" duration="20228000" />
+      <workItem from="1541689211457" duration="344000" />
+      <workItem from="1541689840741" duration="677000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="113242000" />
+    <option name="totallyTimeSpent" value="150643000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -489,11 +509,11 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="23" width="1680" height="1027" extended-state="6" />
+    <frame x="0" y="23" width="1920" height="1177" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24420024" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49608064" visible="true" weight="0.19861555" />
+      <window_info id="Structure" order="1" sideWeight="0.50391936" side_tool="true" visible="true" weight="0.19861555" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32945737" />
@@ -507,7 +527,8 @@
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.32958803" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.039490446" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
-      <window_info anchor="bottom" id="File Transfer" order="12" visible="true" weight="0.22459893" />
+      <window_info anchor="bottom" id="File Transfer" order="12" visible="true" weight="0.17695853" />
+      <window_info anchor="bottom" id="Command Line Tools Console" order="13" visible="true" weight="0.32920355" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -523,42 +544,8 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/db/events.php">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/db/caches.php">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/admin_view.php" />
-    <entry file="file://$PROJECT_DIR$/classes/task/scan_files.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1544">
-          <caret line="41" column="37" lean-forward="true" selection-start-line="41" selection-start-column="37" selection-end-line="41" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/db/upgrade.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="276">
-          <caret line="12" column="78" selection-start-line="12" selection-start-column="78" selection-end-line="12" selection-end-column="78" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/db/tasks.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="27" column="22" lean-forward="true" selection-start-line="27" selection-start-column="22" selection-end-line="27" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/amd/src/helloworld.js" />
-    <entry file="file://$PROJECT_DIR$/db/access.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="588">
-          <caret line="28" column="23" selection-start-line="28" selection-start-column="23" selection-end-line="28" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/styles.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="42">
@@ -573,29 +560,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/classes/task/generate_report.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-797">
-          <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/amd/build/helloworld.min.js" />
-    <entry file="file://$USER_HOME$/Downloads/mappt.swarthmore.edu.har">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2878">
-          <caret line="2912" column="51" lean-forward="true" selection-start-line="2912" selection-start-column="51" selection-end-line="2912" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/Downloads/mappt.swarthmore.edu.har" />
     <entry file="file://$PROJECT_DIR$/test/res.php" />
-    <entry file="file://$PROJECT_DIR$/version.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.vscode/sftp.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -639,13 +606,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/amd/src/dataTableModule.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-788">
-          <caret line="17" column="51" selection-start-line="17" selection-start-column="23" selection-end-line="17" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/settings.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="414">
@@ -657,17 +617,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1625">
           <caret line="233" column="49" lean-forward="true" selection-start-line="233" selection-start-column="49" selection-end-line="233" selection-end-column="49" />
-          <folding>
-            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/config.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" column="2" lean-forward="true" selection-start-line="5" selection-start-column="2" selection-end-line="5" selection-end-column="23" />
         </state>
       </provider>
     </entry>
@@ -678,66 +627,130 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/admin.php">
+    <entry file="file://$PROJECT_DIR$/classes/Card.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-909">
-          <caret line="138" column="23" lean-forward="true" selection-start-line="138" selection-start-column="23" selection-end-line="138" selection-end-column="23" />
-          <folding>
-            <element signature="n#has#0;n#!!top" />
-            <element signature="n#generateOverallReport#0;n#!!top" />
-          </folding>
+        <state relative-caret-position="299">
+          <caret line="18" column="1" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/block_filescan.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="103" column="46" selection-start-line="103" selection-start-column="46" selection-end-line="103" selection-end-column="46" />
-          <folding>
-            <element signature="n#get_course_files#0;n#block_filescan#0;n#!!top" />
-            <element signature="n#generate_admin_summary#0;n#block_filescan#0;n#!!top" />
-            <element signature="n#generate_summary#0;n#block_filescan#0;n#!!top" />
-            <element signature="n#get_content#0;n#block_filescan#0;n#!!top" />
-          </folding>
+        <state relative-caret-position="231">
+          <caret line="103" column="46" lean-forward="true" selection-start-line="103" selection-start-column="46" selection-end-line="103" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/config.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="69">
+          <caret line="3" column="46" selection-start-line="3" selection-start-column="46" selection-end-line="3" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/admin.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-90">
+          <caret line="219" column="35" lean-forward="true" selection-start-line="219" selection-start-column="35" selection-end-line="219" selection-end-column="35" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/external.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-987">
-          <caret line="175" selection-start-line="175" selection-end-line="175" />
-          <folding>
-            <element signature="e#262#344#0#PHP" />
-            <element signature="n#getTotalRecords#0;n#!!top" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/classes/observer.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="588">
+        <state relative-caret-position="400">
           <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lang/en/block_filescan.php">
+    <entry file="file://$PROJECT_DIR$/amd/src/dataTableModule.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+        <state relative-caret-position="742">
+          <caret line="171" column="2" lean-forward="true" selection-start-line="171" selection-start-column="2" selection-end-line="171" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/events.php">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/install.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/caches.php">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classes/observer.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="851">
+          <caret line="37" selection-start-line="37" selection-end-line="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/access.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1449">
+          <caret line="63" column="33" selection-start-line="63" selection-start-column="18" selection-end-line="63" selection-end-column="33" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/db/services.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="253">
-          <caret line="11" column="2" lean-forward="true" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="2" />
+          <caret line="11" column="2" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="2" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/classes/Card.php">
+    <entry file="file://$PROJECT_DIR$/lang/en/block_filescan.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="18" column="1" lean-forward="true" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
+        <state relative-caret-position="1081">
+          <caret line="47" selection-start-line="47" selection-end-line="47" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/upgrade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="12" column="53" selection-start-line="12" selection-start-column="53" selection-end-line="12" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/version.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="69">
+          <caret line="3" column="29" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/tasks.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="690">
+          <caret line="41" column="62" selection-start-line="41" selection-start-column="40" selection-end-line="41" selection-end-column="62" />
+          <folding>
+            <element signature="e#7#58#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classes/task/scan_files.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="975">
+          <caret line="138" column="35" selection-start-line="138" selection-start-column="19" selection-end-line="138" selection-end-column="35" />
+          <folding>
+            <element signature="e#88#108#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classes/task/generate_report.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="53" column="38" lean-forward="true" selection-start-line="53" selection-start-column="38" selection-end-line="53" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classes/task/cleanup_filescan_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="632">
+          <caret line="42" column="35" lean-forward="true" selection-start-line="42" selection-start-column="35" selection-end-line="42" selection-end-column="35" />
         </state>
       </provider>
     </entry>

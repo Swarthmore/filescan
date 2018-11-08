@@ -36,5 +36,15 @@ $tasks = array(
     'day' => '*',
     'dayofweek' => '*',
     'month' => '*'
+  ),
+
+  array(
+    'classname' => 'block_filescan\task\cleanup_filescan_table',
+    'blocking' => 0,
+    'minute' => '0',
+    'hour' => '4',
+    'day' => '*',
+    'dayofweek' => '*',
+    'month' => '*'
   )
 );

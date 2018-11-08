@@ -2,8 +2,8 @@
 
 namespace block_filescan\task;
 
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
+//ini_set('display_errors', 'On');
+//error_reporting(E_ALL);
 
 /* Per https://docs.moodle.org/dev/Task_API#Failures
 	A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network 
@@ -92,12 +92,16 @@ f.component in ("course", "course", "block_html", "mod_assign", "mod_book", "mod
       $course = get_course($courseid);
       $num_users = count(get_enrolled_users($context, '', 0));
       $teachers = get_role_users($teacher_role_id, $context, NULL, "u.id, u.firstname, u.lastname, u.email");
+      $filepath = $file->path;
+      $file_id = $file->filescanid;
 
       $course_object->fullname = $course->fullname;
       $course_object->shortname = $course->shortname;
       $course_object->courseid = $courseid;
       $course_object->teachers = $teachers;
       $course_object->student_enrollment = $num_users - count($teachers);
+      $course_object->filepath = $filepath;
+      $course_object->file_id = $file_id;
 
       // Add the new course info to the end of the array
       $courseinfo[] = $course_object;

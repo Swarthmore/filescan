@@ -29,6 +29,10 @@ function getTotalRecords($table)
   }
 }
 
+function getTotalFilteredRecords($table, $conditions){
+  $sql = '';
+}
+
 class block_filescan_external extends external_api
 {
 
@@ -47,9 +51,9 @@ class block_filescan_external extends external_api
         'draw' => new external_value (PARAM_INT, 'Draw counter'),
         'start' => new external_value (PARAM_INT, 'Paging first record indicator'),
         'length' => new external_value (PARAM_INT, 'Number of records the table can display in the current draw.'),
-        'search' => new external_single_structure(array(
-          'value' => new external_value(PARAM_TEXT, 'Search string'),
-          'regex' => new external_value(PARAM_RAW, 'Is a  regex search')
+        'search' => new external_single_structure (array(
+          'value' => new external_value (PARAM_TEXT, 'Search string'),
+          'regex' => new external_value (PARAM_RAW, 'Is a  regex search')
         )),
 
         'columns' => new external_multiple_structure(
@@ -102,36 +106,46 @@ class block_filescan_external extends external_api
       'columns'   => $columns
     );
 
+    // todo: the column names should probably go into a config file
+    $columnNames = array('id', 'pages', 'status', 'checked', 'text', 'title', 'outline', 'language', 'last checked', 'courses', 'filepath', 'action');
+
+    // populate the required columns array
+    for($i=0; $i<=count($columnNames); $i++) {
+      $columns[$i]['name'] = $columnNames[$i];
+      $columns[$i]['searchable'] = true;
+      $columns[$i]['orderable'] = true;
+      $columns[$i]['search']['value'] = '';
+      $columns[$i]['search']['regex'] = true;
+    }
+
     //$params = self::validate_parameters(self::get_access_files_parameters(), $p);
 
-    // these are the columns (db) that we want to select, along with a datatables id (dt) for the column
-    $columns = array(
-      array('db' => 'pagecount',    'dt' => 0),
-      array('db' => 'status',       'dt' => 1),
-      array('db' => 'checked',      'dt' => 2),
-      array('db' => 'hastext',      'dt' => 3),
-      array('db' => 'hastitle',     'dt' => 4),
-      array('db' => 'hasoutline',   'dt' => 5),
-      array('db' => 'haslanguage',  'dt' => 6),
-      array('db' => 'timechecked',  'dt' => 7),
-      array('db' => 'courseinfo',   'dt' => 8),
-      array('db' => 'filepath',     'dt' => 9)
-    );
+    // construct the sql statement
+    $sql = 'SELECT id, contenthash, pagecount, status, checked, hastext, hastitle, hasoutline, haslanguage, timechecked, courseinfo
+            FROM {block_filescan_files}';
 
-    // construct sql clauses
-    $select = 'id >=' . $p['start'] . ' and id <= ' . ($p['start'] + $p['length']);
+    $conditions = array();
+
+    // If there's a search parameter passed, we need to concatendate it to the sql statement and set it in the conditions
+    if ($p['search']['value'] != '') {
+      $like = $DB->sql_like('courseinfo', ':searchvalue');
+      $conditions['searchvalue'] = '%' . $p['search']['value'] . '%';
+      $sql .= ' WHERE ' . $like;
+    }
+
+    $rf = $DB->count_records($table, $conditions);
 
     $limit = self::limit($p['start'], $p['length']);
-    $order = self::order('DESC');
+    $sql .= $limit;
 
-    $results = $DB->get_records_select($table, $select);
+    $results = $DB->get_records_sql(trim($sql, "\t\n"), $conditions);
 
     $warnings = [];
 
     return array(
-      'draw'              => (int)$draw,
+      'draw'              => (int) $draw,
       'recordsTotal'      => getTotalRecords($table),
-      'recordsFiltered'   => getTotalRecords($table),
+      'recordsFiltered'   => $rf, // the total amount of records after a filter has been applied
       'data'              => $results,
       'warnings'          => $warnings
     );
@@ -152,7 +166,7 @@ class block_filescan_external extends external_api
     $limit = '';
 
     if (isset($start) && isset($length)) {
-      $limit = "LIMIT " . intval($start) . "," . intval($length);
+      $limit = " LIMIT " . intval($start) . "," . intval($length);
     }
 
     return $limit;
@@ -167,7 +181,7 @@ class block_filescan_external extends external_api
   public static function order($dir) {
 
     if ($dir != 'ASC' || $dir != 'DESC') {
-      return 'you blew it. please pass ASC or DESC into this function';
+      return 'Please pass ASC or DESC into this function';
     }
 
     $order = '';
@@ -180,26 +194,27 @@ class block_filescan_external extends external_api
    * @return string
    */
 
-  public static function filter($search) {
-    if(!$search) {
+  public static function filter($column, $operator, $search)
+  {
+
+    $operators = array(
+      '=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'LIKE', 'IN', 'IS NULL', 'IS NOT NULL'
+    );
+
+    // error conditions
+    if (!$search) {
       return ''; // do not return a where clause
     }
 
-    $where = '';
-    return $where;
-  }
+    if (in_array($operator, $operators)) {
+      return 'An invalid operator was detected. There was an error generating the where clause of this query.';
+    }
 
-  /**
-   * This function should return a filepath given a filehash
-   *
-   * @param $filehash
-   * @return string
-   */
-
-  public static function get_file_from_hash($filehash) {
-    global $DB;
-    $table = 'files';
-    return $DB->get_records($table, array('contenthash' => $filehash));
+    // success conditions
+    if ($operator = '=') {
+      $where = 'WHERE ' . '\'' . $column . '\'' . $operator . $search;
+      return $where;
+    }
   }
 
   /**
