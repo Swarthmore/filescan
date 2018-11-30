@@ -87,8 +87,8 @@ class scan_files extends \core\task\scheduled_task
         			AND c.contextlevel = 70 
         			AND f.filesize <> 0 
         			AND f.mimetype = "application/pdf"
-        			AND f.component != "assignfeedback_editpdf" 
-        			AND f.filearea != "stamps"
+        			AND f.component <> "assignfeedback_editpdf" 
+        			AND f.filearea <> "stamps"
         			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True or (checked=False and status="error" and statuscode >=' . $max_retries . ')) 	
         		ORDER BY f.timemodified DESC
         		LIMIT ' . $max_files_to_check;

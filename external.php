@@ -12,27 +12,6 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . "/externallib.php");
 
-/**
- * returns the total records in $table
- *
- * @param $table
- * @return int
- */
-function getTotalRecords($table)
-{
-  global $DB;
-
-  if ($DB->count_records($table, $conditions = null)) {
-    return $DB->count_records($table, $conditions = null);
-  } else {
-    return 0;
-  }
-}
-
-function getTotalFilteredRecords($table, $conditions){
-  $sql = '';
-}
-
 class block_filescan_external extends external_api
 {
 
@@ -60,12 +39,12 @@ class block_filescan_external extends external_api
 
           new external_single_structure([
             'data' => new external_value(PARAM_RAW, 'The column data.'),
-            'name' => new external_value(PARAM_TEXT, 'The column name.'),
+            'name' => new external_value(PARAM_RAW, 'The column name.'),
             'searchable' => new external_value(PARAM_RAW, 'Is the column searchable'),
             'orderable' => new external_value(PARAM_RAW, 'Is the column orderable'),
 
             'search' => new external_single_structure([
-              'value' => new external_value(PARAM_TEXT, 'Search value'),
+              'value' => new external_value(PARAM_RAW, 'Search value'),
               'regex' => new external_value(PARAM_RAW, 'Is this a regex search')
             ])
 
@@ -74,8 +53,8 @@ class block_filescan_external extends external_api
 
         'order' => new external_multiple_structure(
           new external_single_structure([
-            'column' => new external_value(PARAM_INT, 'Column to which ordering should be applied.'),
-            'dir' => new external_value(PARAM_TEXT, 'Ordering direction for this column')
+            'column' => new external_value(PARAM_RAW, 'Column to which ordering should be applied.'),
+            'dir' => new external_value(PARAM_RAW, 'Ordering direction for this column')
           ])
         )
 
@@ -83,138 +62,283 @@ class block_filescan_external extends external_api
   }
 
   /**
-   * Returns access file information
+   * Makes the data tables request for data
    *
+   * @param $draw
    * @param $start
    * @param $length
+   * @param $search
+   * @param $cols
+   * @param $order
+   *
    * @return array
    */
 
-  public static function request_files($draw, $start, $length, $search, $order, $columns)
+  public static function request_files($draw, $start, $length, $search, $cols, $order)
   {
 
     global $DB;
 
-    $table = 'block_filescan_files';
+    //$DB->set_debug(true);
 
-    $p = array(
+    // set up all the variables we will need to handle the request to the database
+
+    $config = include_once 'config/config.php';
+
+    $table = 'block_filescan_files';
+    $primaryKey = 'id';
+
+    $columns = array(
+      array('db' => 'id',          'dt' => 'id'),
+      array('db' => 'status',      'dt' => 'status'),
+      array('db' => 'hastext',     'dt' => 'hastext'),
+      array('db' => 'hastitle',    'dt' => 'hastitle'),
+      array('db' => 'hasoutline',  'dt' => 'hasoutline'),
+      array('db' => 'haslanguage', 'dt' => 'haslanguage'),
+      array('db' => 'timechecked', 'dt' => 'timechecked'),
+      array('db' => 'courseinfo',  'dt' => 'courseinfo')
+    );
+
+    // todo: validate parameters before sending the request
+    // Set up the parameters required for DataTables
+    // These are parameters given to us by DataTables
+    $request = array(
       'draw'      => $draw,
       'start'     => $start,
       'length'    => $length,
       'search'    => $search,
+      'columns'   => $cols,
       'order'     => $order,
-      'columns'   => $columns
     );
 
-    // todo: the column names should probably go into a config file
-    $columnNames = array('id', 'pages', 'status', 'checked', 'text', 'title', 'outline', 'language', 'last checked', 'courses', 'filepath', 'action');
+    // Build the SQL query string from the request
+    $limit = self::limit( $request, $columns );
+    $order = self::order( $request, $columns );
+    $where = self::filter( $request, $columns );
 
-    // populate the required columns array
-    for($i=0; $i<=count($columnNames); $i++) {
-      $columns[$i]['name'] = $columnNames[$i];
-      $columns[$i]['searchable'] = true;
-      $columns[$i]['orderable'] = true;
-      $columns[$i]['search']['value'] = '';
-      $columns[$i]['search']['regex'] = true;
+    $dataSQL = "SELECT `".implode("`, `", self::pluck($columns, 'db'))."` FROM {block_filescan_files}";
+
+    $search = null;
+
+    $resFilterLengthSQL = "SELECT COUNT({$primaryKey}) FROM {block_filescan_files}";
+
+    if ($request['search']['value'] || $request['search'][0]) {
+      $dataSQL .= " WHERE courseinfo LIKE :search";
+      $search = array('search' => "%" . $request['search']['value'] . "%");
+      $resFilterLengthSQL .= '  WHERE courseinfo LIKE :search';
     }
 
-    //$params = self::validate_parameters(self::get_access_files_parameters(), $p);
+    $recordsFiltered = reset($DB->get_record_sql($resFilterLengthSQL, $search));
 
-    // construct the sql statement
-    $sql = 'SELECT id, contenthash, pagecount, status, checked, hastext, hastitle, hasoutline, haslanguage, timechecked, courseinfo
-            FROM {block_filescan_files}';
+    // Total data set length
+    $resTotalLengthSQL = "SELECT COUNT({$primaryKey}) FROM {block_filescan_files}";
+    $recordsTotal = reset($DB->get_record_sql($resTotalLengthSQL));
 
-    $conditions = array();
-
-    // If there's a search parameter passed, we need to concatendate it to the sql statement and set it in the conditions
-    if ($p['search']['value'] != '') {
-      $like = $DB->sql_like('courseinfo', ':searchvalue');
-      $conditions['searchvalue'] = '%' . $p['search']['value'] . '%';
-      $sql .= ' WHERE ' . $like;
-    }
-
-    $rf = $DB->count_records($table, $conditions);
-
-    $limit = self::limit($p['start'], $p['length']);
-    $sql .= $limit;
-
-    $results = $DB->get_records_sql(trim($sql, "\t\n"), $conditions);
+    $dataSQL .= ' ' . $order . ' ' . $limit;
 
     $warnings = [];
 
+    $data = $DB->get_records_sql($dataSQL, $search);
+
     return array(
-      'draw'              => (int) $draw,
-      'recordsTotal'      => getTotalRecords($table),
-      'recordsFiltered'   => $rf, // the total amount of records after a filter has been applied
-      'data'              => $results,
-      'warnings'          => $warnings
+      "draw"            => isset ( $request['draw'] ) ? intval( $request['draw'] ) : 0,
+      "recordsTotal"    => intval( $recordsTotal ),
+      "recordsFiltered" => intval( $recordsFiltered ),
+      "data"            => $data,
+      "warnings"        => $warnings
     );
+  }
+
+  /**
+   * Create the data output array for the DataTables rows
+   *
+   *  @param  array $columns Column information array
+   *  @param  array $data    Data from the SQL get
+   *  @return array          Formatted data in a row based format
+   */
+  static function data_output ( $columns, $data )
+  {
+    $out = array();
+
+    for ( $i=0, $ien=count($data) ; $i<$ien ; $i++ ) {
+      $row = array();
+
+      for ( $j=0, $jen=count($columns) ; $j<$jen ; $j++ ) {
+        $column = $columns[$j];
+
+        // Is there a formatter?
+        if ( isset( $column['formatter'] ) ) {
+          $row[ $column['dt'] ] = $column['formatter']( $data[$i][ $column['db'] ], $data[$i] );
+        }
+        else {
+          $row[ $column['dt'] ] = $data[$i][ $columns[$j]['db'] ];
+        }
+      }
+
+      $out[] = $row;
+    }
+
+    return $out;
   }
 
   /**
    * Paging
    *
-   * Construct the LIMIT clause for SQL query
+   * Construct the LIMIT clause for server-side processing SQL query
    *
-   * @param array $request Data sent to the server by DataTables
-   * @param array $columns Information about the columns
-   * @return string
+   *  @param  array $request Data sent to server by DataTables
+   *  @param  array $columns Column information array
+   *  @return string SQL limit clause
    */
-
-  public static function limit($start, $length)
+  static function limit ( $request, $columns )
   {
     $limit = '';
 
-    if (isset($start) && isset($length)) {
-      $limit = " LIMIT " . intval($start) . "," . intval($length);
+    if ( isset($request['start']) && $request['length'] != -1 ) {
+      $limit = "LIMIT ".intval($request['start']).", ".intval($request['length']);
     }
 
     return $limit;
   }
 
   /**
-   * returns the order clause for the sql statement
-   * @param $dir
-   * @return string
+   * Ordering
+   *
+   * Construct the ORDER BY clause for server-side processing SQL query
+   *
+   *  @param  array $request Data sent to server by DataTables
+   *  @param  array $columns Column information array
+   *  @return string SQL order by clause
    */
-
-  public static function order($dir) {
-
-    if ($dir != 'ASC' || $dir != 'DESC') {
-      return 'Please pass ASC or DESC into this function';
-    }
-
+  static function order ( $request, $columns )
+  {
     $order = '';
 
+    if ( isset($request['order']) && count($request['order']) ) {
+      $orderBy = array();
+      $dtColumns = self::pluck( $columns, 'dt' );
+
+      for ( $i=0, $ien=count($request['order']) ; $i<$ien ; $i++ ) {
+        // Convert the column index into the column data property
+        $columnIdx = intval($request['order'][$i]['column']);
+        $requestColumn = $request['columns'][$columnIdx];
+
+        $columnIdx = array_search( $requestColumn['data'], $dtColumns );
+        $column = $columns[ $columnIdx ];
+
+        if ( $requestColumn['orderable'] == 'true' ) {
+          $dir = $request['order'][$i]['dir'] === 'asc' ?
+            'ASC' :
+            'DESC';
+
+          $orderBy[] = '`'.$column['db'].'` '.$dir;
+        }
+      }
+
+      if ( count( $orderBy ) ) {
+        $order = 'ORDER BY '.implode(', ', $orderBy);
+      }
+    }
+
+    return $order;
   }
 
   /**
-   * returns the where clause for the sql statement
-   * @param $search
-   * @return string
+   * Searching / Filtering
+   *
+   * Construct the WHERE clause for server-side processing SQL query.
+   *
+   * NOTE this does not match the built-in DataTables filtering which does it
+   * word by word on any field. It's possible to do here performance on large
+   * databases would be very poor
+   *
+   *  @param  array $request Data sent to server by DataTables
+   *  @param  array $columns Column information array
+   *  @param  array $bindings Array of values for PDO bindings, used in the
+   *    sql_exec() function
+   *  @return string SQL where clause
    */
-
-  public static function filter($column, $operator, $search)
+  static function filter ($request, $columns)
   {
 
-    $operators = array(
-      '=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'LIKE', 'IN', 'IS NULL', 'IS NOT NULL'
-    );
+    global $DB;
 
-    // error conditions
-    if (!$search) {
-      return ''; // do not return a where clause
+    $globalSearch = array();
+    $columnSearch = array();
+    $dtColumns = self::pluck( $columns, 'dt' );
+
+    if ( isset($request['search']) && $request['search']['value'] != '' ) {
+      $str = $request['search']['value'];
+
+      for ( $i=0, $ien=count($request['columns']) ; $i<$ien ; $i++ ) {
+        $requestColumn = $request['columns'][$i];
+        $columnIdx = array_search( $requestColumn['data'], $dtColumns );
+        $column = $columns[ $columnIdx ];
+
+        if ( $requestColumn['searchable'] == 'true' ) {
+          //$binding = self::bind( $bindings, '%'.$str.'%', PDO::PARAM_STR );
+
+          $globalSearch[] = "`".$column['db']."` LIKE ".$str;
+
+          //$globalSearch[] = "`".$column['db']."` LIKE ". $str;
+        }
+      }
     }
 
-    if (in_array($operator, $operators)) {
-      return 'An invalid operator was detected. There was an error generating the where clause of this query.';
+    // Individual column filtering
+    if ( isset( $request['columns'] ) ) {
+      for ( $i=0, $ien=count($request['columns']) ; $i<$ien ; $i++ ) {
+        $requestColumn = $request['columns'][$i];
+        $columnIdx = array_search( $requestColumn['data'], $dtColumns );
+        $column = $columns[ $columnIdx ];
+
+        $str = $requestColumn['search']['value'];
+
+        if ( $requestColumn['searchable'] == 'true' && $str != '' ) {
+          //$binding = self::bind( $bindings, '%'.$str.'%', PDO::PARAM_STR );
+          $columnSearch[] = "`".$column['db']."` LIKE ".$str;
+          //$globalSearch[] = $column['db'] . " LIKE %\'".$str."\'";
+        }
+      }
     }
 
-    // success conditions
-    if ($operator = '=') {
-      $where = 'WHERE ' . '\'' . $column . '\'' . $operator . $search;
-      return $where;
+    // Combine the filters into a single string
+    $where = '';
+
+    if ( count( $globalSearch ) ) {
+      $where = '('.implode(' OR ', $globalSearch).')';
     }
+
+    if ( count( $columnSearch ) ) {
+      $where = $where === '' ?
+        implode(' AND ', $columnSearch) :
+        $where .' AND '. implode(' AND ', $columnSearch);
+    }
+
+    if ( $where !== '' ) {
+      $where = 'WHERE '.$where;
+    }
+
+    return $where;
+  }
+
+  /**
+   * Pull a particular property from each assoc. array in a numeric array,
+   * returning and array of the property values from each item.
+   *
+   *  @param  array  $a    Array to get data from
+   *  @param  string $prop Property to read
+   *  @return array        Array of property values
+   */
+  static function pluck ( $a, $prop )
+  {
+    $out = array();
+
+    for ( $i=0, $len=count($a) ; $i<$len ; $i++ ) {
+      $out[] = $a[$i][$prop];
+    }
+
+    return $out;
   }
 
   /**
@@ -234,19 +358,15 @@ class block_filescan_external extends external_api
         'data' => new external_multiple_structure(
           new external_single_structure(
             array(
-              'id' => new external_value(PARAM_INT, 'file id'),
-              'contenthash' => new external_value(PARAM_TEXT, 'hash'),
-              'pagecount' => new external_value(PARAM_TEXT, 'page count'),
-              'status' => new external_value(PARAM_RAW, 'status'),
-              'checked' => new external_value(PARAM_BOOL, 'checked'),
-              'hastext' => new external_value(PARAM_BOOL, 'hastext'),
-              'hastitle' => new external_value(PARAM_BOOL, 'hastitle'),
-              'hasoutline' => new external_value(PARAM_BOOL, 'hasoutline'),
-              'haslanguage' => new external_value(PARAM_BOOL, 'haslanguage'),
-              'timechecked' => new external_value(PARAM_RAW, 'time last checked'),
-              'courseinfo' => new external_value(PARAM_RAW, 'courseinfo')
+              'id' => new external_value(PARAM_INT, 'Unique identifier.'),
+              'status' => new external_value(PARAM_TEXT, 'The file scan status.'),
+              'hastext' => new external_value(PARAM_BOOL, 'Bool representing if the file has scannable text.'),
+              'hastitle' => new external_value(PARAM_BOOL, 'Bool representing if the file has a title.'),
+              'hasoutline' => new external_value(PARAM_BOOL, 'Bool representing if the file has an outline.'),
+              'haslanguage' => new external_value(PARAM_BOOL, 'Bool representing if the file has a langauge.'),
+              'timechecked' => new external_value(PARAM_RAW, 'Timestamp of the when the file was last scanned.'),
+              'courseinfo' => new external_value(PARAM_RAW, 'JSON representation of course info.')
             ), 'File')),
-
         'warnings' => new external_warnings(),
       )
     );

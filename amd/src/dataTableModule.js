@@ -1,13 +1,74 @@
+/**
+ * Converts a unix timestamp to something that is human readable
+ *
+ * @param divTimeStr
+ * @returns {string}
+ * @constructor
+ */
 function ConvertDateFromDiv(divTimeStr) {
     //eg:-divTimeStr=18/03/2013 12:53:00
-    var tmstr = divTimeStr.toString().split(' '); //'21-01-2013 PM 3:20:24'
-    var dt = tmstr[0].split('/');
-    var str = dt[2] + "/" + dt[1] + "/" + dt[0] + " " + tmstr[1]; //+ " " + tmstr[1]//'2013/01/20 3:20:24 pm'
-    var time = new Date(str);
+    let tmstr = divTimeStr.toString().split(' ') //'21-01-2013 PM 3:20:24'
+    let dt = tmstr[0].split('/')
+    let str = dt[2] + "/" + dt[1] + "/" + dt[0] + " " + tmstr[1] //+ " " + tmstr[1]//'2013/01/20 3:20:24 pm'
+    let time = new Date(str)
+
     if (time == "Invalid Date") {
-        time = new Date(divTimeStr);
+        time = new Date(divTimeStr)
     }
-    return time.toLocaleDateString();
+
+    return time.toLocaleDateString()
+}
+
+/**
+ * Returns a success icon if true, and a danger icon if not
+ *
+ * @param bool
+ * @returns {string}
+ */
+function getIcon(bool) {
+    if(bool){
+        return '<i class="fa fa-check-circle text-success fa-2x"></i>'
+    } else {
+        return '<i class="fa fa-times-circle text-danger fa-2x"></i>'
+    }
+}
+
+/**
+ * Returns an icon clause
+ *
+ * @param status
+ * @returns {string}
+ */
+function getStatusIcon(status) {
+    if(status === 'check') {
+        return '<i class="fa fa-exclamation-triangle fa-2x text-info"></i>'
+    } else if(status === 'fail') {
+        return '<i class="fa fa-cubes fa-2x text-warning"></i>'
+    } else if (status === 'error') {
+        return '<i class="fa fa-ban fa-2x text-danger"></i>'
+    } else if (status === 'pass') {
+        return '<i class="fa fa-check fa-2x text-success"></i>'
+    }
+}
+
+/**
+ * Parse teachers out of the courseinfo object
+ *
+ * @param course
+ * @returns {Array}
+ */
+function parseTeachers(course) {
+    let teachers = ''
+
+    Object.entries(course).forEach(([key, val]) => {
+        if (key === 'teachers') {
+            Object.entries(val).forEach(([teacherId, teacherInfo]) => {
+                teachers += teacherInfo.firstname + ' ' + teacherInfo.lastname + '<br>'
+            })
+        }
+    })
+
+    return teachers
 }
 
 define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
@@ -20,95 +81,54 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
             const api = domain + '/webservice/rest/server.php' + '?wstoken=' + token + '&wsfunction=' + f + '&moodlewsrestformat=' + 'json'
 
             $(document).ready(function () {
-                $('#dt').DataTable({
+
+                let myTable = $('#myTable').DataTable({
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
-                        url: api,
-                        type: 'POST'
+                        "url": api,
+                        "cache": true // this removes _ from being returned
                     },
-                    "columnDefs": [{
-                        "defaultContent": "NULL",
-                        "targets": "_all"
-                    }],
+                    "columnDefs": [
+                        {
+                            "targets": "id",
+                            "visible": false
+                        }
+                    ],
                     "columns": [
-                        {"data": "id"},
-                        {"data": "pagecount"},
                         {
                             "data": "status",
-                            "render": (data) => {
-                                if (data == 'check') {
-                                    return '<i class="fa fa-check text-success fa-fw"></i>'
-                                } else if (data == 'fail') {
-                                    return '<i class="fa fa-exclamation text-warning fa-fw" aria-hidden="true"></i>'
-                                } else if (data == 'error') {
-                                    return '<i class="fa fa-times text-danger fa-fw" aria-hidden="true"></i>'
-                                } else {
-                                    return '<strong>Error</strong>' // catch all in case all else fails
-                                }
-                            }
-                        },
-                        {
-                            "data": "checked",
-                            "render": (data) => {
-                                if (data) {
-                                    return '<i class="fa fa-check text-success"></i>'
-                                } else {
-                                    return '<i class="fa fa-times text-danger"></i>'
-                                }
-                            }
+                            "className": "text-center",
+                            "render": data => getStatusIcon(data)
                         },
                         {
                             "data": "hastext",
-                            "render": (data) => {
-                                if (data) {
-                                    return '<i class="fa fa-check text-success"></i>'
-                                } else {
-                                    return '<i class="fa fa-times text-danger"></i>'
-                                }
-                            }
+                            "className": "text-center",
+                            "render": data => getIcon(data)
                         },
                         {
                             "data": "hastitle",
-                            "render": (data) => {
-                                if (data) {
-                                    return '<i class="fa fa-check text-success"></i>'
-                                } else {
-                                    return '<i class="fa fa-times text-danger"></i>'
-                                }
-                            }
+                            "className": "text-center",
+                            "render": data => getIcon(data)
                         },
                         {
                             "data": "hasoutline",
-                            "render": (data) => {
-                                if (data) {
-                                    return '<i class="fa fa-check text-success"></i>'
-                                } else {
-                                    return '<i class="fa fa-times text-danger"></i>'
-                                }
-                            }
+                            "className": "text-center",
+                            "render": data => getIcon(data)
                         },
                         {
                             "data": "haslanguage",
-                            "render": (data) => {
-                                if (data) {
-                                    return '<i class="fa fa-check text-success"></i>'
-                                } else {
-                                    return '<i class="fa fa-times text-danger"></i>'
-                                }
-                            }
+                            "className": "text-center",
+                            "render": data => getIcon(data)
                         },
                         {
                             "data": "timechecked",
-                            "render": (data, type, row, meta) => {
-                                let d = Date.parse(data)
-                                return ConvertDateFromDiv(d)
-                            }
+                            "className": "text-center",
+                            "render": data => { return ConvertDateFromDiv(Date.parse(data)) }
                         },
                         {
                             "data": "courseinfo",
-                            "render": (data) => {
-                                // parse the data from courseinfo and display a link to the courses
+                            "render": (data, type, row, meta) => {
                                 let url = '/course/view.php?id='
 
                                 if (data) {
@@ -117,54 +137,58 @@ define(['jquery', 'theme_boost/dataTables'], ($, DataTable) => {
 
                                     d.forEach(course => {
                                         let courseUrl = url + course.courseid
-                                        let teachersObj = course.teachers // could have multiple teachers
-                                        let teacher
                                         let enrolled = course.student_enrollment
 
-                                        // check the teacher object
-                                        if (teachersObj) {
-                                            teacher =  Object.values(teachersObj)[0]
-
-                                            if(!teacher){
-                                                teacher = 'No teacher'
-                                            } else {
-                                                teacher = `<a href="#">${teacher.firstname} ${teacher.lastname}</a>`
-                                            }
-                                        }
+                                        let teachers = parseTeachers(course)
 
                                         if (course) {
                                             courses.push(
-                                                '<a href="' + courseUrl + '">' + course.shortname + '</a>' + '<br>' +
-                                                teacher + '<br>' +
-                                                enrolled + ' Students Enrolled' + '<br>' +
-                                                `<strong><a href="https://mappt.swarthmore.edu/mod/resource/view.php?id=${course.file_id}">` + course.file_id + '</a></strong>'
+
+                                                `<ul class="list-group list-fix">` +
+
+                                                `<li class="list-group-item">` +
+                                                `<div class="row mb-3">` +
+                                                `<div class="col-sm-2"><strong>Course: </strong></div>` +
+                                                `<div class="col-sm"><a href="${courseUrl}">${course.shortname}</a></div>` +
+                                                `</div>` +
+                                                `</li>` +
+
+                                                `<li class="list-group-item">` +
+                                                `<div class="row mb-3">` +
+                                                `<div class="col-sm-2"><strong>Teachers: </strong></div>` +
+                                                `<div class="col-sm">${teachers}</div>` +
+                                                `</div>` +
+                                                `</li>` +
+
+                                                `<li class="list-group-item">` +
+                                                `<div class="row mb-3">` +
+                                                `<div class="col-sm-2"><strong>Students Enrolled: </strong></div>` +
+                                                `<div class="col-sm">${enrolled}</div>` +
+                                                `</div>` +
+                                                `</li>` +
+
+                                                `<li class="list-group-item">` +
+                                                `<div class="row mb-3">` +
+                                                `<div class="col-sm-2"><strong>File: </strong></div>` +
+                                                `<div class="col-sm"><a href="https://mappt.swarthmore.edu/mod/resource/view.php?id=${course.instance_id}">${course.filename}</a></div>` +
+                                                `</div>` +
+                                                `</li>` +
+                                                `</ul>`
+
                                             )
                                         } else {
-                                            courses.push('NA')
+                                            courses.push('No course information found. This may be an invalid courseinfo entry within the block_filescan_files table.')
                                         }
                                     })
-                                    return courses.join('<hr>')
+                                    return courses.join('<br>')
                                 } else {
-                                    return 'NA'
+                                    return `No response returned from the DataTables service. Are you sure the course exists?<br><strong>Ref id: ${row['id']}</strong>`
                                 }
                             }
-                        },
-                        {
-                            "data": "filepath",
-                            "render": () => {
-                                return '<i class="fa fa-file text-info fa-2x mt-2"></i>'
-                            }
-                        },
-                        {
-                            "data": "action",
-                            "render": (data) => {
-                                return (
-                                    `<a class="btn btn-primary btn-block btn-sm mt-2" href="#" role="button">Fix</a>`
-                                );
-                            }
                         }
-                    ],
+                    ]
                 })
+
             })
 
         }
