@@ -49,25 +49,31 @@ $capabilities = array(
     )
   ),
 
-
   'block/filescan:scan' => array(
     'riskbitmask' => RISK_PERSONAL,
     'captype' => 'read',
     'contextlevel' => CONTEXT_COURSE,
     'archetypes' => array(
-      'editingteacher' => CAP_ALLOW,
-      'manager' => CAP_ALLOW
+      'guest'           => CAP_PREVENT,
+      'student'         => CAP_PREVENT,
+      'teacher'         => CAP_PREVENT,
+      'coursecreator'   => CAP_ALLOW,
+      'editingteacher'  => CAP_ALLOW,
+      'manager'         => CAP_ALLOW
     ),
     'clonepermissionsfrom' => 'moodle/course:update',
   ),
 
-  'block/filescan:viewadminreport' => [
+  'block/filescan:viewadminreport' => array(
     'captype' => 'read',
     'contextlevel' => CONTEXT_BLOCK,
-    'archetypes' => [
-      'editingteacher' => CAP_ALLOW,
-      'manager' => CAP_ALLOW
-    ]
-  ]
-
+    'archetypes' => array(
+      'guest'          => CAP_PREVENT,
+      'student'        => CAP_PREVENT,
+      'teacher'        => CAP_PREVENT,
+      'editingteacher' => CAP_PREVENT,
+      'coursecreator'  => CAP_PREVENT,
+      'manager'        => CAP_ALLOW
+    )
+  )
 );

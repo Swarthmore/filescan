@@ -18,7 +18,9 @@ class block_filescan extends block_base
     $this->title = get_string('filescan', 'block_filescan');
   }
 
-  // This function tells Moodle that the block can be viewed on the site, my (dashboard), and course
+  /**
+   * @return array
+   */
   public function applicable_formats()
   {
     return [
@@ -28,10 +30,9 @@ class block_filescan extends block_base
     ];
   }
 
-  // when you enter a course, this pulls the files for the selected course
-  // there's a caching mechanism for this -- this is only called when there's
-  // not a cache summary in place
-
+  /**
+   * @return array
+   */
   private function get_course_files()
   {
 
@@ -101,6 +102,10 @@ class block_filescan extends block_base
     return $results;
   }
 
+  /**
+   * @param $courseid
+   * @return string
+   */
   private function generate_summary($courseid)
   {
     global $DB;
@@ -177,19 +182,19 @@ class block_filescan extends block_base
   }
 
   /**
-   * Moodle calls this to display the content in the block
+   * @return stdClass
    */
-
   public function get_content()
   {
 
     global $COURSE;
     global $CFG;
     global $DB;
+    global $PAGE;
 
     require_once($CFG->dirroot . '/course/lib.php');
 
-    $table              = 'block_filescan_files';
+    $table = 'block_filescan_files';
 
     $results['pass']    = $DB->count_records($table, ['status' => 'pass']);
     $results['fails']   = $DB->count_records($table, ['status' => 'fail']);
@@ -198,65 +203,66 @@ class block_filescan extends block_base
 
     $context            = context_course::instance($COURSE->id);
     $canview            = has_capability('block/filescan:viewpages', $context);
-    $canviewadmin       = has_capability('block/filescan:viewadminreport', $this->page->context);
-
-    // If the role can't view the block, return an empty string for the content
-    // and exit (blocks with no content aren't shown)
-    if (!$canview) {
-      $this->content          = new stdClass;
-      $this->content->text    = "";
-      $this->content->footer  = "";
-      return $this->content;
-    }
-
-    // Determine course metadata
-    $coursename         = $COURSE->fullname;
-    $courseshortname    = $COURSE->shortname;
-    $courseurl          = course_get_url($COURSE);
-
-    // Determine if the file scan has been previously cached or not
-    $cache = cache::make('block_filescan', 'filescan');
-    $filescan_cache = $cache->get($COURSE->id);
-
-    if ($filescan_cache) {
-      $filescan_summary = $filescan_cache;
-    } else {
-      $filescan_summary = $this->generate_summary($COURSE->id);
-      $result = $cache->set($COURSE->id, $filescan_summary);
-    }
-
-    if ($this->content !== null) {
-      return $this->content;
-    }
+    $canviewadmin       = has_capability('block/filescan:viewadminreport', $context);
 
     $this->content = new stdClass;
 
     // check if the user has the viewadminreport capability. If they do, then the URL and Summary are changed
-    if ($canviewadmin) {
+    if ($canviewadmin && ($this->page->pagetype == 'my-index' || $this->page->pagetype == 'site-index')) {
 
       $url = new moodle_url('/blocks/filescan/admin.php');
 
       $this->title = get_string('reportheading', 'block_filescan');
 
       $this->content->text =  html_writer::tag('p', 'Passing: ' . $results['pass'], null)
-                            . html_writer::tag('p', 'Fails: '   . $results['fails'], null)
-                            . html_writer::tag('p', 'Errors: '  . $results['errors'], null)
-                            . html_writer::tag('p', 'Checks: '  . $results['checks'], null);
+                            . html_writer::tag('p', 'Fails: ' . $results['fails'], null)
+                            . html_writer::tag('p', 'Errors: ' . $results['errors'], null)
+                            . html_writer::tag('p', 'Checks: ' . $results['checks'], null);
 
       $this->content->footer = html_writer::link($url, get_string('reportheading', 'block_filescan'));
 
+    }
+    else if (!$canviewadmin && ($this->page->pagetype == 'site-index' || $this->page->pagetype == 'my-index')) {
+        $this->content = new stdClass;
+        $this->content->text = "";
+        $this->content->footer = "";
+    }
+    else if ($canview) {
+
+      // Determine course metadata
+      $coursename       = $COURSE->fullname;
+      $courseshortname  = $COURSE->shortname;
+      $courseurl        = course_get_url($COURSE);
+
+      // Determine if the file scan has been previously cached or not
+      $cache = cache::make('block_filescan', 'filescan');
+      $filescan_cache = $cache->get($COURSE->id);
+
+      if ($filescan_cache) {
+        $filescan_summary = $filescan_cache;
+      } else {
+        $filescan_summary = $this->generate_summary($COURSE->id);
+        $result = $cache->set($COURSE->id, $filescan_summary);
+      }
+
+      $url = new moodle_url('/blocks/filescan/view.php', ['courseid' => $COURSE->id]);
+      $this->content->text = get_string('summaryview', 'block_filescan') . $filescan_summary;
+      $this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
+
     } else {
-      $url                      = new moodle_url('/blocks/filescan/view.php', ['courseid' => $COURSE->id]);
-      $this->content->text      = get_string('summaryview', 'block_filescan') . $filescan_summary;
-      $this->content->footer    = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
+      $this->content = new stdClass;
+      $this->content->text = "";
+      $this->content->footer = "";
+    }
+
+    if ($this->content !== null) {
+      return $this->content;
+    }
+
+    function has_config()
+    {
+      return true;
     }
 
   }
-
-  // Tell Moodle there is a configuration file in settings.php
-  function has_config()
-  {
-    return true;
-  }
-
 }

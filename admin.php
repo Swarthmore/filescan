@@ -8,16 +8,16 @@
 require_once('../../config.php');             // global config
 $config = include_once('config/config.php');  // plugin config
 
-// if config indicates development mode, then allow errors to be thrown to the dom
-
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  ini_set('memory_limit', '1024M');
-  error_reporting(-1);
-
-
 global $OUTPUT;
 global $PAGE;
+global $USER;
+global $COURSE;
+
+
+$canview = has_capability('block/filescan:viewadminreport', context_course::instance($COURSE->id));
+if (!$canview) {
+  die('You do not have the proper permissions to view this page.');
+}
 
 // meta stuff
 $PAGE->set_context(context_system::instance());
@@ -130,6 +130,8 @@ $totalRecords   = getTotalRecords('block_filescan_files');
 // start outputting our page
 echo $OUTPUT->header();
 
+echo '<p style="margin-top: 50px;">' . has_capability('block/filescan:viewadminreport', context_system::instance()) . '</p>';
+
 echo html_writer::tag('h4', 'At a Glance', array('class' => 'text-primary'));
 
 // generate the title, text, outline and language card row
@@ -192,6 +194,7 @@ echo
   </div>
 ';
 
+// these styles are only needed if you are running the Boost theme.
 echo '
 <style>
 .dataTables_paginate,
