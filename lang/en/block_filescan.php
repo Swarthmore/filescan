@@ -26,7 +26,7 @@ $string['summary:files_found'] = '{$a} PDF files found'; // Substituting integer
 $string['summary:files_accessible'] = '{$a} Accessible'; // Substituting integer.
 $string['summary:files_partially_accessible'] = '{$a} Partially Accessible'; // Substituting integer.
 $string['summary:files_inaccessible'] = '{$a} Inaccessible'; // Substituting integer.
-$string['summary:files_accessibility_unknown'] = '{$a} Accessibility Unkown'; // Substituting integer.
+$string['summary:files_accessibility_unknown'] = '{$a} Accessibility Unknown'; // Substituting integer.
 $string['summary:last_updated'] = 'Last updated: {$a}'; // Substituting string (date).
 $string['summary:title'] = 'Summary';
 
