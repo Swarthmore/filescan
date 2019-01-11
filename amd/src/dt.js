@@ -21,6 +21,8 @@ define(['jquery', 'core/config', 'core/ajax', 'theme_boost/datatables'], functio
 
       $(document).ready(function () {
         
+        mdlconfig.wwwroot = "http://moodle.aws-dev.swarthmnore.edu";
+
         // initialize the data table
         var view = $('#view').DataTable({
           "processing": true,
