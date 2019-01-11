@@ -22,34 +22,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = array(
-  array(
-    'classname' => 'block_filescan\task\scan_files',
-    'blocking' => 0,
-    'minute' => '*/5',
-    'hour' => '*',
-    'day' => '*',
-    'dayofweek' => '*',
-    'month' => '*'
-  ),
-
-  array(
-    'classname' => 'block_filescan\task\generate_report',
-    'blocking' => 0,
-    'minute' => '0',
-    'hour' => '4',
-    'day' => '*',
-    'dayofweek' => '*',
-    'month' => '*'
-  ),
-
-  array(
-    'classname' => 'block_filescan\task\cleanup_filescan_table',
-    'blocking' => 0,
-    'minute' => '0',
-    'hour' => '4',
-    'day' => '*',
-    'dayofweek' => '*',
-    'month' => '*'
-  )
-);
+$functions = [
+  'block_filescan_request_files' => [
+    'classname' => 'block_filescan_external',
+    'methodname' => 'request_files',
+    'classpath' => 'blocks/filescan/external.php',
+    'description' => 'Returns files for the dashboard',
+    'type' => 'read',
+    'ajax' => true
+  ]
+];
