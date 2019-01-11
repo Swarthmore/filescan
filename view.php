@@ -279,7 +279,7 @@ foreach ($file_list as $f) {
 }
 
 // Check to see if there are any files still processing and update status flag as needed
-if ($ocr_summary['pending'] > 0) {
+if (array_key_exists ('pending', $ocr_summary) && $ocr_summary['pending'] > 0) {
   $processing = true;
 }
 
