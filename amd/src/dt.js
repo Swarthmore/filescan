@@ -14,7 +14,7 @@
 //   }
 // });
 
-define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, datatables){
+define(['jquery', 'core/config', 'core/ajax', 'theme_boost/datatables'], function ($, mdlconfig, ajax, DataTable){
 
   return {
     init: function () {
