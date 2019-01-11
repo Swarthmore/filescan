@@ -1,10 +1,5 @@
 <?php
 
-// filename
-// course name
-// teachers
-// # enrolled
-
 require_once('../../config.php');             // global config
 $config = include_once('config/config.php');  // plugin config
 
@@ -13,13 +8,14 @@ global $PAGE;
 global $USER;
 global $COURSE;
 
-
+// Define if the user has the capability to view the admin report
 $canview = has_capability('block/filescan:viewadminreport', context_course::instance($COURSE->id));
+
 if (!$canview) {
   die('You do not have the proper permissions to view this page.');
 }
 
-// meta stuff
+// set page details
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title('File Scan Report (System-wide)');
 $PAGE->set_url('/block/filescan/admin.php', null);
@@ -33,8 +29,8 @@ $token = array('token' => $config['token']);
 
 // use this variable to scale the bars under the displayed percentages
 $scale = array(
-  'x' => 2,
-  'y' => 1
+  'x' => 1,
+  'y' => 0.5 
 );
 
 // use this variable to define the width and height (in pixels) of the progress bars
@@ -106,10 +102,13 @@ function generateOverallReport($status)
   }
 }
 
-// call the datatables module
-$PAGE->requires->js_call_amd('block_filescan/dataTableModule', 'make', $token);
+// start outputting our page
+echo $OUTPUT->header();
 
-/**
+// call the datatables module
+$PAGE->requires->js_call_amd('block_filescan/dt', 'init');
+
+ /**
  * This function returns the total records within $table
  *
  * @param $table
@@ -124,13 +123,8 @@ function getTotalRecords($table)
 
 // TODO: move all this output junk into a function or class
 // generate the dashboard totals
-$checks         = array('title', 'text', 'outline', 'language');
+$checks         = array('text', 'title', 'language', 'outline');
 $totalRecords   = getTotalRecords('block_filescan_files');
-
-// start outputting our page
-echo $OUTPUT->header();
-
-echo '<p style="margin-top: 50px;">' . has_capability('block/filescan:viewadminreport', context_system::instance()) . '</p>';
 
 echo html_writer::tag('h4', 'At a Glance', array('class' => 'text-primary'));
 
@@ -143,28 +137,28 @@ foreach ($checks as $check) {
 
   $fillAttributes = array(
     'style' => 'width: ' . $completed * $scale['x'] . 'px; height: ' . $progressBar['height'] . 'px; max-width: 95%;',
-    'class' => 'bg-success'
+    'class' => 'striped-success bg-success'
   );
 
   $cardAttributes = array(
-    'class' => 'card text-white bg-dark m-3 p-3 text-center'
+    'class' => 'card text-white bg-dark m-3 text-center'
   );
 
   $primaryCard = array(
-    'class' => 'card text-white bg-primary m-3 p-3 text-center'
+    'class' => 'card text-white bg-primary m-3 text-center'
   );
 
   echo html_writer::start_tag('div', $cardAttributes, null);
   echo html_writer::start_tag('div', array('class' => 'card-body'), null);
   echo html_writer::tag('p', ucfirst($check), array('class' => 'lead'));
 
-  echo html_writer::tag('h3', $completed . '%', array('class' => 'text-white display-4'));
-  echo html_writer::start_tag('div', array('style' => 'margin: 0 auto;  max-width: 95%; width: ' . $progressBar['width'] . 'px;', 'class' => 'mb-2 bg-danger'), null);
+  echo html_writer::tag('h4', $completed . '%', array('class' => 'text-white'));
+  echo html_writer::start_tag('div', array('style' => 'margin: 0 auto;  max-width: 95%; width: ' . $progressBar['width'] . 'px;', 'class' => 'mb-2 striped-danger bg-danger'), null);
   echo html_writer::tag('div', null, $fillAttributes);
 
   echo html_writer::end_tag('div');
 
-  echo html_writer::tag('p', $fileHas . ' / ' . $totalRecords, array('class' => 'text-muted'));
+  echo html_writer::tag('p', $fileHas . ' / ' . $totalRecords . ' PDFs', array('class' => 'mt-3', 'style' => 'color: #bdbfc0;'));
 
   echo html_writer::end_tag('div');
   echo html_writer::end_tag('div');
@@ -177,14 +171,14 @@ echo
 '
   <div class="container-fluid">
     <main>       
-      <table id="myTable" class="table mx-2 my-3" style="width: 100%;">
+      <table id="view" class="table mx-2 my-3" style="width: 100%;">
         <thead>
             <tr class="bg-primary text-white">
               <th class="text-center">Status</th>
               <th class="text-center">Text</th>
               <th class="text-center">Title</th>
-              <th class="text-center">Outline</th>
               <th class="text-center">Language</th>
+              <th class="text-center">Outline</th>
               <th class="text-center">Checked</th>
               <th>Course Information</th>
             </tr>
@@ -213,6 +207,26 @@ border: 0;
 margin: 0;
 padding: 0;
 }
+.striped-danger {
+  background: repeating-linear-gradient(
+    45deg,
+    #c62828,
+    #c62828 10px,
+    #e53935 10px,
+    #e53935 20px
+  );
+}
+
+.striped-success {
+  background: repeating-linear-gradient(
+      45deg,
+      #43a047,
+      #43a047 10px,
+      #388e3c 10px,
+      #388e3c 20px
+    );
+}
 </style>
 ';
+
 echo $OUTPUT->footer();

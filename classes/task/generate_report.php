@@ -45,7 +45,7 @@ class generate_report extends \core\task\scheduled_task
       ctx.path as path,
       fs.id as filescanid,
       case when f.component = "mod_resource" then r.name else f.filename end as "filename"
-      from mdl_files f
+      from {files} f
       inner join {context} ctx on (ctx.id = f.contextid)
       inner join {course_modules} cm on (cm.id = ctx.instanceid)
       inner join {block_filescan_files} fs on (f.contenthash = fs.contenthash)

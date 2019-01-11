@@ -74,8 +74,7 @@ class block_filescan_external extends external_api
    * @return array
    */
 
-  public static function request_files($draw, $start, $length, $search, $cols, $order)
-  {
+  public static function request_files($draw, $start, $length, $search, $cols, $order) {
 
     global $DB;
 

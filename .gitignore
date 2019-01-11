@@ -1,5 +1,5 @@
-.vscode/
-.idea/
+.vscode
+.idea
 config/config.php
-vendor/
-node_modules/
+vendor
+node_modules
