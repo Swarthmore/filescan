@@ -189,7 +189,7 @@ echo
 '
   <div class="container-fluid">
     <main>
-      <table id="myTable" class="table mx-2 my-3" style="width: 100%;">
+      <table id="view" class="table mx-2 my-3" style="width: 100%;">
         <thead>
             <tr class="bg-primary text-white">
               <th class="text-center">' . get_string('table:status_header', 'block_filescan') . '</th>
