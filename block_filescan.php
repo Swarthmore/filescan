@@ -1,15 +1,5 @@
 <?php
 
-$config = include_once('config/config.php'); // plugin config
-
-// if config indicates development mode, then allow errors to be thrown to the dom
-if ($config['env'] === 'development') {
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  ini_set('memory_limit', '1024M');
-  error_reporting(-1);
-}
-
 class block_filescan extends block_base
 {
 

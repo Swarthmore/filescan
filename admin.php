@@ -1,7 +1,6 @@
 <?php
 
 require_once('../../config.php');             // global config
-$config = include_once('config/config.php');  // plugin config
 
 global $OUTPUT;
 global $PAGE;
@@ -21,11 +20,6 @@ $PAGE->set_title('File Scan Report (System-wide)');
 $PAGE->set_url('/block/filescan/admin.php', null);
 $PAGE->set_pagelayout('base');
 $PAGE->set_heading(get_string('reportheading', 'block_filescan'));
-$PAGE->set_cacheable($config['cacheable']);
-
-// a valid token is required to access the web service.
-// see: https://docs.moodle.org/35/en/Using_web_services
-$token = array('token' => $config['token']);
 
 // use this variable to scale the bars under the displayed percentages
 $scale = array(
