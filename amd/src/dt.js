@@ -19,11 +19,6 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, dat
   return {
     init: function () {
 
-      // var domain = 'https://mappt.swarthmore.edu'
-      // var f = 'block_filescan_request_files'
-      // var token = '1b2f0290a3b83a35eb7e21c3eed2ef62';
-      // var api = domain + '/webservice/rest/server.php' + '?wstoken=' + token + '&wsfunction=' + f + '&moodlewsrestformat=' + 'json'
-      
       $(document).ready(function () {
         
         // initialize the data table
@@ -36,8 +31,6 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, dat
                 methodname: "block_filescan_request_files",
                 args: data,
                 done: function(res){
-                  // once the new data is obtained, redraw the datatable
-                  // with the data
                   callback(res);
                 },
                 fail: function(){
@@ -97,64 +90,35 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, dat
             },
             {
               "data": "courseinfo",
-              "render": function (data, type, row, meta) {
-                let url = '/course/view.php?id='
-                
-                if (data) {
-                  let d = JSON.parse(data)
-                  let courses = []
-                  
-                  d.forEach(course => {
-                    let courseUrl = url + course.courseid
-                    let enrolled = course.student_enrollment
-                    
-                    let teachers = parseTeachers(course)
-                    
-                    if (course) {
-                      courses.push(
-                        
-                        `<ul class="list-group list-fix">` +
-                        
-                        `<li class="list-group-item">` +
-                        `<div class="row mb-3">` +
-                        `<div class="col-sm-2"><strong>Course: </strong></div>` +
-                        `<div class="col-sm"><a href="${courseUrl}">${course.shortname}</a></div>` +
-                        `</div>` +
-                        `</li>` +
-                        
-                        `<li class="list-group-item">` +
-                        `<div class="row mb-3">` +
-                        `<div class="col-sm-2"><strong>Teachers: </strong></div>` +
-                        `<div class="col-sm">${teachers}</div>` +
-                        `</div>` +
-                        `</li>` +
-                        
-                        `<li class="list-group-item">` +
-                        `<div class="row mb-3">` +
-                        `<div class="col-sm-2"><strong>Students Enrolled: </strong></div>` +
-                        `<div class="col-sm">${enrolled}</div>` +
-                        `</div>` +
-                        `</li>` +
-                        
-                        `<li class="list-group-item">` +
-                        `<div class="row mb-3">` +
-                        `<div class="col-sm-2"><strong>File: </strong></div>` +
-                        `<div class="col-sm"><a href="https://mappt.swarthmore.edu/mod/resource/view.php?id=${course.instance_id}">${course.filename}</a></div>` +
-                        `</div>` +
-                        `</li>` +
-                        `</ul>`
-                        
-                        )
-                      } else {
-                        courses.push('No course information found. This may be an invalid courseinfo entry within the block_filescan_files table.')
-                      }
-                    })
-                    return courses.join('<br>')
+              "render": (data, type, row, meta) => {
+                  let url = '/course/view.php?id='
+
+                  if (data) {
+                      let d = JSON.parse(data)
+                      let courses = []
+
+                      d.forEach(course => {
+                          let courseUrl = url + course.courseid
+                          let enrolled = course.student_enrollment
+
+                          let teachers = parseTeachers(course)
+
+                          if (course) {
+                            courses.push(
+                              `<div><a href="${courseUrl}">${course.shortname}</a> [${enrolled}]</div>` +
+                              `<div>${teachers}</div>` +
+                              `<div class="mb-1"><a href="${mdlcfg.wwwroot}/mod/resource/view.php?id=${course.instance_id}">${course.filename}</a></div>`
+                              ); 
+                          } else {
+                              courses.push('No course information found. This may be an invalid courseinfo entry within the block_filescan_files table.')
+                          }
+                      })
+                      return courses.join('<br>')
                   } else {
-                    return `No response returned from the DataTables service. Are you sure the course exists?<br><strong>Ref id: ${row['id']}</strong>`
+                      return `No response returned from the DataTables service. Are you sure the course exists?<br><strong>Ref id: ${row['id']}</strong>`
                   }
-                }
               }
+          }
             ]
           })
           
