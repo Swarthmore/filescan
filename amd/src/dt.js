@@ -14,13 +14,14 @@
 //   }
 // });
 
-define(['jquery', 'core/config', 'core/ajax', 'theme_boost/datatables'], function ($, mdlconfig, ajax, DataTable){
+define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, DataTable){
 
   return {
     init: function () {
 
       $(document).ready(function () {
         
+        var mdlconfig = {};
         mdlconfig.wwwroot = "http://moodle.aws-dev.swarthmnore.edu";
 
         // initialize the data table
@@ -52,35 +53,35 @@ define(['jquery', 'core/config', 'core/ajax', 'theme_boost/datatables'], functio
               "data": "status",
               "className": "text-center",
               "render": function(data){ 
-                getStatusIcon(data) 
+                data 
               }
             },
             {
               "data": "hastext",
               "className": "text-center",
               "render": function(data){ 
-                getIcon(data) 
+                data
               }
             },
             {
               "data": "hastitle",
               "className": "text-center",
               "render": function(data){ 
-                getIcon(data) 
+                data
               }
             },
             {
               "data": "hasoutline",
               "className": "text-center",
               "render": function(data){ 
-                getIcon(data) 
+                data
               }
             },
             {
               "data": "haslanguage",
               "className": "text-center",
               "render": function(data){ 
-                getIcon(data) 
+                data
               }
             },
             {
@@ -158,14 +159,10 @@ function ConvertDateFromDiv(divTimeStr) {
 * @returns {string}
 */
 function getIcon(bool) {
-  if (checkResponse(status)){
-    if(bool){
-      return '<i class="fa fa-check text-success fa-fw"></i>'
-    } else {
-        return '<i class="fa fa-times text-danger fa-fw"></i>'
-    }
+  if(bool){
+    return '<i class="fa fa-check text-success fa-fw"></i>'
   } else {
-    return "Server response is invalid."
+      return '<i class="fa fa-times text-danger fa-fw"></i>'
   }
 }
 /**
@@ -175,19 +172,14 @@ function getIcon(bool) {
 * @returns {string}
 */
 function getStatusIcon(status) {
-  if (checkResponse(status)) {
-
-    if(status == 'check') {
-      return '<i class="fa fa-exclamation text-warning fa-fw"></i>'
-    } else if(status == 'fail') {
-        return '<i class="fa fa-exclamation-triangle text-warning fa-fw"></i>'
-    } else if (status == 'error') {
-        return '<i class="fa fa-times text-danger fa-fw"></i>'
-    } else if (status == 'pass') {
-        return '<i class="fa fa-check text-success fa-fw"></i>'
-    }
-  } else {
-    return "Server response is invalid."
+  if(status == 'check') {
+    return '<i class="fa fa-exclamation text-warning fa-fw"></i>'
+  } else if(status == 'fail') {
+      return '<i class="fa fa-exclamation-triangle text-warning fa-fw"></i>'
+  } else if (status == 'error') {
+      return '<i class="fa fa-times text-danger fa-fw"></i>'
+  } else if (status == 'pass') {
+      return '<i class="fa fa-check text-success fa-fw"></i>'
   }
 }
 /**
@@ -209,12 +201,4 @@ function parseTeachers(course) {
   })
   
   return teachers
-}
-
-function checkResponse(res){
-  if(res){
-    return true;
-  } else {
-    return false;
-  }
 }
