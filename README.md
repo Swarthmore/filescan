@@ -13,7 +13,6 @@ This Moodle block consists of two main functions:
 * Clone or download this repository into the `<moodle root>/blocks` directory
 * Rename the directory from `block-filescan` to `filescan`
 * Log into Moodle as an admin and update Moodle to add the block
-* Edit `example.config.php` and rename it to `config.php`
 
 # Configuration
 This plugin configuration requires a URL for the File Scan Server.  

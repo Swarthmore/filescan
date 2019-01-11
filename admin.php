@@ -1,11 +1,34 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @package   block_filescan
+ * @copyright 2018 Swarthmore College ITS
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('../../config.php');             // global config
+
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 global $OUTPUT;
 global $PAGE;
 global $USER;
 global $COURSE;
+
+require_login();
 
 // Define if the user has the capability to view the admin report
 $canview = has_capability('block/filescan:viewadminreport', context_course::instance($COURSE->id));
@@ -16,7 +39,7 @@ if (!$canview) {
 
 // set page details
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title('File Scan Report (System-wide)');
+$PAGE->set_title('File Scan Report (System-wide)'); // to do: put this in lang string file
 $PAGE->set_url('/block/filescan/admin.php', null);
 $PAGE->set_pagelayout('base');
 $PAGE->set_heading(get_string('reportheading', 'block_filescan'));
@@ -120,7 +143,7 @@ function getTotalRecords($table)
 $checks         = array('text', 'title', 'language', 'outline');
 $totalRecords   = getTotalRecords('block_filescan_files');
 
-echo html_writer::tag('h4', 'At a Glance', array('class' => 'text-primary'));
+echo html_writer::tag('h4', get_string('adminsummary:title', 'block_filescan'), array('class' => 'text-primary'));
 
 // generate the title, text, outline and language card row
 echo html_writer::start_tag('div', array('class' => 'card-group'), null);
@@ -161,23 +184,24 @@ foreach ($checks as $check) {
 echo html_writer::end_tag('div');
 
 // Generate the datatable
+// to do: write in html writer
 echo
 '
   <div class="container-fluid">
-    <main>       
-      <table id="view" class="table mx-2 my-3" style="width: 100%;">
+    <main>
+      <table id="myTable" class="table mx-2 my-3" style="width: 100%;">
         <thead>
             <tr class="bg-primary text-white">
-              <th class="text-center">Status</th>
-              <th class="text-center">Text</th>
-              <th class="text-center">Title</th>
-              <th class="text-center">Language</th>
-              <th class="text-center">Outline</th>
-              <th class="text-center">Checked</th>
-              <th>Course Information</th>
+              <th class="text-center">' . get_string('table:status_header', 'block_filescan') . '</th>
+              <th class="text-center">' . get_string('table:text_check_header', 'block_filescan') . '</th>
+              <th class="text-center">' . get_string('table:title_check_header', 'block_filescan') . '</th>
+              <th class="text-center">' . get_string('table:lang_check_header', 'block_filescan') . '</th>
+              <th class="text-center">' . get_string('table:outline_check_header', 'block_filescan') . '</th>
+              <th class="text-center">' . get_string('table:date_checked_header', 'block_filescan') . '</th>
+              <th>' . get_string('table:courseinfo_header', 'block_filescan') . '</th>
             </tr>
         </thead>
-      </table>  
+      </table>
     </main>
   </div>
 ';
