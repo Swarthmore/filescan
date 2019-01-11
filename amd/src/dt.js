@@ -35,6 +35,7 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, Dat
                 args: data,
                 done: function(res){
                   callback(res);
+                  view.draw();
                 },
                 fail: function(){
                   console.error("Could not get data");
@@ -53,35 +54,35 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, Dat
               "data": "status",
               "className": "text-center",
               "render": function(data){ 
-                data 
+                return data 
               }
             },
             {
               "data": "hastext",
               "className": "text-center",
               "render": function(data){ 
-                data
+                return data
               }
             },
             {
               "data": "hastitle",
               "className": "text-center",
               "render": function(data){ 
-                data
+                return data
               }
             },
             {
               "data": "hasoutline",
               "className": "text-center",
               "render": function(data){ 
-                data
+                return data
               }
             },
             {
               "data": "haslanguage",
               "className": "text-center",
               "render": function(data){ 
-                data
+                return data
               }
             },
             {
