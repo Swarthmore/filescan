@@ -1,7 +1,7 @@
 {
   "require": {
     "aws/aws-sdk-php": "^3.8",
-    "ext-json": "^1.4", // brought this down from 1.5 to 1.4 due to missing repos on moodle server
+    "ext-json": "^1.4",
     "php-kit/ext-pdo": "^1.1"
   }
 }

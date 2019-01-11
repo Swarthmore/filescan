@@ -22,7 +22,6 @@
 require_once('../../config.php');
 defined('MOODLE_INTERNAL') || die;
 
-require_once('../../config.php');
 global $DB;
 
 // Check for all required variables.
