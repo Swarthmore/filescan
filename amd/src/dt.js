@@ -20,9 +20,9 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, Dat
     init: function () {
 
       $(document).ready(function () {
-        
-        var mdlconfig = {};
-        mdlconfig.wwwroot = "http://moodle.aws-dev.swarthmnore.edu";
+
+        var mdlcfg = {};
+        mdlcfg.wwwroot = "http://moodle.aws-dev.swarthmnore.edu";
 
         // initialize the data table
         var view = $('#view').DataTable({
