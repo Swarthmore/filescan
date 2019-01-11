@@ -172,13 +172,13 @@ function getIcon(bool) {
 * @returns {string}
 */
 function getStatusIcon(status) {
-  if(status == 'check') {
+  if(status === 'check') {
     return '<i class="fa fa-exclamation text-warning fa-fw"></i>'
-  } else if(status == 'fail') {
+  } else if(status === 'fail') {
       return '<i class="fa fa-exclamation-triangle text-warning fa-fw"></i>'
-  } else if (status == 'error') {
+  } else if (status === 'error') {
       return '<i class="fa fa-times text-danger fa-fw"></i>'
-  } else if (status == 'pass') {
+  } else if (status === 'pass') {
       return '<i class="fa fa-check text-success fa-fw"></i>'
   } else {
     return "error"
