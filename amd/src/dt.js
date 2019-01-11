@@ -60,35 +60,35 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, Dat
               "data": "hastext",
               "className": "text-center",
               "render": function(data){ 
-                return data
+                return getStatusIcon(data);
               }
             },
             {
               "data": "hastitle",
               "className": "text-center",
               "render": function(data){ 
-                return data
+                return getStatusIcon(data);
               }
             },
             {
               "data": "hasoutline",
               "className": "text-center",
               "render": function(data){ 
-                return data
+                return getStatusIcon(data);
               }
             },
             {
               "data": "haslanguage",
               "className": "text-center",
               "render": function(data){ 
-                return data
+                return getStatusIcon(data);
               }
             },
             {
               "data": "timechecked",
               "className": "text-center",
               "render": function(data){ 
-                return ConvertDateFromDiv(Date.parse(data)) 
+                return ConvertDateFromDiv(Date.parse(data));
               }
             },
             {
