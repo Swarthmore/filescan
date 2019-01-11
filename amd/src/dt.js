@@ -35,7 +35,6 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, Dat
                 args: data,
                 done: function(res){
                   callback(res);
-                  view.draw();
                 },
                 fail: function(){
                   console.error("Could not get data");
@@ -54,7 +53,7 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, Dat
               "data": "status",
               "className": "text-center",
               "render": function(data){ 
-                return data 
+                return getStatusIcon(data);
               }
             },
             {
@@ -181,6 +180,8 @@ function getStatusIcon(status) {
       return '<i class="fa fa-times text-danger fa-fw"></i>'
   } else if (status == 'pass') {
       return '<i class="fa fa-check text-success fa-fw"></i>'
+  } else {
+    return "error"
   }
 }
 /**
