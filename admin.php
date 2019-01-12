@@ -123,7 +123,7 @@ function generateOverallReport($status)
 echo $OUTPUT->header();
 
 // call the datatables module
-$PAGE->requires->js_call_amd('block_filescan/dt', 'init');
+$PAGE->requires->js_call_amd('block_filescan/app', 'init');
 
  /**
  * This function returns the total records within $table

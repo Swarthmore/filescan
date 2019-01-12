@@ -1,19 +1,4 @@
-require.config({
-  paths: {
-    "jquery": "../lib/jquery-3.3.1.min.js",
-    "dataTables": "../lib/datatables.min.js"
-  },
-  shim: {
-    "jquery": {
-      exports: "$"
-    },
-    "dataTables": {
-      depts: ["jquery"]
-    }
-  }
-});
-
-define(['jquery', 'core/ajax', 'dataTables'], function ($, ajax, DataTable){
+define(['jquery', 'core/ajax', 'block_filescan/DataTables'], function ($, ajax){
 
   return {
     init: function () {
@@ -24,7 +9,7 @@ define(['jquery', 'core/ajax', 'dataTables'], function ($, ajax, DataTable){
         mdlcfg.wwwroot = "http://moodle.aws-dev.swarthmnore.edu";
 
         // initialize the data table
-        var view = $('#view').DataTable({
+        var view = $('#view').DataTables({
           "processing": true,
           "serverSide": true,
           "ajax": function(data, callback, settings) {
