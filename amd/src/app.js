@@ -8,8 +8,10 @@ define(['jquery', 'core/ajax', 'block_filescan/DataTables'], function ($, ajax){
         var mdlcfg = {};
         mdlcfg.wwwroot = "http://moodle.aws-dev.swarthmnore.edu";
 
+        console.info($.fn.DataTables);
+        
         // initialize the data table
-        var view = $('#view').DataTable({
+        var view = $('#view').DataTables({
           "processing": true,
           "serverSide": true,
           "ajax": function(data, callback, settings) {
