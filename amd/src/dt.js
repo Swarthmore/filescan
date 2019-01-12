@@ -1,20 +1,19 @@
-// once these files are moved locally 
-// require.config({
-//   paths: {
-//     "jquery": "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js",
-//     "dataTables.net": "https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"
-//   },
-//   shim: {
-//     "jquery": {
-//       exports: "$"
-//     },
-//     "datatables.net": {
-//       depts: ["jquery"]
-//     }
-//   }
-// });
+require.config({
+  paths: {
+    "jquery": "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js",
+    "dataTables": "../lib/datatables.min.js"
+  },
+  shim: {
+    "jquery": {
+      exports: "$"
+    },
+    "dataTables": {
+      depts: ["jquery"]
+    }
+  }
+});
 
-define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, DataTable){
+define(['jquery', 'core/ajax', 'dataTables'], function ($, ajax, DataTable){
 
   return {
     init: function () {
@@ -60,28 +59,28 @@ define(['jquery', 'core/ajax', 'theme_boost/datatables'], function ($, ajax, Dat
               "data": "hastext",
               "className": "text-center",
               "render": function(data){ 
-                return getStatusIcon(data);
+                return getIcon(data);
               }
             },
             {
               "data": "hastitle",
               "className": "text-center",
               "render": function(data){ 
-                return getStatusIcon(data);
+                return getIcon(data);
               }
             },
             {
               "data": "hasoutline",
               "className": "text-center",
               "render": function(data){ 
-                return getStatusIcon(data);
+                return getIcon(data);
               }
             },
             {
               "data": "haslanguage",
               "className": "text-center",
               "render": function(data){ 
-                return getStatusIcon(data);
+                return getIcon(data);
               }
             },
             {
