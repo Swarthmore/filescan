@@ -8,7 +8,7 @@ define([], function(){
       // The names that will be used to refer to lib
       DataTables: {
         deps: ["jquery"],
-        exports: "$.fn.DataTable"
+        exports: "DataTable"
       }
     }
   })
