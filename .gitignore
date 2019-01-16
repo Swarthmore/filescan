@@ -1,7 +1,6 @@
 .vscode
 .idea
 config/config.php
-vendor
 node_modules
 .DS_Store
 ruleset.xml
