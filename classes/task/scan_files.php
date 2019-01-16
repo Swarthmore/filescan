@@ -77,7 +77,7 @@ class scan_files extends \core\task\scheduled_task
 
     // Find PDF files in course materials (not student files, stamps, etc) that haven't already been scanned
     // Have to do 2 lookups because there can be multiple entries for each contenthash and need to ensure we get the latest updated contenthashes
-    $query = 'SELECT distinct f.contenthash, f.timemodified 
+    $query = 'SELECT distinct f.contenthash 
         		FROM {files} f, {context} c
         		WHERE c.id = f.contextid 
         			AND c.contextlevel = 70 
@@ -86,7 +86,7 @@ class scan_files extends \core\task\scheduled_task
         			AND f.component <> "assignfeedback_editpdf" 
         			AND f.filearea <> "stamps"
         			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True or (checked=False and status="error" and statuscode >=' . $max_retries . ')) 	
-        		ORDER BY f.timemodified DESC
+        		ORDER BY f.id DESC
         		LIMIT ' . $max_files_to_check;
 
     $contenthashes = $DB->get_records_sql($query);

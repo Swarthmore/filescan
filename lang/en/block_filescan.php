@@ -52,7 +52,7 @@ $string['summary:files_accessible']               = '{$a} Accessible'; // Substi
 $string['summary:files_partially_accessible']     = '{$a} Partially Accessible'; // Substituting integer.
 $string['summary:files_inaccessible']             = '{$a} Inaccessible'; // Substituting integer.
 $string['summary:files_error']                    = '{$a} File Error'; // Substituting integer.
-$string['summary:files_accessibility_unknown']    = '{$a} Accessibility Unkown'; // Substituting integer.
+$string['summary:files_accessibility_unknown']    = '{$a} Accessibility Unknown'; // Substituting integer.
 $string['summary:last_updated']                   = 'Updated: {$a}'; // Substituting string (date).
 $string['summary:title']                          = 'Summary';
 
