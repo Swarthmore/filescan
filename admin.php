@@ -45,10 +45,7 @@ $PAGE->set_pagelayout('base');
 $PAGE->set_heading(get_string('reportheading', 'block_filescan'));
 
 // use this variable to scale the bars under the displayed percentages
-$scale = array(
-  'x' => 1,
-  'y' => 0.5 
-);
+$scale = array('x' => 1, 'y' => 0.5);
 
 // use this variable to define the width and height (in pixels) of the progress bars
 // located in each card
@@ -119,6 +116,11 @@ function generateOverallReport($status)
   }
 }
 
+// Load the datatables css file
+// This needs to come before the header
+$PAGE->requires->css('/blocks/filescan/lib/datatables.min.css', true);
+$PAGE->requires->css('/blocks/filescan/lib/filescan.css', true);
+
 // start outputting our page
 echo $OUTPUT->header();
 
@@ -183,8 +185,8 @@ foreach ($checks as $check) {
 
 echo html_writer::end_tag('div');
 
-// Generate the datatable
-// to do: write in html writer
+// Create the DataTable structure
+// TODO: write this in html writer
 echo
 '
   <div class="container-fluid">
@@ -204,47 +206,6 @@ echo
       </table>
     </main>
   </div>
-';
-
-// these styles are only needed if you are running the Boost theme.
-echo '
-<style>
-.dataTables_paginate,
-.dataTables_info {
-    font-size: 16px;
-}
-.dataTables_paginate a {
-    padding: 10px;
-}
-.paginate_button.next, .paginate_button.previous {
-    font-weight: bold;
-    padding: 10px 16px;
-}
-.list-fix li {
-border: 0;
-margin: 0;
-padding: 0;
-}
-.striped-danger {
-  background: repeating-linear-gradient(
-    45deg,
-    #c62828,
-    #c62828 10px,
-    #e53935 10px,
-    #e53935 20px
-  );
-}
-
-.striped-success {
-  background: repeating-linear-gradient(
-      45deg,
-      #43a047,
-      #43a047 10px,
-      #388e3c 10px,
-      #388e3c 20px
-    );
-}
-</style>
 ';
 
 echo $OUTPUT->footer();

@@ -1,15 +1,10 @@
-define([], function(){
-  window.requirejs.config({
-    paths: {
-      // Paths to required js libraries
-      "DataTables": M.cfg.wwwroot + "/blocks/filescan/amd/lib/datatables.min"
-    },
-    shim: {
-      // The names that will be used to refer to lib
-      DataTables: {
-        deps: ["jquery"],
-        exports: "$.fn.DataTables"
-      }
-    }
-  })
+define([], function () {
+    window.requirejs.config({
+        paths: {
+            "datatables": "http://moodle.aws-dev.swarthmore.edu/blocks/filescan/lib/datatables.min",
+        },
+        shim: {
+            'datatables': {exports: 'DataTables'},
+        }
+    });
 });
