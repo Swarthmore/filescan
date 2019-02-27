@@ -44,7 +44,6 @@ $string['cannot_view']                            = 'Not allowed to view page';
 $string['helptitle']                              = 'What is this and how do I fix it?';
 
 // Cache
-<<<<<<< HEAD
 $string['cachedef_filescan']                      = 'Filescan results cache for each course';
 
 // Summary.
@@ -71,7 +70,6 @@ $string['table:outline_check_header']             = 'Outline';
 $string['table:actions_header']                   = 'Actions';
 $string['table:date_checked_header']              = 'Checked';
 $string['table:courseinfo_header']                = 'Course Information';
-=======
 $string['cachedef_filescan'] = 'Filescan results cache for each course';
 
 // Summary
@@ -91,7 +89,6 @@ $string['table:text_check_header'] = 'Text';
 $string['table:title_check_header'] = 'Title';
 $string['table:lang_check_header'] = 'Language';
 $string['table:outline_check_header'] = 'Outline';
->>>>>>> master
 
 // Scheduled tasks
 $string['filescan_task']                          = 'Filescan task';
