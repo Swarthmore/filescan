@@ -9,7 +9,6 @@ This Moodle block consists of two main functions:
 * Moodle 3.1+
 * A server to process files: https://github.com/Swarthmore/filescan-server.  This software can be installed on the Moodle server.
 
-
 # Installation
 * Clone or download this repository into the `<moodle root>/blocks` directory
 * Rename the directory from `block-filescan` to `filescan`

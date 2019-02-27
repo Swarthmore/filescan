@@ -1,0 +1,35 @@
+.dataTables_paginate,
+.dataTables_info {
+    font-size: 16px;
+}
+.dataTables_paginate a {
+    padding: 10px;
+}
+.paginate_button.next, .paginate_button.previous {
+    font-weight: bold;
+    padding: 10px 16px;
+}
+.list-fix li {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+.striped-danger {
+    background: repeating-linear-gradient(
+            45deg,
+            #c62828,
+            #c62828 10px,
+            #e53935 10px,
+            #e53935 20px
+    );
+}
+
+.striped-success {
+    background: repeating-linear-gradient(
+            45deg,
+            #43a047,
+            #43a047 10px,
+            #388e3c 10px,
+            #388e3c 20px
+    );
+}
