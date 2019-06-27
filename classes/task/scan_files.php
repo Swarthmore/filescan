@@ -8,11 +8,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 
 /* Per https://docs.moodle.org/dev/Task_API#Failures
-	A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network 
-	is temporarily down. This is handled by the task system automatically - all the failing task needs to do is throw 
-	an exception. The task will be retried after 1 minute. If the task keeps failing, the retry algorithm will add 
+	A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network
+	is temporarily down. This is handled by the task system automatically - all the failing task needs to do is throw
+	an exception. The task will be retried after 1 minute. If the task keeps failing, the retry algorithm will add
 	more time between each successive attempts up to a max of 24 hours.
-	
+
 	Will throw exceptions when fatal errors occur
 */
 
@@ -77,17 +77,21 @@ class scan_files extends \core\task\scheduled_task
 
     // Find PDF files in course materials (not student files, stamps, etc) that haven't already been scanned
     // Have to do 2 lookups because there can be multiple entries for each contenthash and need to ensure we get the latest updated contenthashes
-    $query = 'SELECT distinct f.contenthash 
-        		FROM {files} f, {context} c
-        		WHERE c.id = f.contextid 
-        			AND c.contextlevel = 70 
-        			AND f.filesize <> 0 
-        			AND f.mimetype = "application/pdf"
-        			AND f.component <> "assignfeedback_editpdf" 
-        			AND f.filearea <> "stamps"
-        			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True or (checked=False and status="error" and statuscode >=' . $max_retries . ')) 	
-        		ORDER BY f.id DESC
-        		LIMIT ' . $max_files_to_check;
+    $query = "SELECT DISTINCT f.id, f.contenthash
+                FROM {files} f, {context} c
+               WHERE c.id = f.contextid
+                 AND c.contextlevel = 70
+                 AND f.filesize <> 0
+                 AND f.mimetype = 'application/pdf'
+                 AND f.component <> 'assignfeedback_editpdf'
+                 AND f.filearea <> 'stamps'
+                 AND f.contenthash NOT IN
+                     (SELECT contenthash
+                        FROM {block_filescan_files}
+                       WHERE checked = 1
+                          OR (checked = 0 AND status = 'error' AND statuscode >= $max_retries))
+               ORDER BY f.id DESC
+               LIMIT $max_files_to_check";
 
     $contenthashes = $DB->get_records_sql($query);
 
@@ -105,10 +109,10 @@ class scan_files extends \core\task\scheduled_task
     $comma_separated_contenthashes = "'" . $comma_separated_contenthashes . "'";
 
 
-    $query = 'SELECT  f.contenthash, f.pathnamehash 
-        			FROM {files} f
-        			WHERE f.contenthash in (' . $comma_separated_contenthashes . ') 
-        			GROUP BY f.contenthash';
+    $query = 'SELECT f.contenthash, f.pathnamehash
+                FROM {files} f
+               WHERE f.contenthash IN (' . $comma_separated_contenthashes . ')
+               GROUP BY f.contenthash, f.pathnamehash';
 
     $files = $DB->get_records_sql($query);
 
@@ -264,4 +268,3 @@ class scan_files extends \core\task\scheduled_task
   }
 
 }
-	
