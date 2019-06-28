@@ -197,5 +197,21 @@ function xmldb_block_filescan_upgrade($oldversion)
     }
   }
 
+  if ($oldversion < 2019011616) {
+
+      // Changing nullability of field timechecked on table block_filescan_files to null.
+      // Changing the default of field timechecked on table block_filescan_files to drop it.
+      $table = new xmldb_table('block_filescan_files');
+      $field = new xmldb_field('timechecked', XMLDB_TYPE_DATETIME, null, null, null, null, null, 'haslanguage');
+
+      // Launch change of nullability for field timechecked.
+      $dbman->change_field_notnull($table, $field);
+      // Launch change of default for field timechecked.
+      $dbman->change_field_default($table, $field);
+
+      // Filescan savepoint reached.
+      upgrade_block_savepoint(true, 2019011616, 'filescan');
+  }
+
   return true;
 }
