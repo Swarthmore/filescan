@@ -152,7 +152,9 @@ echo html_writer::start_tag('div', array('class' => 'card-group'), null);
 
 foreach ($checks as $check) {
   $fileHas    = has($check); // do this so we dont kill the db
-  $completed  = round($fileHas / $totalRecords * 100,2);
+
+	// prevent division by zero errors
+  $completed = $totalRecords !== 0 ? round($fileHas / $totalRecords * 100, 2) : 0;
 
   $fillAttributes = array(
     'style' => 'width: ' . $completed * $scale['x'] . 'px; height: ' . $progressBar['height'] . 'px; max-width: 95%;',
