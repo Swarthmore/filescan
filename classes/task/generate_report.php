@@ -2,9 +2,6 @@
 
 namespace block_filescan\task;
 
-//ini_set('display_errors', 'On');
-//error_reporting(E_ALL);
-
 /* Per https://docs.moodle.org/dev/Task_API#Failures
 	A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network 
 	is temporarily down. This is handled by the task system automatically - all the failing task needs to do is throw 

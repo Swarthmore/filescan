@@ -3,7 +3,6 @@
 namespace block_filescan\task;
 require(__DIR__ . '/../../vendor/autoload.php');
 
-use GuzzleHttp\Pool;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 
