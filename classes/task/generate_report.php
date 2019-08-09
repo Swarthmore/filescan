@@ -140,6 +140,3 @@ class generate_report extends \core\task\scheduled_task
   }
 
 }
-	
-
-
