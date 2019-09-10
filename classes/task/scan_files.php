@@ -137,7 +137,6 @@ class scan_files extends \core\task\scheduled_task
       mtrace("Found file: " . $f->contenthash);
       $file = $fs->get_file_by_hash($f->pathnamehash);
 
-
       $file_contents = $file->get_content();
 
       if ($file_contents === FALSE) {
