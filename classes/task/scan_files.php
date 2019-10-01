@@ -1,19 +1,14 @@
 <?php
 
+// Per https://docs.moodle.org/dev/Task_API#Failures
+// A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network
+// is temporarily down. This is handled by the task system automatically - all the failing task needs to do is throw
+// an exception. The task will be retried after 1 minute. If the task keeps failing, the retry algorithm will add
+// more time between each successive attempts up to a max of 24 hours.
+//
+// Will throw exceptions when fatal errors occur
+
 namespace block_filescan\task;
-require(__DIR__ . '/../../vendor/autoload.php');
-
-use GuzzleHttp\Client;
-use GuzzleHttp\Promise;
-
-/* Per https://docs.moodle.org/dev/Task_API#Failures
-	A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network
-	is temporarily down. This is handled by the task system automatically - all the failing task needs to do is throw
-	an exception. The task will be retried after 1 minute. If the task keeps failing, the retry algorithm will add
-	more time between each successive attempts up to a max of 24 hours.
-
-	Will throw exceptions when fatal errors occur
-*/
 
 class scan_files extends \core\task\scheduled_task
 {
@@ -38,7 +33,7 @@ class scan_files extends \core\task\scheduled_task
         $fileentry->statuscode = $record->statuscode + 1;
       }
       $sql = $DB->update_record("block_filescan_files", $fileentry);
-      $sql ? mtrace("Updated record") : mtrace("Could not update record");
+      $sql ? mtrace("Updated record for " . $fileentry->contenthash) : mtrace("Could not update record " . $fileentry->contenthash);
 
     } else {
       if ($fileentry->checked == 0) {
@@ -52,11 +47,8 @@ class scan_files extends \core\task\scheduled_task
 
   public function execute()
   {
-
     global $CFG, $DB;
     require_once($CFG->libdir . '/filelib.php');
-
-    //$DB->set_debug(true);
 
     mtrace("Filescan cron script is running");
 
@@ -84,13 +76,24 @@ class scan_files extends \core\task\scheduled_task
                  AND f.mimetype = 'application/pdf'
                  AND f.component <> 'assignfeedback_editpdf'
                  AND f.filearea <> 'stamps'
-                 AND f.contenthash NOT IN
-                     (SELECT contenthash
-                        FROM {block_filescan_files}
-                       WHERE checked = 1
-                          OR (checked = 0 AND status = 'error' AND statuscode >= $max_retries))
                ORDER BY f.id DESC
                LIMIT $max_files_to_check";
+
+//    $query = "SELECT DISTINCT f.id, f.contenthash
+//                FROM {files} f, {context} c
+//               WHERE c.id = f.contextid
+//                 AND c.contextlevel = 70
+//                 AND f.filesize <> 0
+//                 AND f.mimetype = 'application/pdf'
+//                 AND f.component <> 'assignfeedback_editpdf'
+//                 AND f.filearea <> 'stamps'
+//                 AND f.contenthash NOT IN
+//                     (SELECT contenthash
+//                        FROM {block_filescan_files}
+//                       WHERE checked = 1
+//                          OR (checked = 0 AND status = 'error' AND statuscode >= $max_retries))
+//               ORDER BY f.id DESC
+//               LIMIT $max_files_to_check";
 
     $contenthashes = $DB->get_records_sql($query);
 
@@ -107,162 +110,108 @@ class scan_files extends \core\task\scheduled_task
     $comma_separated_contenthashes = implode("','", $hash_array);
     $comma_separated_contenthashes = "'" . $comma_separated_contenthashes . "'";
 
-
-    $query = 'SELECT f.contenthash, f.pathnamehash
-                FROM {files} f
-               WHERE f.contenthash IN (' . $comma_separated_contenthashes . ')
-               GROUP BY f.contenthash, f.pathnamehash';
+    $query = 'SELECT f.contenthash, f.pathnamehash FROM {files} f WHERE f.contenthash IN (' . $comma_separated_contenthashes . ') GROUP BY f.contenthash, f.pathnamehash';
 
     $files = $DB->get_records_sql($query);
-
 
     if (!$files) {
       mtrace("No files found");
       return false;
     }
 
-    $client = new Client([
-      // Base URI is used with relative requests
-      'base_uri' => $api_url,
-      // You can set any number of default request options.
-      'timeout' => 50.0,
-    ]);
-
-
-    // Add each concurrent request to an array
-    $promises = array();
+    // Get the file storage , we will need this for getting the files by their hash
     $fs = get_file_storage();
 
-    foreach ($files as $f) {
-      mtrace("Found file: " . $f->contenthash);
+    // output the files
+    foreach($files as $f) {
       $file = $fs->get_file_by_hash($f->pathnamehash);
-
       $file_contents = $file->get_content();
+      $file_content_hash = $f->contenthash;
 
-      if ($file_contents === FALSE) {
-        // Cannot get file contents -- report an error
-        $fileentry = new \stdClass();
-        $fileentry->timechecked = date("Y-m-d H:i:s");
-        $fileentry->contenthash = $f->contenthash;
-        $fileentry->status = "error";
-        $fileentry->checked = 0;
-        self::save_filescan_results($DB, $fileentry);
+      // If there are no file contents, save the results to the db here and break out of the
+      // current iteration
+      if (!$file_contents) {
+        $row = new \stdClass();
+        $row->timechecked = date("Y-m-d H:i:s");
+        $row->contenthash = $file_content_hash;
+        $row->status = "error";
+        $row->checked = 0;
+        self::save_filescan_results($DB, $row);
         continue;
       }
 
+      // Construct the request
+      $opts = array();
+      $headers = array(
+        "cache-control: no-cache",
+        "Content-Type: multipart/form-data"
+      );
 
-      // Make an async POST request
-      $promises[$f->contenthash] = $client->postAsync('/v1/file', [
-        'multipart' => [
-          [
-            'name' => 'upfile',
-            'contents' => $file_contents,
-            'filename' => $f->contenthash,
-          ],
-          [
-            'name' => 'id',
-            'contents' => $f->contenthash
-          ]
-        ]
-      ]);
+      // See the undocumented curl docs in the moodle source code
+      // https://github.com/moodle/moodle/blob/master/lib/filelib.php#L2972
 
-    }
+      $request = new \curl($opts);
 
+      // Make the request and get the response
+      $response = $request->post(
+        $api_url . "/v1/file",
+        array(
+          "upfile" => $file,
+          "id" => $f->contenthash
+        ),
+        array(
+          "CURLOPT_HEADER" => $headers,
+          "CURLOPT_TIMEOUT" => 10000,
+          "CURLOPT_FRESH_CONNECT" => true,
+          "CURLOPT_FOLLOWLOCATION" => true,
+          "CURLOPT_SSL_VERIFYPEER" => false
+        )
+      );
 
-    // Wait for the requests to complete, even if some of them fail
-    $results = Promise\settle($promises)->wait();
+      $request_info = $request->get_info();
 
+      // Create the row object here and assign the contenthash to it
+      $row = new \stdClass();
+      $row->contenthash = $file_content_hash;
 
-    // Handle each the results.  They $key is the contenthash.
-    foreach ($results as $key => $r) {
+      // If we don't get a 200 response, output the error to moodle via mtrace and
+      // mark the row with an error. Save the results and exit out of the current loop
+      if ($request_info['http_code'] != 200) {
 
-      $fileentry = new \stdClass();
-      $fileentry->timechecked = date("Y-m-d H:i:s");
-      $fileentry->contenthash = $key;
+        mtrace("Did not receive 200 status from filescan server when requesting scan for " . $row->contenthash);
+        mtrace(var_dump($request_info));
 
-
-      if ($r['state'] == 'fulfilled') {
-
-        $response = $r['value'];
-
-        $response_code = $response->getStatusCode();
-        $result = json_decode($response->getBody(), true);
-
-        // Assume an unknown status -- correct as needed
-        // TODO: implement an incomplete entry if the conversion fails
-        if (array_key_exists('filename', $result['application/json'])) {
-          mtrace("Saving results for " . $result['application/json']['filename']);
-        } else {
-          mtrace(print_r($r));
-        }
-
-        if ($response_code == 200) {
-
-          if ($result['application/json']['hasText']) {
-            $fileentry->hastext = 1;
-          } else {
-            $fileentry->hastext = 0;
-          }
-
-          if ($result['application/json']['title']) {
-            $fileentry->hastitle = 1;
-          } else {
-            $fileentry->hastitle = 0;
-          }
-
-          if ($result['application/json']['language']) {
-            $fileentry->haslanguage = 1;
-          } else {
-            $fileentry->haslanguage = 0;
-          }
-
-          if ($result['application/json']['hasOutline']) {
-            $fileentry->hasoutline = 1;
-          } else {
-            $fileentry->hasoutline = 0;
-          }
-
-          # Determine overall status based on parameters above
-          # no text ==> fail
-          # has text, title, language, outline ==> pass
-          # has text but missing at least one of title, language, outline ==> check
-          if ($fileentry->hastext == 0) {
-            $fileentry->status = "fail";
-          } elseif (($fileentry->hastitle == 1) && ($fileentry->haslanguage == 1) && ($fileentry->hasoutline == 1)) {
-            $fileentry->status = "pass";
-          } else {
-            $fileentry->status = "check";
-          }
-
-
-          $fileentry->checked = 1;
-          $fileentry->pagecount = $result['application/json']['numPages'];
-
-        } else {
-          $fileentry->status = "error";
-          $fileentry->checked = 0;
-        }
-
-
-      } else if ($r['state'] == 'rejected') {
-        // Not sure how to get the response based on the request.
-        mtrace("Request rejectedi for " . $fileentry->contenthash);
-        mtrace($r['reason']);
-        $fileentry->status = "error";
-        $fileentry->checked = 0;
-
-      } else {
-        mtrace("Unknown exceptioni for " . $fileentry->contenthash);
-        $fileentry->status = "error";
-        $fileentry->checked = 0;
+        // Update the row with an error status and break out of the loop
+        $row->status = "error";
+        $row->checked = 0;
+        self::save_filescan_results($DB, $row);
+        continue;
       }
 
-      // Update the database with the results
-      self::save_filescan_results($DB, $fileentry);
+      // Decode the response into an array of arrays
+      $results  = json_decode($response);
 
+      // Handle the results
+      $row->timechecked = date("Y-m-d H:i:s");
+      $row->hastext = $results["application/json"]["hasText"];
+      $row->hasTitle = $results["application/json"]["title"];
+      $row->hasLanguage = $results["application/json"]["language"];
+      $row->hasOutline = $results["application/json"]["hasOutline"];
+      $row->checked = 1;
+      $row->pagecount = $results["application/json"]["numPages"];
+
+      // Determine if the file is accessible or not
+      // no text -> fail
+      // has text, title, language, and outline -> pass 🔥🔥🔥
+      // has text but is missing other -> check
+      $row->status = ($row->hasTitle && $row->hasLanguage && $row->hasOutline)
+        ? ($row->hasText ? "pass" : "fail")
+        : "check" ;
+
+      // Update the database with the results
+      self::save_filescan_results($DB, $row);
 
     }
-
   }
 
 }
