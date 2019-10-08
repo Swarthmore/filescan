@@ -210,8 +210,11 @@ class scan_files extends \core\task\scheduled_task
       // Handle the results
       $row->timechecked = date("Y-m-d H:i:s");
       $row->hastext = (int) $results["application/json"]["hasText"];
-      $row->hastitle = (int) $results["application/json"]["title"];
-      $row->haslanguage = (int) $results["application/json"]["language"];
+      // There might be a better way to do this, the server will return the actual
+      // string for title and language, and casting that to an int doesn't work
+      // so this is the way it is for now
+      $row->hastitle = $results["application/json"]["title"] ? 1 : 0;
+      $row->haslanguage = $results["application/json"]["language"] ? 1 : 0;
       $row->hasoutline = (int) $results["application/json"]["hasOutline"];
       $row->checked = 1;
       $row->pagecount = (int) $results["application/json"]["numPages"];
