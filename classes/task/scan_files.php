@@ -251,21 +251,6 @@ class scan_files extends \core\task\scheduled_task
   }
 
   /**
-   * @description This is a helper function get easily get config variables
-   * @param $var string
-   * @return string
-   */
-  private function get_from_config($var)
-  {
-    $cvar = get_config("block_filescan", (string)$var);
-    if (!$cvar) {
-      throw new \runtimeexception("Oops! It looks like you tried to request a variable from your plugin's configuration that doesn't exist. Be careful!");
-    } else {
-      return $cvar;
-    }
-  }
-
-  /**
    * @description Runs the scan_files task
    * @return bool
    */
