@@ -26,7 +26,6 @@ $capabilities = array(
 
   'block/filescan:addinstance' => array(
     'riskbitmask' => RISK_SPAM | RISK_XSS,
-
     'captype' => 'write',
     'contextlevel' => CONTEXT_BLOCK,
     'archetypes' => array(
@@ -34,7 +33,6 @@ $capabilities = array(
       'manager' => CAP_ALLOW,
       'coursecreator' => CAP_ALLOW
     ),
-
     'clonepermissionsfrom' => 'moodle/site:manageblocks'
   ),
 
@@ -83,8 +81,7 @@ $capabilities = array(
       'coursecreator'   => CAP_ALLOW,
       'editingteacher'  => CAP_ALLOW,
       'manager'         => CAP_ALLOW
-    ),
-    'clonepermissionsfrom' => 'moodle/course:update',
+    )
   ),
 
   'block/filescan:viewadminreport' => array(
