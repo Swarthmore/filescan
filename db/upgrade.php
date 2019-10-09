@@ -213,5 +213,20 @@ function xmldb_block_filescan_upgrade($oldversion)
       upgrade_block_savepoint(true, 2019011616, 'filescan');
   }
 
+  if ($oldversion < 2019100800) {
+
+    // Define index contenthash (unique) to be added to block_filescan_files.
+    $table = new xmldb_table('block_filescan_files');
+    $index = new xmldb_index('contenthash', XMLDB_INDEX_UNIQUE, ['contenthash']);
+
+    // Conditionally launch add index contenthash.
+    if (!$dbman->index_exists($table, $index)) {
+      $dbman->add_index($table, $index);
+    }
+
+    // Filescan savepoint reached.
+    upgrade_block_savepoint(true, 2019100800, 'filescan');
+  }
+
   return true;
 }
