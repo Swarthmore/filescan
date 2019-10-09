@@ -19,7 +19,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../config.php');             // global config
+//require_once('../../config.php');             // global config
 
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
