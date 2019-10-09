@@ -93,8 +93,8 @@ class scan_files extends \core\task\scheduled_task
     // Set up an array containing the latest contenthashes
     $hash_array = array();
 
-    foreach ($content_hashes as $c) {
-      $hash_array[] = $c->contenthash;
+    foreach ($content_hashes as $i=>$c) {
+      $hash_array[$i] = $c->contenthash;
     }
 
     $comma_separated_content_hashes = implode("','", $hash_array);
