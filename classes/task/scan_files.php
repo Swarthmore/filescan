@@ -196,7 +196,7 @@ class scan_files extends \core\task\scheduled_task
 
       // If we don't get a 200 response, output the error to moodle via mtrace and
       // mark the row with an error. Save the results and exit out of the current loop
-      if ($request_info['http_code'] != 200) {
+      if ($request_info["http_code"] != 200) {
 
         mtrace("Did not receive 200 status from filescan server when requesting scan for " . $row->contenthash);
         mtrace(var_dump($request_info));
