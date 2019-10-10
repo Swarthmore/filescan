@@ -3,11 +3,78 @@ define(['core/config',
   'block_filescan/datatables',
   'core/ajax'], (mdlcfg, $, DataTable, ajax) => {
 
+  /**
+   * Converts a unix timestamp to something that is human readable
+   *
+   * @param divTimeStr
+   * @returns {string}
+   * @constructor
+   */
+  const ConvertDateFromDiv = divTimeStr => {
+    //eg:-divTimeStr=18/03/2013 12:53:00
+    let tmstr = divTimeStr.toString().split(' ') //'21-01-2013 PM 3:20:24'
+    let dt = tmstr[0].split('/')
+    let str = dt[2] + "/" + dt[1] + "/" + dt[0] + " " + tmstr[1] //+ " " + tmstr[1]//'2013/01/20 3:20:24 pm'
+    let time = new Date(str)
+
+    if (time == "Invalid Date") {
+      time = new Date(divTimeStr)
+    }
+
+    return time.toLocaleDateString()
+  };
+
+  /**
+   * Returns a Bootstrap icon statement.
+   *
+   * @param bool
+   * @returns {string}
+   */
+  const getIcon = bool => bool ? '<i class="fa fa-check text-success fa-fw"></i>' : '<i class="fa fa-times text-danger fa-fw"></i>';
+
+  /**
+   * Returns a Bootstrap icon statement.
+   *
+   * @param status
+   * @returns {string}
+   */
+  const getStatusIcon = status => {
+    if (status === 'check') {
+      return '<i class="fa fa-exclamation text-warning fa-fw"></i>'
+    } else if (status === 'fail') {
+      return '<i class="fa fa-exclamation-triangle text-warning fa-fw"></i>'
+    } else if (status === 'error') {
+      return '<i class="fa fa-times text-danger fa-fw"></i>'
+    } else if (status === 'pass') {
+      return '<i class="fa fa-check text-success fa-fw"></i>'
+    } else {
+      return "error"
+    }
+  };
+
+  /**
+   * Parse teachers out of the courseinfo object
+   *
+   * @param course
+   * @returns {Array}
+   */
+  const parseTeachers = course => {
+    let teachers = [];
+    Object.entries(course).forEach(([key, val]) => {
+      if (key === 'teachers') {
+        Object.entries(val).forEach(([teacherId, teacherInfo]) => {
+          teachers += teacherInfo.firstname + ' ' + teacherInfo.lastname + '<br>'
+        })
+      }
+    });
+    return teachers;
+  };
+
   /*
   * This function instantiates the DataTable, then uses an AJAX function
   * to grab and update it's data.
    */
-  function initManage() {
+  const initManage = () => {
 
     $(document).ready(() => {
 
@@ -62,19 +129,19 @@ define(['core/config',
           {
             "data": "courseinfo",
             "render": (data, type, row, meta) => {
-              let url = '/course/view.php?id='
+              let url = '/course/view.php?id=';
 
               if (data) {
-                let d = JSON.parse(data)
-                let courses = []
+                let d = JSON.parse(data);
+                let courses = [];
 
                 d.forEach(course => {
 
                   let courseUrl, enrolled;
 
                   if (course.courseid && course.student_enrollment) {
-                    courseUrl = url + course.courseid
-                    enrolled = course.student_enrollment
+                    courseUrl = url + course.courseid;
+                    enrolled = course.student_enrollment;
                   } else {
                     courseUrl = "Course URL Undefined";
                     enrolled = 0;
@@ -91,7 +158,7 @@ define(['core/config',
                   } else {
                     courses.push('No course information found. This may be an invalid courseinfo entry within the block_filescan_files table.')
                   }
-                })
+                });
                 return courses.join('<br>')
               } else {
                 return `No response returned from the DataTables service. Are you sure the course exists?<br><strong>Ref id: ${row['id']}</strong>`
@@ -103,83 +170,10 @@ define(['core/config',
 
     })
 
-  }
+  };
 
   return {
     init: () => initManage()
   }
 
-})
-
-/**
- * Converts a unix timestamp to something that is human readable
- *
- * @param divTimeStr
- * @returns {string}
- * @constructor
- */
-function ConvertDateFromDiv(divTimeStr) {
-  //eg:-divTimeStr=18/03/2013 12:53:00
-  let tmstr = divTimeStr.toString().split(' ') //'21-01-2013 PM 3:20:24'
-  let dt = tmstr[0].split('/')
-  let str = dt[2] + "/" + dt[1] + "/" + dt[0] + " " + tmstr[1] //+ " " + tmstr[1]//'2013/01/20 3:20:24 pm'
-  let time = new Date(str)
-
-  if (time == "Invalid Date") {
-    time = new Date(divTimeStr)
-  }
-
-  return time.toLocaleDateString()
-}
-
-/**
- * Returns a Bootstrap icon statement.
- *
- * @param bool
- * @returns {string}
- */
-function getIcon(bool) {
-  if (bool) {
-    return '<i class="fa fa-check text-success fa-fw"></i>'
-  } else {
-    return '<i class="fa fa-times text-danger fa-fw"></i>'
-  }
-}
-
-/**
- * Returns a Bootstrap icon statement.
- *
- * @param status
- * @returns {string}
- */
-function getStatusIcon(status) {
-  if (status === 'check') {
-    return '<i class="fa fa-exclamation text-warning fa-fw"></i>'
-  } else if (status === 'fail') {
-    return '<i class="fa fa-exclamation-triangle text-warning fa-fw"></i>'
-  } else if (status === 'error') {
-    return '<i class="fa fa-times text-danger fa-fw"></i>'
-  } else if (status === 'pass') {
-    return '<i class="fa fa-check text-success fa-fw"></i>'
-  } else {
-    return "error"
-  }
-}
-
-/**
- * Parse teachers out of the courseinfo object
- *
- * @param course
- * @returns {Array}
- */
-function parseTeachers(course) {
-  let teachers = [];
-  Object.entries(course).forEach(([key, val]) => {
-    if (key === 'teachers') {
-      Object.entries(val).forEach(([teacherId, teacherInfo]) => {
-        teachers += teacherInfo.firstname + ' ' + teacherInfo.lastname + '<br>'
-      })
-    }
-  })
-  return teachers;
-}
+});
