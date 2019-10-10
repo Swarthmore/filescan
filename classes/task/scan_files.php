@@ -57,7 +57,6 @@ class scan_files extends \core\task\scheduled_task
    */
   private function get_files($conn)
   {
-
     // Grab some of the plugin variables from the config, we need these while constructing the query
     $max_files_to_check = (int) get_config("block_filescan", "numfilespercron");
     $max_retries = (int) get_config("block_filescan", "maxretries");
