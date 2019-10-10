@@ -1,10 +1,11 @@
 <?php
 
 namespace block_filescan\task;
-require(__DIR__ . '/../../vendor/autoload.php');
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Promise;
+//require(__DIR__ . '/../../vendor/autoload.php');
+
+//use GuzzleHttp\Client;
+//use GuzzleHttp\Promise;
 
 /* Per https://docs.moodle.org/dev/Task_API#Failures
 	A task, either scheduled or adhoc can sometimes fail. An example would be updating an RSS field when the network
@@ -20,14 +21,12 @@ class scan_files extends \core\task\scheduled_task
 
   public function get_name()
   {
-    // Shown in admin screens
     return get_string('filescan_task', 'block_filescan');
   }
 
 
   private static function save_filescan_results($DB, $fileentry)
   {
-
     $record = $DB->get_record("block_filescan_files", array('contenthash' => $fileentry->contenthash));
 
     if ($record) {
@@ -55,8 +54,6 @@ class scan_files extends \core\task\scheduled_task
 
     global $CFG, $DB;
     require_once($CFG->libdir . '/filelib.php');
-
-    //$DB->set_debug(true);
 
     mtrace("Filescan cron script is running");
 
@@ -107,7 +104,6 @@ class scan_files extends \core\task\scheduled_task
     $comma_separated_contenthashes = implode("','", $hash_array);
     $comma_separated_contenthashes = "'" . $comma_separated_contenthashes . "'";
 
-
     $query = 'SELECT f.contenthash, f.pathnamehash
                 FROM {files} f
                WHERE f.contenthash IN (' . $comma_separated_contenthashes . ')
@@ -115,33 +111,23 @@ class scan_files extends \core\task\scheduled_task
 
     $files = $DB->get_records_sql($query);
 
-
     if (!$files) {
       mtrace("No files found");
       return false;
     }
 
-    $client = new Client([
-      // Base URI is used with relative requests
-      'base_uri' => $api_url,
-      // You can set any number of default request options.
-      'timeout' => 50.0,
-    ]);
-
-
-    // Add each concurrent request to an array
-    $promises = array();
     $fs = get_file_storage();
 
+    require_once("FilescanRequest.php");
+    
     foreach ($files as $f) {
       mtrace("Found file: " . $f->contenthash);
       $file = $fs->get_file_by_hash($f->pathnamehash);
 
-
       $file_contents = $file->get_content();
 
+      // If there are no file contents, give the file entry a status of error
       if ($file_contents === FALSE) {
-        // Cannot get file contents -- report an error
         $fileentry = new \stdClass();
         $fileentry->timechecked = date("Y-m-d H:i:s");
         $fileentry->contenthash = $f->contenthash;
@@ -151,118 +137,119 @@ class scan_files extends \core\task\scheduled_task
         continue;
       }
 
+      // Test url
+      //$turl = "http://local.moodle/pluginfile.php/33/mod_folder/content/0/beardsley_1st_floor_blank.pdf?forcedownload=1";
 
-      // Make an async POST request
-      $promises[$f->contenthash] = $client->postAsync('/v1/file', [
-        'multipart' => [
-          [
-            'name' => 'upfile',
-            'contents' => $file_contents,
-            'filename' => $f->contenthash,
-          ],
-          [
-            'name' => 'id',
-            'contents' => $f->contenthash
-          ]
-        ]
-      ]);
+      // Construct the file URL
+      $url_base = $CFG->wwwroot;
+      $url = "{$url_base}/pluginfile.php/{$file->get_contextid()}/{$file->get_component()}/{$file->get_filearea()}/{$file->get_itemid()}/{$file->get_filepath()}/{$file->get_filename()}";
+      
+      echo "<pre>";
+      var_dump($url); 
+      echo "</pre>";
+      
+      // Construct the request
+      #$req = new \FilescanRequest(
+      # "/v1/file",
+      # "http://filescan_server:9000",
+      # $f->contenthash,
+      # $furl 
+      #);
+
+      // Get the response and dump it
+      //$res = $req->send();
 
     }
-
-
-    // Wait for the requests to complete, even if some of them fail
-    $results = Promise\settle($promises)->wait();
-
 
     // Handle each the results.  They $key is the contenthash.
-    foreach ($results as $key => $r) {
-
-      $fileentry = new \stdClass();
-      $fileentry->timechecked = date("Y-m-d H:i:s");
-      $fileentry->contenthash = $key;
-
-
-      if ($r['state'] == 'fulfilled') {
-
-        $response = $r['value'];
-
-        $response_code = $response->getStatusCode();
-        $result = json_decode($response->getBody(), true);
-
-        // Assume an unknown status -- correct as needed
-        // TODO: implement an incomplete entry if the conversion fails
-        if (array_key_exists('filename', $result['application/json'])) {
-          mtrace("Saving results for " . $result['application/json']['filename']);
-        } else {
-          mtrace(print_r($r));
-        }
-
-        if ($response_code == 200) {
-
-          if ($result['application/json']['hasText']) {
-            $fileentry->hastext = 1;
-          } else {
-            $fileentry->hastext = 0;
-          }
-
-          if ($result['application/json']['title']) {
-            $fileentry->hastitle = 1;
-          } else {
-            $fileentry->hastitle = 0;
-          }
-
-          if ($result['application/json']['language']) {
-            $fileentry->haslanguage = 1;
-          } else {
-            $fileentry->haslanguage = 0;
-          }
-
-          if ($result['application/json']['hasOutline']) {
-            $fileentry->hasoutline = 1;
-          } else {
-            $fileentry->hasoutline = 0;
-          }
-
-          # Determine overall status based on parameters above
-          # no text ==> fail
-          # has text, title, language, outline ==> pass
-          # has text but missing at least one of title, language, outline ==> check
-          if ($fileentry->hastext == 0) {
-            $fileentry->status = "fail";
-          } elseif (($fileentry->hastitle == 1) && ($fileentry->haslanguage == 1) && ($fileentry->hasoutline == 1)) {
-            $fileentry->status = "pass";
-          } else {
-            $fileentry->status = "check";
-          }
-
-
-          $fileentry->checked = 1;
-          $fileentry->pagecount = $result['application/json']['numPages'];
-
-        } else {
-          $fileentry->status = "error";
-          $fileentry->checked = 0;
-        }
-
-
-      } else if ($r['state'] == 'rejected') {
-        // Not sure how to get the response based on the request.
-        mtrace("Request rejectedi for " . $fileentry->contenthash);
-        mtrace($r['reason']);
-        $fileentry->status = "error";
-        $fileentry->checked = 0;
-
-      } else {
-        mtrace("Unknown exceptioni for " . $fileentry->contenthash);
-        $fileentry->status = "error";
-        $fileentry->checked = 0;
-      }
-
-      // Update the database with the results
-      self::save_filescan_results($DB, $fileentry);
-
-
-    }
+//    foreach ($results as $key => $r) {
+//
+//      $fileentry = new \stdClass();
+//      $fileentry->timechecked = date("Y-m-d H:i:s");
+//      $fileentry->contenthash = $key;
+//
+//
+//      if ($r['state'] == 'fulfilled') {
+//
+//        $response = $r['value'];
+//
+//        $response_code = $response->getStatusCode();
+//        $result = json_decode($response->getBody(), true);
+//
+//        // Assume an unknown status -- correct as needed
+//        // TODO: implement an incomplete entry if the conversion fails
+//        if (array_key_exists('filename', $result['application/json'])) {
+//          mtrace("Saving results for " . $result['application/json']['filename']);
+//        } else {
+//          mtrace(print_r($r));
+//        }
+//
+//        if ($response_code == 200) {
+//
+//          if ($result['application/json']['hasText']) {
+//            $fileentry->hastext = 1;
+//          } else {
+//            $fileentry->hastext = 0;
+//          }
+//
+//          if ($result['application/json']['title']) {
+//            $fileentry->hastitle = 1;
+//          } else {
+//            $fileentry->hastitle = 0;
+//          }
+//
+//          if ($result['application/json']['language']) {
+//            $fileentry->haslanguage = 1;
+//          } else {
+//            $fileentry->haslanguage = 0;
+//          }
+//
+//          if ($result['application/json']['hasOutline']) {
+//            $fileentry->hasoutline = 1;
+//          } else {
+//            $fileentry->hasoutline = 0;
+//          }
+//
+//          # Determine overall status based on parameters above
+//          # no text ==> fail
+//          # has text, title, language, outline ==> pass
+//          # has text but missing at least one of title, language, outline ==> check
+//          if ($fileentry->hastext == 0) {
+//            $fileentry->status = "fail";
+//          } elseif (($fileentry->hastitle == 1) && ($fileentry->haslanguage == 1) && ($fileentry->hasoutline == 1)) {
+//            $fileentry->status = "pass";
+//          } else {
+//            $fileentry->status = "check";
+//          }
+//
+//
+//          $fileentry->checked = 1;
+//          $fileentry->pagecount = $result['application/json']['numPages'];
+//
+//        } else {
+//          $fileentry->status = "error";
+//          $fileentry->checked = 0;
+//        }
+//
+//
+//      } else if ($r['state'] == 'rejected') {
+//        // Not sure how to get the response based on the request.
+//        mtrace("Request rejectedi for " . $fileentry->contenthash);
+//        mtrace($r['reason']);
+//        $fileentry->status = "error";
+//        $fileentry->checked = 0;
+//
+//      } else {
+//        mtrace("Unknown exceptioni for " . $fileentry->contenthash);
+//        $fileentry->status = "error";
+//        $fileentry->checked = 0;
+//      }
+//
+//      // Update the database with the results
+//      self::save_filescan_results($DB, $fileentry);
+//
+//
+//    }
 
   }
 
