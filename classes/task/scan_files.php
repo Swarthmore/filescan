@@ -22,6 +22,11 @@ class scan_files extends \core\task\scheduled_task
     return get_string('filescan_task', 'block_filescan');
   }
 
+  /**
+   * @description Presists a result row to the database
+   * @param $conn - The moodle db connection
+   * @param $row - The database row
+   */
   private static function save_filescan_results($conn, $row)
   {
     $record = $conn->get_record("block_filescan_files", array('contenthash' => $row->contenthash));
@@ -61,7 +66,7 @@ class scan_files extends \core\task\scheduled_task
     $max_files_to_check = (int) get_config("block_filescan", "numfilespercron");
     $max_retries = (int) get_config("block_filescan", "maxretries");
 
-    $query = "
+    $query = <<<EOQ
       SELECT DISTINCT f.id, f.contenthash
       FROM {files} f, {context} c
       WHERE c.id = f.contextid
@@ -77,7 +82,7 @@ class scan_files extends \core\task\scheduled_task
                 OR (checked = 0 AND status = 'error' AND statuscode >= $max_retries))
       ORDER BY f.id DESC
       LIMIT $max_files_to_check; 
-    ";
+    EOQ;
 
     // make the query and return an array of the files
     $content_hashes = $conn->get_records_sql($query);
@@ -99,12 +104,12 @@ class scan_files extends \core\task\scheduled_task
     $comma_separated_content_hashes = implode("','", $hash_array);
     $comma_separated_content_hashes = "'" . $comma_separated_content_hashes . "'";
 
-    $query = " 
+    $query = <<<EOQ
       SELECT f.contenthash, f.pathnamehash 
       FROM {files} f 
       WHERE f.contenthash IN ($comma_separated_content_hashes)
       GROUP BY f.contenthash, f.pathnamehash
-    ";
+    EOQ;
 
     $files = $conn->get_records_sql($query);
 
@@ -135,7 +140,7 @@ class scan_files extends \core\task\scheduled_task
     $headers = array(
       "cache-control: no-cache",
       "Content-Type: multipart/form-data",
-      'Accept: application/json'
+      "Accept: application/json"
     );
 
     // Set up curl options
