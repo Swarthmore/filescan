@@ -174,6 +174,21 @@ class scan_files extends \core\task\scheduled_task
         continue;
       }
 
+      // Check the filesize, if it is greater than a certain limit, don't send the request
+      $max_filesize = 200000000;
+      $filesize = (int) $file->get_filesize();
+
+      if ($filesize > $max_filesize) {
+        mtrace("File is to big to process. Skipping.");
+        $row = new \stdClass();
+        $row->timechecked = date("Y-m-d H:i:s");
+        $row->contenthash = $file_content_hash;
+        $row->status = "error";
+        $row->checked = 0;
+        self::save_filescan_results($conn, $row);
+        continue;
+      }
+
       // Set up the request handler, which is an instance of Moodle's curl implementation
       // See the undocumented curl docs in the Moodle source code
       // https://github.com/moodle/moodle/blob/master/lib/filelib.php#L2972
