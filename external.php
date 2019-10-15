@@ -26,6 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+global $CFG;
+
 require_once($CFG->libdir . "/externallib.php");
 
 class block_filescan_external extends external_api
@@ -93,8 +95,6 @@ class block_filescan_external extends external_api
   public static function request_files($draw, $start, $length, $search, $cols, $order) {
 
     global $DB;
-
-    //$DB->set_debug(true);
 
     // set up all the variables we will need to handle the request to the database
 

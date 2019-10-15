@@ -1,7 +1,7 @@
 define(['core/config',
   'jquery',
   'block_filescan/datatables',
-  'core/ajax'], (mdlcfg, $, DataTable, ajax) => {
+  'core/ajax'], function (mdlcfg, $, DataTable, ajax) {
 
   /*
   * This function instantiates the DataTable, then uses an AJAX function
@@ -9,21 +9,27 @@ define(['core/config',
    */
   function initManage() {
 
-    $(document).ready(() => {
+    $(document).ready(function () {
 
-      // $.noConflct() returns control of the $ variable to Moodle's jQuery
+      /*
+      * $.noConflct() returns control of the $ variable to Moodle's jQuery
+      */
       $.noConflict(true);
 
       $("#view").DataTable({
         "processing": true,
         "serverSide": true,
-        "ajax": (data, callback, settings) => {
+        "ajax": function (data, callback, settings) {
           ajax.call([
             {
-              "methodname": "block_filescan_request_files",
-              "args": data,
-              "done": res => callback(res),
-              "fail": () => console.error("Could not get data")
+              methodname: "block_filescan_request_files",
+              args: data,
+              done: function (res) {
+                callback(res);
+              },
+              fail: function () {
+                console.error("Could not get data");
+              }
             }
           ])
         },
@@ -32,43 +38,55 @@ define(['core/config',
           {
             "data": "status",
             "className": "text-center",
-            "render": data => getStatusIcon(data)
+            "render": function (data) {
+              return getStatusIcon(data);
+            }
           },
           {
             "data": "hastext",
             "className": "text-center",
-            "render": data => getIcon(data)
+            "render": function (data) {
+              return getIcon(data);
+            }
           },
           {
             "data": "hastitle",
             "className": "text-center",
-            "render": data => getIcon(data)
+            "render": function (data) {
+              return getIcon(data);
+            }
           },
           {
             "data": "hasoutline",
             "className": "text-center",
-            "render": data => getIcon(data)
+            "render": function (data) {
+              return getIcon(data);
+            }
           },
           {
             "data": "haslanguage",
             "className": "text-center",
-            "render": data => getIcon(data)
+            "render": function (data) {
+              return getIcon(data);
+            }
           },
           {
             "data": "timechecked",
             "className": "text-center",
-            "render": data => ConvertDateFromDiv(Date.parse(data))
+            "render": function (data) {
+              return ConvertDateFromDiv(Date.parse(data));
+            }
           },
           {
             "data": "courseinfo",
-            "render": (data, type, row, meta) => {
+            "render": function (data, type, row, meta) {
               let url = '/course/view.php?id='
 
               if (data) {
                 let d = JSON.parse(data)
                 let courses = []
 
-                d.forEach(course => {
+                d.forEach(function (course) {
 
                   let courseUrl, enrolled;
 
@@ -80,13 +98,14 @@ define(['core/config',
                     enrolled = 0;
                   }
 
+
                   let teachers = parseTeachers(course);
 
                   if (course) {
                     courses.push(
-                      `<div><a href="${courseUrl}">${course.shortname}</a> [${enrolled}]</div>` +
-                      `<div>${teachers}</div>` +
-                      `<div class="mb-1"><a href="${mdlcfg.wwwroot}/mod/resource/view.php?id=${course.instance_id}">${course.filename}</a></div>`
+                        `<div><a href="${courseUrl}">${course.shortname}</a> [${enrolled}]</div>` +
+                        `<div>${teachers}</div>` +
+                        `<div class="mb-1"><a href="${mdlcfg.wwwroot}/mod/resource/view.php?id=${course.instance_id}">${course.filename}</a></div>`
                     );
                   } else {
                     courses.push('No course information found. This may be an invalid courseinfo entry within the block_filescan_files table.')
@@ -106,8 +125,11 @@ define(['core/config',
   }
 
   return {
-    init: () => initManage()
+    init: function () {
+      initManage();
+    }
   }
+
 
 })
 

@@ -44,16 +44,6 @@ $PAGE->set_url('/block/filescan/admin.php', null);
 $PAGE->set_pagelayout('base');
 $PAGE->set_heading(get_string('reportheading', 'block_filescan'));
 
-// use this variable to scale the bars under the displayed percentages
-$scale = array('x' => 1, 'y' => 0.5);
-
-// use this variable to define the width and height (in pixels) of the progress bars
-// located in each card
-$progressBar = array(
-  'width'   => 100 * $scale['x'],
-  'height'  => 16  * $scale['y']
-);
-
 /**
  * This counts how many records have the passed in option
  *
@@ -145,69 +135,45 @@ function getTotalRecords($table)
 $checks         = array('text', 'title', 'language', 'outline');
 $totalRecords   = getTotalRecords('block_filescan_files');
 
-echo html_writer::tag('h4', get_string('adminsummary:title', 'block_filescan'), array('class' => 'text-primary'));
+echo html_writer::tag('h2', get_string('adminsummary:title', 'block_filescan'), array());
 
 // generate the title, text, outline and language card row
-echo html_writer::start_tag('div', array('class' => 'card-group'), null);
+echo html_writer::start_tag('div', array(), null);
 
-foreach ($checks as $check) {
-  $fileHas    = has($check); // do this so we dont kill the db
+  foreach ($checks as $check) {
+    $fileHas    = has($check);
 
-	// prevent division by zero errors
-  $completed = $totalRecords !== 0 ? round($fileHas / $totalRecords * 100, 2) : 0;
+    // Prevent division by zero errors
+    $completed = $totalRecords !== 0 ? round($fileHas / $totalRecords * 100, 2) : 0;
 
-  $fillAttributes = array(
-    'style' => 'width: ' . $completed * $scale['x'] . 'px; height: ' . $progressBar['height'] . 'px; max-width: 95%;',
-    'class' => 'striped-success bg-success'
-  );
-
-  $cardAttributes = array(
-    'class' => 'card text-white bg-dark m-3 text-center'
-  );
-
-  $primaryCard = array(
-    'class' => 'card text-white bg-primary m-3 text-center'
-  );
-
-  echo html_writer::start_tag('div', $cardAttributes, null);
-  echo html_writer::start_tag('div', array('class' => 'card-body'), null);
-  echo html_writer::tag('p', ucfirst($check), array('class' => 'lead'));
-
-  echo html_writer::tag('h4', $completed . '%', array('class' => 'text-white'));
-  echo html_writer::start_tag('div', array('style' => 'margin: 0 auto;  max-width: 95%; width: ' . $progressBar['width'] . 'px;', 'class' => 'mb-2 striped-danger bg-danger'), null);
-  echo html_writer::tag('div', null, $fillAttributes);
-
-  echo html_writer::end_tag('div');
-
-  echo html_writer::tag('p', $fileHas . ' / ' . $totalRecords . ' PDFs', array('class' => 'mt-3', 'style' => 'color: #bdbfc0;'));
-
-  echo html_writer::end_tag('div');
-  echo html_writer::end_tag('div');
-}
+    // Generate the output string for each check
+    $out = "<p><strong>" . ucfirst($check) . "</strong>" . ": " . $completed . "%" . "<br>" . $fileHas . "/" . $totalRecords . " PDFs" ."</p>";
+    echo $out;
+  }
 
 echo html_writer::end_tag('div');
 
 // Create the DataTable structure
 // TODO: write this in html writer
 echo
-'
-  <div class="container-fluid">
-    <main>
-      <table id="view" class="table mx-2 my-3" style="width: 100%;">
-        <thead>
-            <tr class="bg-primary text-white">
-              <th class="text-center">' . get_string('table:status_header', 'block_filescan') . '</th>
-              <th class="text-center">' . get_string('table:text_check_header', 'block_filescan') . '</th>
-              <th class="text-center">' . get_string('table:title_check_header', 'block_filescan') . '</th>
-              <th class="text-center">' . get_string('table:lang_check_header', 'block_filescan') . '</th>
-              <th class="text-center">' . get_string('table:outline_check_header', 'block_filescan') . '</th>
-              <th class="text-center">' . get_string('table:date_checked_header', 'block_filescan') . '</th>
-              <th>' . get_string('table:courseinfo_header', 'block_filescan') . '</th>
-            </tr>
-        </thead>
-      </table>
-    </main>
-  </div>
-';
+'<table id="view" class="table table-striped table-bordered dataTable" style="width: 100%;" role="grid" aria-describedby="PDFs in your Moodle instance">
+  <thead>
+      <tr>
+        <th class="sorting">' . get_string('table:status_header', 'block_filescan') . '</th>
+        <th class="sorting">' . get_string('table:text_check_header', 'block_filescan') .
+'</th>
+        <th class="sorting">' . get_string('table:title_check_header', 'block_filescan') .
+'</th>
+        <th class="sorting">' . get_string('table:lang_check_header', 'block_filescan') .
+'</th>
+        <th class="sorting">' . get_string('table:outline_check_header', 'block_filescan') .
+'</th>
+        <th class="sorting">' . get_string('table:date_checked_header', 'block_filescan') .
+'</th>
+        <th class="sorting">' . get_string('table:courseinfo_header', 'block_filescan') .
+'</th>
+      </tr>
+  </thead>
+</table>';
 
 echo $OUTPUT->footer();

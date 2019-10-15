@@ -28,6 +28,9 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
             </KEYS>
+            <INDEXES>
+                <INDEX NAME="contenthash" UNIQUE="true" FIELDS="contenthash"/>
+            </INDEXES>
         </TABLE>
     </TABLES>
 </XMLDB>
