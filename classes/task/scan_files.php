@@ -147,7 +147,7 @@ class scan_files extends \core\task\scheduled_task
 
       // in bytes
       // TODO: make max filesize a config option
-      $max_filesize = 200000000;
+      $max_filesize = (int) get_config("block_filescan", "maxfilesize");
       $filesize = (int) $file->get_filesize();
 
       // If there are no file contents, save the results to the db here and break out of the
