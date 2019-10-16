@@ -136,34 +136,23 @@ class scan_files extends \core\task\scheduled_task
       return true;
     }
 
-    // Set up the request headers
-    $headers = array(
-      "cache-control: no-cache",
-      "Content-Type: multipart/form-data",
-      "Accept: application/json"
-    );
-
-    // Set up curl options
-    $curl_opts = array(
-      "curlopt_httpheader" => $headers,
-      "curlopt_timeout" => "120L",
-      "curlopt_followlocation" => true,
-      "curlopt_header" => false
-    );
-
-
     // Get the file storage , we will need this for getting the files by their hash
     $fs = get_file_storage();
 
-    // For each file, construct a Moodle curl request
     foreach ($files as $f) {
 
       $file = $fs->get_file_by_hash($f->pathnamehash);
       $file_contents = $file->get_content();
       $file_content_hash = $f->contenthash;
 
+      // in bytes
+      // TODO: make max filesize a config option
+      $max_filesize = (int) get_config("block_filescan", "maxfilesize");
+      $filesize = (int) $file->get_filesize();
+
       // If there are no file contents, save the results to the db here and break out of the
       // current iteration
+      // Check the filesize, if it is greater than a certain limit, don't send the request
       if (!$file_contents) {
         $row = new \stdClass();
         $row->timechecked = date("Y-m-d H:i:s");
@@ -174,10 +163,31 @@ class scan_files extends \core\task\scheduled_task
         continue;
       }
 
+      // If the filesize is greater than the max filesize, skip the current loop iter
+      if ($filesize > $max_filesize) {
+        mtrace("Cannot process file. Exceeds max file size");
+        continue;
+      }
+
       // Set up the request handler, which is an instance of Moodle's curl implementation
       // See the undocumented curl docs in the Moodle source code
       // https://github.com/moodle/moodle/blob/master/lib/filelib.php#L2972
       $request = new \curl();
+
+      // Set up the request headers
+      $headers = array(
+        "cache-control: no-cache",
+        "Content-Type: multipart/form-data",
+        "Accept: application/json"
+      );
+
+      // Set up curl options
+      $curl_opts = array(
+        "curlopt_httpheader" => $headers,
+        "curlopt_timeout" => "120L",
+        "curlopt_followlocation" => true,
+        "curlopt_header" => false
+      );
 
       $params = array(
         "upfile" => $file,

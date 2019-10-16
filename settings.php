@@ -36,6 +36,12 @@ if ($hassiteconfig) {
     get_string('filescan_numfilespercron_desc', 'block_filescan'),
     '5', PARAM_TEXT, 128));
 
+  $settings->add(new admin_setting_configtext('block_filescan/maxfilesize',
+    get_string('filescan_maxfilesize', 'block_filescan'),
+    get_string('filescan_maxfilesize_desc', 'block_filescan'),
+    128000000, PARAM_INT
+  ));
+
   $settings->add(new admin_setting_configtext('block_filescan/maxretries',
     get_string('filescan_maxretries', 'block_filescan'),
     get_string('filescan_maxretries_desc', 'block_filescan'),
