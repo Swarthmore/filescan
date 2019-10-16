@@ -39,7 +39,7 @@ if ($hassiteconfig) {
   $settings->add(new admin_setting_configtext('block_filescan/maxfilesize',
     get_string('filescan_maxfilesize', 'block_filescan'),
     get_string('filescan_maxfilesize_desc', 'block_filescan'),
-    128000, PARAM_INT
+    128000000, PARAM_INT
   ));
 
   $settings->add(new admin_setting_configtext('block_filescan/maxretries',
