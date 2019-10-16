@@ -136,34 +136,23 @@ class scan_files extends \core\task\scheduled_task
       return true;
     }
 
-    // Set up the request headers
-    $headers = array(
-      "cache-control: no-cache",
-      "Content-Type: multipart/form-data",
-      "Accept: application/json"
-    );
-
-    // Set up curl options
-    $curl_opts = array(
-      "curlopt_httpheader" => $headers,
-      "curlopt_timeout" => "120L",
-      "curlopt_followlocation" => true,
-      "curlopt_header" => false
-    );
-
-
     // Get the file storage , we will need this for getting the files by their hash
     $fs = get_file_storage();
 
-    // For each file, construct a Moodle curl request
     foreach ($files as $f) {
 
       $file = $fs->get_file_by_hash($f->pathnamehash);
       $file_contents = $file->get_content();
       $file_content_hash = $f->contenthash;
 
+      // in bytes
+      // TODO: make max filesize a config option
+      $max_filesize = 200000000;
+      $filesize = (int) $file->get_filesize();
+
       // If there are no file contents, save the results to the db here and break out of the
       // current iteration
+      // Check the filesize, if it is greater than a certain limit, don't send the request
       if (!$file_contents) {
         $row = new \stdClass();
         $row->timechecked = date("Y-m-d H:i:s");
@@ -174,18 +163,9 @@ class scan_files extends \core\task\scheduled_task
         continue;
       }
 
-      // Check the filesize, if it is greater than a certain limit, don't send the request
-      $max_filesize = 200000000;
-      $filesize = (int) $file->get_filesize();
-
+      // If the filesize is greater than the max filesize, skip the current loop iter
       if ($filesize > $max_filesize) {
-        mtrace("File is to big to process. Skipping.");
-        $row = new \stdClass();
-        $row->timechecked = date("Y-m-d H:i:s");
-        $row->contenthash = $file_content_hash;
-        $row->status = "error";
-        $row->checked = 0;
-        self::save_filescan_results($conn, $row);
+        mtrace("Cannot process file. Exceeds max file size");
         continue;
       }
 
@@ -193,6 +173,21 @@ class scan_files extends \core\task\scheduled_task
       // See the undocumented curl docs in the Moodle source code
       // https://github.com/moodle/moodle/blob/master/lib/filelib.php#L2972
       $request = new \curl();
+
+      // Set up the request headers
+      $headers = array(
+        "cache-control: no-cache",
+        "Content-Type: multipart/form-data",
+        "Accept: application/json"
+      );
+
+      // Set up curl options
+      $curl_opts = array(
+        "curlopt_httpheader" => $headers,
+        "curlopt_timeout" => "120L",
+        "curlopt_followlocation" => true,
+        "curlopt_header" => false
+      );
 
       $params = array(
         "upfile" => $file,
