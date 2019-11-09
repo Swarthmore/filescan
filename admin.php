@@ -108,8 +108,7 @@ function generateOverallReport($status)
 
 // Load the datatables css file
 // This needs to come before the header
-$PAGE->requires->css('/blocks/filescan/lib/datatables.min.css', true);
-$PAGE->requires->css('/blocks/filescan/lib/filescan.css', true);
+$PAGE->requires->css('/blocks/filescan/css/datatables.min.css', true);
 
 // start outputting our page
 echo $OUTPUT->header();

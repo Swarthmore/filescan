@@ -1,7 +1,7 @@
 define(['core/config',
   'jquery',
   'block_filescan/datatables',
-  'core/ajax'], function (mdlcfg, $, DataTable, ajax) {
+  'core/ajax'], function (mdlcfg, $, DataTables, ajax) {
 
   /*
   * This function instantiates the DataTable, then uses an AJAX function
