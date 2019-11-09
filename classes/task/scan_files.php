@@ -66,23 +66,17 @@ class scan_files extends \core\task\scheduled_task
     $max_files_to_check = (int) get_config("block_filescan", "numfilespercron");
     $max_retries = (int) get_config("block_filescan", "maxretries");
 
-    $query = <<<EOQ
-      SELECT DISTINCT f.id, f.contenthash
-      FROM {files} f, {context} c
-      WHERE c.id = f.contextid
-       AND c.contextlevel = 70
-       AND f.filesize <> 0
-       AND f.mimetype = 'application/pdf'
-       AND f.component <> 'assignfeedback_editpdf'
-       AND f.filearea <> 'stamps'
-       AND f.contenthash NOT IN
-           (SELECT contenthash
-             FROM {block_filescan_files}
-             WHERE checked = 1
-                OR (checked = 0 AND status = 'error' AND statuscode >= $max_retries))
-      ORDER BY f.id DESC
-      LIMIT $max_files_to_check; 
-    EOQ;
+    $query = 'SELECT distinct f.contenthash 
+        		FROM {files} f, {context} c
+        		WHERE c.id = f.contextid 
+        			AND c.contextlevel = 70 
+        			AND f.filesize <> 0 
+        			AND f.mimetype = "application/pdf"
+        			AND f.component <> "assignfeedback_editpdf" 
+        			AND f.filearea <> "stamps"
+        			AND f.contenthash NOT IN (SELECT contenthash FROM {block_filescan_files} where checked=True or (checked=False and status="error" and statuscode >=' . $max_retries . ')) 	
+        		ORDER BY f.id DESC
+        		LIMIT ' . $max_files_to_check;
 
     // make the query and return an array of the files
     $content_hashes = $conn->get_records_sql($query);
@@ -104,13 +98,11 @@ class scan_files extends \core\task\scheduled_task
     $comma_separated_content_hashes = implode("','", $hash_array);
     $comma_separated_content_hashes = "'" . $comma_separated_content_hashes . "'";
 
-    $query = <<<EOQ
-      SELECT f.contenthash, f.pathnamehash 
-      FROM {files} f 
-      WHERE f.contenthash IN ($comma_separated_content_hashes)
-      GROUP BY f.contenthash, f.pathnamehash
-    EOQ;
-
+    $query = "SELECT  f.contenthash, f.pathnamehash 
+        			FROM {files} f
+              WHERE f.contenthash IN ($comma_separated_content_hashes)
+              GROUP BY f.contenthash";
+              
     $files = $conn->get_records_sql($query);
 
     // Either return an array of the files, or return an empty array.
