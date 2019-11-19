@@ -1,15 +1,3 @@
-/*
- * This combined file was created by the DataTables downloader builder:
- *   https://datatables.net/download
- *
- * To rebuild or modify this file with the latest versions of the included
- * software please visit:
- *   https://datatables.net/download/#dt/dt-1.10.20
- *
- * Included libraries:
- *   DataTables 1.10.20
- */
-
 /*! DataTables 1.10.20
  * ©2008-2019 SpryMedia Ltd - datatables.net/license
  */
@@ -13921,7 +13909,7 @@
 		 *
 		 *  @type string
 		 */
-		build:"dt/dt-1.10.20",
+		builder: "-source-",
 	
 	
 		/**
@@ -15344,5 +15332,3 @@
 
 	return $.fn.dataTable;
 }));
-
-

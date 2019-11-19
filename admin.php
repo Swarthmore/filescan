@@ -155,7 +155,7 @@ echo html_writer::end_tag('div');
 // Create the DataTable structure
 // TODO: write this in html writer
 echo
-'<table id="view" class="table table-striped table-bordered dataTable" style="width: 100%;" role="grid" aria-describedby="PDFs in your Moodle instance">
+'<table id="view" class="display" style="width: 100%;">
   <thead>
       <tr>
         <th class="sorting">' . get_string('table:status_header', 'block_filescan') . '</th>

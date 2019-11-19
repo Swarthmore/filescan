@@ -23,5 +23,3 @@ This plugin configuration requires a URL for the File Scan Server.
 By default, the scheduled task is set to scan an additional set of files every 5 minutes.  This can be adjusted in the Server --> Scheduled Tasks screen.  
 
 There are configurations for help links for each type of accessibility problems.  These links can be set to specific URL's for remiation of the file.
-
-
