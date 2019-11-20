@@ -12,7 +12,8 @@ define([
     init: function() {
       $(document).ready(function() {
 
-        $.noConflict(true); // this returns control of the $ variable to Moodle's jQuery
+        // this returns control of the $ variable to Moodle's jQuery
+        $.noConflict(true);
 
         $("#view").DataTable({
           processing: true,
@@ -101,20 +102,26 @@ define([
                     var teachers = parseTeachers(course);
 
                     if (course) {
-                      courses.push(
-                        '<div><a href="' + courseUrl + '>"' + course.shortname + '</a> ' + enrolled + '</div>' +
-                        '<div>' + teachers + '</div>' +
-                        '<div class="mb-1"><a href="' + Config.wwwroot + '/mod/resource/view.php?id=' + course.instance_id + '>' + course.filename + '</a></div>'
-                      );
+                      var cStr = '<div>'
+                        + '<a href="' + courseUrl + '>"' + course.shortname + '</a> ' 
+                        + enrolled 
+                        + '</div>';
+                      var tStr = '<div>' + teachers + '</div>'
+                      var fStr = '<div class="mb-1">' 
+                        + '<a href="' + Config.wwwroot + '/mod/resource/view.php?id=' 
+                        + course.instance_id + '>' + course.filename + '</a></div>';
+                      courses.push(cStr + tStr + fStr);
                     } else {
                       courses.push(
-                        "No course information found. This may be an invalid courseinfo entry within the block_filescan_files table."
+                        "No course information found. This may be an invalid courseinfo \
+                        entry within the block_filescan_files table."
                       );
                     }
                   });
                   return courses.join("<br>");
                 } else {
-                  return 'No response returned from the DataTables service. Are you sure the course exists?<br><strong>Ref id: ' + row["id"] + '</strong>';
+                  return 'No response returned from the DataTables service. \
+                  Are you sure the course exists?<br><strong>Ref id: ' + row["id"] + '</strong>';
                 }
               }
             }
@@ -133,11 +140,9 @@ define([
  * @constructor
  */
 function ConvertDateFromDiv(divTimeStr) {
-  //eg:-divTimeStr=18/03/2013 12:53:00
-  var tmstr = divTimeStr.toString().split(" "); //'21-01-2013 PM 3:20:24'
+  var tmstr = divTimeStr.toString().split(" ");
   var dt = tmstr[0].split("/");
-  var str = dt[2] + "/" + dt[1] + "/" + dt[0] + " " + tmstr[1]; //+ " " + tmstr[1]//'2013/01/20 3:20:24 pm'
-  var time = new Date(str);
+  var str = dt[2] + "/" + dt[1] + "/" + dt[0] + " " + tmstr[1];
 
   if (time == "Invalid Date") {
     time = new Date(divTimeStr);
