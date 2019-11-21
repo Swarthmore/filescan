@@ -1,0 +1,4 @@
+div.dataTables_processing { 
+  font-size: 200%;
+  z-index: 100 !important; 
+}

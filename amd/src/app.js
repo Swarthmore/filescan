@@ -1,69 +1,64 @@
 define([
-  "core/config",
   "core/ajax",
   "jquery",
   "block_filescan/jquery.dataTables",
   "block_filescan/buttons.html5",
   "block_filescan/dataTables.buttons",
   "block_filescan/dataTables.select",
-], function (Config, Ajax, $, Datatables) {
+], function (Ajax, $) {
+
+  // this returns control of the $ variable to Moodle's jQuery
+  $.noConflict(true);
+
+  // keep track of the app state here
+  const state = {
+    isLoading: false
+  }
 
   return {
+
     init: function() {
+
       $(document).ready(function() {
 
-        // this returns control of the $ variable to Moodle's jQuery
-        $.noConflict(true);
-
-        $("#view").DataTable({
+        const dt = $("#view").DataTable({
           processing: true,
           serverSide: true,
+          lengthMenu: [ [50, 100, 200, -1], [50, 100, 200, "All"] ],
           ajax: function(data, cb, settings) {
             Ajax.call([
               {
                 methodname: "block_filescan_request_files",
-                args: data,
-                done: function(res) {
-                  cb(res);
-                },
-                fail: function() {
-                  console.error("Could not get data!");
-                }
+                args: data, 
+                done: function(res){ cb(res); },
+                fail: function(){ handleError("Could not get data from the Moodle API!") }
               }
             ]);
           },
           select: true,
-          dom: "Bfrtip", 
-          buttons: ["copy", "csv"],
-          columnDefs: [{ targets: "id", visible: false }],
+          dom: "Blfrtip", 
+          buttons: ["copy"],
+          columnDefs: [{  targets: "id", visible: false  }],
           columns: [
             {
               data: "status",
               className: "text-center",
-              render: function(data) {
-                return getStatusIcon(data);
-              }
+              render: function(data) { return getStatusIcon(data); }
             },
             {
               data: "hastext",
               className: "text-center",
-              render: function(data) {
-                return getIcon(data);
-              }
+              render: function(data) { return getIcon(data); }
             },
             {
               data: "hastitle",
               className: "text-center",
-              render: function(data) {
-                return getIcon(data);
-              }
+              render: function(data) { return getIcon(data); }
             },
             {
               data: "hasoutline",
               className: "text-center",
-              render: function(data) {
-                return getIcon(data);
-              }
+              render: function(data) { return getIcon(data); }
             },
             {
               data: "haslanguage",
@@ -89,27 +84,19 @@ define([
                   var courses = [];
 
                   d.forEach(function(course) {
-                    var courseUrl, enrolled;
 
-                    if (course.courseid && course.student_enrollment) {
-                      courseUrl = url + course.courseid;
-                      enrolled = course.student_enrollment;
-                    } else {
-                      courseUrl = "Course URL Undefined";
-                      enrolled = 0;
-                    }
+                    var courseUrl = (M.cfg.wwwroot + url + course.courseid) || 0;
+                    var enrolled = course.student_enrollment || 0;
 
                     var teachers = parseTeachers(course);
 
                     if (course) {
-                      var cStr = '<div>'
-                        + '<a href="' + courseUrl + '>"' + course.shortname + '</a> ' 
-                        + enrolled 
-                        + '</div>';
-                      var tStr = '<div>' + teachers + '</div>'
-                      var fStr = '<div class="mb-1">' 
-                        + '<a href="' + Config.wwwroot + '/mod/resource/view.php?id=' 
-                        + course.instance_id + '>' + course.filename + '</a></div>';
+                      
+                      var courseStr = $("<p></p>").text(makeUrl(courseUrl, course.shortname));
+     
+                      var cStr = '<p>' + makeUrl(courseUrl, course.shortname) + '</p>';
+                      var tStr = '<p>' + '<i class="fa fa-chalkboard-teacher mr-1"></i>' + teachers + '</p>'
+                      var fStr = '<p class="mb-1">' + makeUrl(M.cfg.wwwroot + '/mod/resource/view.php?id=' + course.instance_id, course.filename) + '</p>';
                       courses.push(cStr + tStr + fStr);
                     } else {
                       courses.push(
@@ -127,10 +114,284 @@ define([
             }
           ]
         });
+        
+        $('#btn-reload').on("click", function () {
+          dt.ajax.reload();
+        });
+
+        $("#btn-export-csv").on("click", function () {
+          exportData();
+        });
+
+        /**
+         * @desc This will return the number of filescan records
+         * @note This is kind of hacky and there might be a better way to do this
+         */
+        function exportData() {
+          Ajax.call([
+            {
+              methodname: "block_filescan_request_files",
+              args: {
+                "draw": 1,
+                "columns": [
+                  {
+                    "data": "status",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "hastext",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "hastitle",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "hasoutline",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "haslanguage",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "timechecked",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "courseinfo",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  }
+                ],
+                "order": [
+                  {
+                    "column": 0,
+                    "dir": "asc"
+                  }
+                ],
+                "start": 0,
+                "length": 1,
+                "search": {
+                  "value": "",
+                  "regex": false
+                }
+              },
+              done: function(res) {
+                const count = res.recordsTotal;
+                getAllRecords(count);
+              },
+              fail: function() {
+                throw new Error("Could not get data from the Moodle API!");
+              }
+            }
+          ]);
+        }
+
+        /**
+         * @desc This will return all records in the filescan table
+         * and should be used for exporting data, unless a native way in datatables
+         * is found (right now because we are usign server-side processing, it's not
+         * easy to do this)
+         * @param  count 
+         */
+        function getAllRecords(count) {
+          Ajax.call([
+            {
+              methodname: "block_filescan_request_files",
+              args: {
+                "draw": 1,
+                "columns": [
+                  {
+                    "data": "status",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "hastext",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "hastitle",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "hasoutline",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "haslanguage",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "timechecked",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  },
+                  {
+                    "data": "courseinfo",
+                    "name": "",
+                    "searchable": true,
+                    "orderable": true,
+                    "search": {
+                      "value": "",
+                      "regex": false
+                    }
+                  }
+                ],
+                "order": [
+                  {
+                    "column": 0,
+                    "dir": "asc"
+                  }
+                ],
+                "start": 0,
+                "length": count,
+                "search": {
+                  "value": "",
+                  "regex": false
+                }
+              },
+              done: function(res) {
+                // csv checks out as ok
+                const csv = parseDataToCsv(res.data);
+                save(Date.now().toString() + "_filescan" + ".csv", csv);
+              },
+              fail: function() {
+                handleError("Could not get data from the Moodle API!");
+              }
+            }
+          ]);
+        }
+
+        /**
+         * @desc Parses data received from the filescan table to a CSV
+         * @param {*} data 
+         */
+        function parseDataToCsv(arr) {
+          const array = [Object.keys(arr[0])].concat(arr)
+        
+          return array.map(function(it) {
+            return Object.values(it).toString()
+          }).join('\n')
+        }
+
+        /**
+         * @desc Creates a file download
+         * @param String filename 
+         * @param {*} data 
+         */
+        function save(filename, data) {
+          var blob = new Blob([data], {type: 'text/csv'});
+          if (window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveBlob(blob, filename);
+          }
+          else {
+            var elem = window.document.createElement('a');
+            elem.href = 'data:text/csv;charset=utf-8,' + encodeURI(data);
+            elem.download = filename;        
+            document.body.appendChild(elem);
+            elem.click();        
+            document.body.removeChild(elem);
+          }
+        }
+
+        function handleError(str) {
+          throw new Error(str);
+        }
       });
     }
   };
 });
+
+/**
+ * @desc It's easier to write a function to create links than to deal with
+ * poor JS interpolation (Because moodle doesn't support new js at this time -_-)
+ * @param String href 
+ * @param String text 
+ */
+function makeUrl(href, text) {
+  var urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+  if (!urlRegex.test(href)) {
+    throw new Error("Invalid URL passed to makeUrl function: ", href);
+  }
+  return '<a href="' + href + '">' + text + '</a>'
+}
 
 /**
  * Converts a unix timestamp to something that is human readable
@@ -143,6 +404,7 @@ function ConvertDateFromDiv(divTimeStr) {
   var tmstr = divTimeStr.toString().split(" ");
   var dt = tmstr[0].split("/");
   var str = dt[2] + "/" + dt[1] + "/" + dt[0] + " " + tmstr[1];
+  var time = new Date(str);
 
   if (time == "Invalid Date") {
     time = new Date(divTimeStr);

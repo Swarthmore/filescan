@@ -109,6 +109,7 @@ function generateOverallReport($status)
 // Load the datatables css file
 // This needs to come before the header
 $PAGE->requires->css('/blocks/filescan/css/datatables.min.css', true);
+$PAGE->requires->css('/blocks/filescan/css/custom.css', true);
 
 // start outputting our page
 echo $OUTPUT->header();
@@ -140,7 +141,7 @@ echo html_writer::tag('h2', get_string('adminsummary:title', 'block_filescan'), 
 echo html_writer::start_tag('div', array(), null);
 
   foreach ($checks as $check) {
-    $fileHas    = has($check);
+    $fileHas = has($check);
 
     // Prevent division by zero errors
     $completed = $totalRecords !== 0 ? round($fileHas / $totalRecords * 100, 2) : 0;
@@ -155,6 +156,8 @@ echo html_writer::end_tag('div');
 // Create the DataTable structure
 // TODO: write this in html writer
 echo
+'<button type="button" id="btn-reload" class="dt-button buttons-copy buttons-html5">Refresh data</button>',
+'<button type="button" id="btn-export-csv" class="dt-button buttons-copy buttons-html5">Export CSV</button>',
 '<table id="view" class="display" style="width: 100%;">
   <thead>
       <tr>

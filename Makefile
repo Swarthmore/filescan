@@ -12,7 +12,7 @@ grunt:
 	cd amd && grunt
 
 purge:
-	php $(PWD)/../../cli/purge_caches.php
+	php $(PWD)/../../admin/cli/purge_caches.php
 
 # Convert a DataTables javascript file to work in the Moodle AMD environment.
 $(SRC_DIR)/%.js: $(ORIG_DIR)/%.js
