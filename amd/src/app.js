@@ -31,7 +31,7 @@ define([
                 methodname: "block_filescan_request_files",
                 args: data, 
                 done: function(res){ cb(res); },
-                fail: function(){ handleError("Could not get data from the Moodle API!") }
+                fail: function(err){ handleError("Could not get data from the Moodle API: ", err) }
               }
             ]);
           },
@@ -63,16 +63,12 @@ define([
             {
               data: "haslanguage",
               className: "text-center",
-              render: function(data) {
-                return getIcon(data);
-              }
+              render: function(data) { return getIcon(data); }
             },
             {
               data: "timechecked",
               className: "text-center",
-              render: function(data) {
-                return ConvertDateFromDiv(Date.parse(data));
-              }
+              render: function(data) { return ConvertDateFromDiv(Date.parse(data)); }
             },
             {
               data: "courseinfo",
@@ -92,11 +88,22 @@ define([
 
                     if (course) {
                       
-                      var courseStr = $("<p></p>").text(makeUrl(courseUrl, course.shortname));
+                      var courseStr = $("<p></p>").text(
+                        makeUrl(courseUrl, course.shortname)
+                      );
      
-                      var cStr = '<p>' + makeUrl(courseUrl, course.shortname) + '</p>';
-                      var tStr = '<p>' + '<i class="fa fa-chalkboard-teacher mr-1"></i>' + teachers + '</p>'
-                      var fStr = '<p class="mb-1">' + makeUrl(M.cfg.wwwroot + '/mod/resource/view.php?id=' + course.instance_id, course.filename) + '</p>';
+                      var cStr = '<p>' + 
+                        makeUrl(courseUrl, course.shortname) + 
+                        '</p>';
+                      var tStr = '<p>' + 
+                        '<i class="fa fa-chalkboard-teacher mr-1"></i>' + 
+                        teachers + 
+                        '</p>'
+                      var fStr = '<p class="mb-1">' + 
+                        makeUrl(M.cfg.wwwroot + 
+                          '/mod/resource/view.php?id=' + 
+                          course.instance_id, course.filename
+                        ) + '</p>';
                       courses.push(cStr + tStr + fStr);
                     } else {
                       courses.push(
@@ -108,7 +115,9 @@ define([
                   return courses.join("<br>");
                 } else {
                   return 'No response returned from the DataTables service. \
-                  Are you sure the course exists?<br><strong>Ref id: ' + row["id"] + '</strong>';
+                  Are you sure the course exists?<br><strong>Ref id: ' + 
+                    row["id"] + 
+                    '</strong>';
                 }
               }
             }
@@ -222,8 +231,8 @@ define([
                 const count = res.recordsTotal;
                 getAllRecords(count);
               },
-              fail: function() {
-                throw new Error("Could not get data from the Moodle API!");
+              fail: function(err) {
+                throw new Error("Could not get data from the Moodle API: ", err);
               }
             }
           ]);
