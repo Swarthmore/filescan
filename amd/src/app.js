@@ -7,66 +7,61 @@ define([
   "block_filescan/dataTables.select",
 ], function (Ajax, $) {
 
-  function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return !!right[Symbol.hasInstance](left); } else { return left instanceof right; } }
+"use strict";
 
-  function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-  
-  function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-  
-  function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-  
-  var ProgressBar =
-  /*#__PURE__*/
-  function () {
-    function ProgressBar(_ref) {
-      var id = _ref.id,
-          value = _ref.value,
-          type = _ref.type;
-  
-      _classCallCheck(this, ProgressBar);
-  
+function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return !!right[Symbol.hasInstance](left); } else { return left instanceof right; } }
+
+function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var ProgressBar =
+/*#__PURE__*/
+function () {
+  function ProgressBar(_ref) {
+    var id = _ref.id,
+        value = _ref.value,
+        type = _ref.type;
+
+    _classCallCheck(this, ProgressBar);
+
+    this._value = value;
+    this._type = type;
+    this._el = $("<div>").addClass("overflow-hidden progress-bar bg-" + this._type).attr({
+      id: id
+    }).css({
+      width: this._value
+    });
+  }
+
+  _createClass(ProgressBar, [{
+    key: "update",
+    value: function update(_ref2) {
+      var value = _ref2.value,
+          type = _ref2.type;
       this._value = value;
       this._type = type;
-      this._el = $("<div>").addClass("overflow-hidden progress-bar bg-" + this._type).attr({
-        id: id,
-        role: "progressbar",
-        ariaValueNow: this._value,
-        ariaValueMin: 0,
-        ariaValueMax: 100
-      }).css({
-        width: this._value
+
+      this._el.removeClass().addClass("overflow-hidden progress-bar bg-" + this._type).css({
+        width: value
       });
     }
-  
-    _createClass(ProgressBar, [{
-      key: "update",
-      value: function update(_ref2) {
-        var value = _ref2.value,
-            type = _ref2.type;
-        this._value = value;
-        this._type = type;
-  
-        this._el.removeClass().addClass("overflow-hidden progress-bar bg-" + this._type).attr({
-          ariaValueNow: value
-        }).css({
-          width: value + "%"
-        });
-      }
-    }, {
-      key: "value",
-      get: function get() {
-        return this._value;
-      }
-    }, {
-      key: "el",
-      get: function get() {
-        return this._el;
-      }
-    }]);
-  
-    return ProgressBar;
-  }();
+  }, {
+    key: "value",
+    get: function get() {
+      return this._value;
+    }
+  }, {
+    key: "el",
+    get: function get() {
+      return this._el;
+    }
+  }]);
 
+  return ProgressBar;
+}();
   // this returns control of the $ variable to Moodle's jQuery
   $.noConflict(true);
 
@@ -460,26 +455,30 @@ define([
       var $statsLanguage = $("#stats-language");
       var $statsOutline = $("#stats-outline");
        
+      function makePctStr(val, total) {
+        return Math.round((val / total) * 100) + "%";
+      }
+
        // Initialize everything to zero
        // We do this because we then want to change the css property to
        // the actual value 
        var $textProgress = new ProgressBar({
-        value: 0 + "%",
+        value: makePctStr(0, 100),
         type: "primary"
        });
 
        var $titleProgress = new ProgressBar({
-        value: 0 + "%",
+        value: makePctStr(0, 100),
         type: "primary"
        });
 
        var $languageProgress = new ProgressBar({
-        value: 0 + "%",
+        value: makePctStr(0, 100),
         type: "primary"
        });
 
        var $outlineProgress = new ProgressBar({
-        value: 0 + "%",
+        value: makePctStr(0, 100),
         type: "primary"
        });
 
@@ -493,28 +492,28 @@ define([
        setTimeout(function(){
 
         $textProgress.update({
-          value: text,
+          value: makePctStr(text, total),
           type: "primary"
         });
 
         $textProgress.el.text(text + " / " + total + " pdfs have text")
 
         $titleProgress.update({
-          value: title,
+          value: makePctStr(title, total),
           type: "primary"
         });
 
         $titleProgress.el.text(title + " / " + total + " pdfs have a title")
 
         $languageProgress.update({
-          value: language,
+          value: makePctStr(language, total),
           type: "primary"
         });
 
-        $languageProgress.el.text(language + " / " + total + " pdfs have a language")
+        $languageProgress.el.text(language + " / " + total +  " pdfs have a language")
 
         $outlineProgress.update({
-          value: outline,
+          value: makePctStr(outline, total),
           type: "primary"
         });
 

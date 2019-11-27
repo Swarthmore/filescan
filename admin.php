@@ -130,18 +130,24 @@ function getTotalRecords($table)
   return $DB->count_records($table, $conditions = null);
 }
 
+$textRecords = has("text");
+$titleRecords = has("title");
+$languageRecords = has("language");
+$outlineRecords = has("outline");
+$totalRecords = getTotalRecords('block_filescan_files');
+
 $PAGE->requires->js_call_amd('block_filescan/app', 'progress', array(
-  has("text"),
-  has("title"),
-  has("language"),
-  has("outline"),
-  getTotalRecords('block_filescan_files')
+  $textRecords,
+  $titleRecords,
+  $languageRecords,
+  $outlineRecords,
+  $totalRecords
 ));
 
 // TODO: move all this output junk into a function or class
 // generate the dashboard totals
 $checks = array('text', 'title', 'language', 'outline');
-$totalRecords = getTotalRecords('block_filescan_files');
+
 
 echo html_writer::tag('h1', get_string('adminsummary:title', 'block_filescan'), array());
 
