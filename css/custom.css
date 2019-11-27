@@ -1,4 +1,26 @@
-div.dataTables_processing { 
-  font-size: 200%;
-  z-index: 100 !important; 
+.stats-container {
+  margin: 32px 0;
+}
+
+.progress-bar {
+  border-radius: .25rem;
+  transition: all 2s ease-in;
+}
+
+.progress-wrapper {
+  padding-right: 20px;
+}
+
+.progress-pct {
+  float: right;
+  color: black;
+}
+
+.progress-wrapper > p {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.pbar {
+ height: 32px;
 }

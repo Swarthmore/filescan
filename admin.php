@@ -130,34 +130,52 @@ function getTotalRecords($table)
   return $DB->count_records($table, $conditions = null);
 }
 
+$PAGE->requires->js_call_amd('block_filescan/app', 'progress', array(
+  has("text"),
+  has("title"),
+  has("language"),
+  has("outline"),
+  getTotalRecords('block_filescan_files')
+));
+
 // TODO: move all this output junk into a function or class
 // generate the dashboard totals
-$checks         = array('text', 'title', 'language', 'outline');
-$totalRecords   = getTotalRecords('block_filescan_files');
+$checks = array('text', 'title', 'language', 'outline');
+$totalRecords = getTotalRecords('block_filescan_files');
 
-echo html_writer::tag('h2', get_string('adminsummary:title', 'block_filescan'), array());
+echo html_writer::tag('h1', get_string('adminsummary:title', 'block_filescan'), array());
 
-// generate the title, text, outline and language card row
-echo html_writer::start_tag('div', array(), null);
+echo '<div class="stats-container">';
+echo '<h2>Your PDF Files</h2>';
 
-  foreach ($checks as $check) {
-    $fileHas = has($check);
+echo '<div class="progress-wrapper">
+        <p class="lead">Text - ' . round((has("text") / $totalRecords) * 100, 2) . '% passing</p>
+        <div id="stats-text" class="progress pbar my-2">
+        </div>
+      </div>';
 
-    // Prevent division by zero errors
-    $completed = $totalRecords !== 0 ? round($fileHas / $totalRecords * 100, 2) : 0;
+echo '<div class="progress-wrapper">
+        <p class="lead">Title - ' . round((has("title") / $totalRecords) * 100, 2). '% passing</p>
+        <div id="stats-title" class="progress pbar my-2"></div>
+      </div>';
 
-    // Generate the output string for each check
-    $out = "<p><strong>" . ucfirst($check) . "</strong>" . ": " . $completed . "%" . "<br>" . $fileHas . "/" . $totalRecords . " PDFs" ."</p>";
-    echo $out;
-  }
+echo '<div class="progress-wrapper">
+        <p class="lead">Language - ' . round((has("language") / $totalRecords) * 100, 2) . '% passing</p>
+        <div id="stats-language" class="progress pbar my-2"></div>
+      </div>';
 
-echo html_writer::end_tag('div');
+echo '<div class="progress-wrapper">
+        <p class="lead">Outline - ' . round((has("outline") / $totalRecords) * 100, 2) . '% passing</p>
+        <div id="stats-outline" class="progress pbar my-2"></div>
+      </div>';
+
+echo '</div>';
 
 // Create the DataTable structure
 // TODO: write this in html writer
 echo
 '<button type="button" id="btn-reload" class="dt-button buttons-copy buttons-html5">Refresh data</button>',
-'<button type="button" id="btn-export-csv" class="dt-button buttons-copy buttons-html5">Export CSV</button>',
+'<button type="button" id="btn-export-csv" class="dt-button buttons-copy buttons-html5">Export All Data</button>',
 '<table id="view" class="display" style="width: 100%;">
   <thead>
       <tr>

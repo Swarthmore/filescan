@@ -7,13 +7,68 @@ define([
   "block_filescan/dataTables.select",
 ], function (Ajax, $) {
 
+  function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return !!right[Symbol.hasInstance](left); } else { return left instanceof right; } }
+
+  function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+  
+  function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+  
+  function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+  
+  var ProgressBar =
+  /*#__PURE__*/
+  function () {
+    function ProgressBar(_ref) {
+      var id = _ref.id,
+          value = _ref.value,
+          type = _ref.type;
+  
+      _classCallCheck(this, ProgressBar);
+  
+      this._value = value;
+      this._type = type;
+      this._el = $("<div>").addClass("overflow-hidden progress-bar bg-" + this._type).attr({
+        id: id,
+        role: "progressbar",
+        ariaValueNow: this._value,
+        ariaValueMin: 0,
+        ariaValueMax: 100
+      }).css({
+        width: this._value
+      });
+    }
+  
+    _createClass(ProgressBar, [{
+      key: "update",
+      value: function update(_ref2) {
+        var value = _ref2.value,
+            type = _ref2.type;
+        this._value = value;
+        this._type = type;
+  
+        this._el.removeClass().addClass("overflow-hidden progress-bar bg-" + this._type).attr({
+          ariaValueNow: value
+        }).css({
+          width: value + "%"
+        });
+      }
+    }, {
+      key: "value",
+      get: function get() {
+        return this._value;
+      }
+    }, {
+      key: "el",
+      get: function get() {
+        return this._el;
+      }
+    }]);
+  
+    return ProgressBar;
+  }();
+
   // this returns control of the $ variable to Moodle's jQuery
   $.noConflict(true);
-
-  // keep track of the app state here
-  const state = {
-    isLoading: false
-  }
 
   return {
 
@@ -129,7 +184,26 @@ define([
         });
 
         $("#btn-export-csv").on("click", function () {
-          exportData();
+          
+          $("#btn-export-csv").prop({
+            disabled: true
+          });
+
+          var promise = exportData()[0];
+          promise
+            .done(function(res){
+              $("#btn-export-csv").prop({ 
+                "disabled": false
+              });
+              const count = res.recordsTotal;
+              getAllRecords(count);
+            })
+            .fail(function(err) {
+              $("#btn-export-csv").prop({ 
+                "disabled": false
+              });
+              handleError(err);
+            })
         });
 
         /**
@@ -137,7 +211,7 @@ define([
          * @note This is kind of hacky and there might be a better way to do this
          */
         function exportData() {
-          Ajax.call([
+          return Ajax.call([
             {
               methodname: "block_filescan_request_files",
               args: {
@@ -226,13 +300,6 @@ define([
                   "value": "",
                   "regex": false
                 }
-              },
-              done: function(res) {
-                const count = res.recordsTotal;
-                getAllRecords(count);
-              },
-              fail: function(err) {
-                throw new Error("Could not get data from the Moodle API: ", err);
               }
             }
           ]);
@@ -384,6 +451,77 @@ define([
           throw new Error(str);
         }
       });
+    },
+
+    progress: function(text, title, language, outline, total ) {
+
+      var $statsText = $("#stats-text");
+      var $statsTitle = $("#stats-title");
+      var $statsLanguage = $("#stats-language");
+      var $statsOutline = $("#stats-outline");
+       
+       // Initialize everything to zero
+       // We do this because we then want to change the css property to
+       // the actual value 
+       var $textProgress = new ProgressBar({
+        value: 0 + "%",
+        type: "primary"
+       });
+
+       var $titleProgress = new ProgressBar({
+        value: 0 + "%",
+        type: "primary"
+       });
+
+       var $languageProgress = new ProgressBar({
+        value: 0 + "%",
+        type: "primary"
+       });
+
+       var $outlineProgress = new ProgressBar({
+        value: 0 + "%",
+        type: "primary"
+       });
+
+       $statsText.append($textProgress.el);
+       $statsTitle.append($titleProgress.el);
+       $statsLanguage.append($languageProgress.el);
+       $statsOutline.append($outlineProgress.el);
+
+       // Once everything is loaded, update the progress 
+       // bar to trigger an animation
+       setTimeout(function(){
+
+        $textProgress.update({
+          value: text,
+          type: "primary"
+        });
+
+        $textProgress.el.text(text + " / " + total + " pdfs have text")
+
+        $titleProgress.update({
+          value: title,
+          type: "primary"
+        });
+
+        $titleProgress.el.text(title + " / " + total + " pdfs have a title")
+
+        $languageProgress.update({
+          value: language,
+          type: "primary"
+        });
+
+        $languageProgress.el.text(language + " / " + total + " pdfs have a language")
+
+        $outlineProgress.update({
+          value: outline,
+          type: "primary"
+        });
+
+        $outlineProgress.el.text(outline + " / " + total + " pdfs have an outline")
+
+       }, 500);
+
     }
   };
 });
