@@ -11,14 +11,15 @@
   padding-right: 20px;
 }
 
-.progress-pct {
-  float: right;
-  color: black;
-}
-
 .progress-wrapper > p {
   margin-bottom: 0;
   margin-top: 0;
+}
+
+.progress-bar > .progress-text {
+  text-align: left;
+  padding-left: 8px;
+  color: white;
 }
 
 .pbar {

@@ -29,7 +29,7 @@ function () {
 
     this._value = value;
     this._type = type;
-    this._el = $("<div>").addClass("overflow-hidden progress-bar bg-" + this._type).attr({
+    this._el = $("<div>").addClass("progress-bar bg-" + this._type).attr({
       id: id
     }).css({
       width: this._value
@@ -44,7 +44,7 @@ function () {
       this._value = value;
       this._type = type;
 
-      this._el.removeClass().addClass("overflow-hidden progress-bar bg-" + this._type).css({
+      this._el.removeClass().addClass("progress-bar bg-" + this._type).css({
         width: value
       });
     }
@@ -496,28 +496,28 @@ function () {
           type: "primary"
         });
 
-        $textProgress.el.text(text + " / " + total + " pdfs have text")
+        $textProgress.el.html("<span class='progress-text'>" + text + " / " + total + " pdfs have text" + "</span>")
 
         $titleProgress.update({
           value: makePctStr(title, total),
           type: "primary"
         });
 
-        $titleProgress.el.text(title + " / " + total + " pdfs have a title")
+        $titleProgress.el.html("<span class='progress-text'>" + title + " / " + total + " pdfs have a title" + "</span>")
 
         $languageProgress.update({
           value: makePctStr(language, total),
           type: "primary"
         });
 
-        $languageProgress.el.text(language + " / " + total +  " pdfs have a language")
+        $languageProgress.el.html("<span class='progress-text'>" + language + " / " + total +  " pdfs have a language" + "</span>")
 
         $outlineProgress.update({
           value: makePctStr(outline, total),
           type: "primary"
         });
 
-        $outlineProgress.el.text(outline + " / " + total + " pdfs have an outline")
+        $outlineProgress.el.html("<span class='progress-text'>" + outline + " / " + total + " pdfs have an outline" + "</span>" )
 
        }, 500);
 
