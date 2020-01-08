@@ -13,70 +13,68 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Accessibilty file scan
- *
- * @package   block_filescan
- * @copyright 2017 Swarthmore College ITS
+ * @package   block_afs
+ * @copyright 2019 Swarthmore College ITS
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-
 if ($hassiteconfig) {
 
-  $settings->add(new admin_setting_configtext('block_filescan/apiurl',
-    get_string('filescan_apiurl', 'block_filescan'),
-    get_string('filescan_apiurl_desc', 'block_filescan'),
-    '', PARAM_TEXT, 128));
+    $settings->add(new admin_setting_configtext('block_afs/apiurl',
+        get_string('settings:apiurl', 'block_afs'),
+        get_string('settings:apiurl_desc', 'block_afs'),
+        '', PARAM_TEXT, 128));
 
-  $settings->add(new admin_setting_configtext('block_filescan/numfilespercron',
-    get_string('filescan_numfilespercron', 'block_filescan'),
-    get_string('filescan_numfilespercron_desc', 'block_filescan'),
-    '5', PARAM_TEXT, 128));
+    $settings->add(new admin_setting_configtext('block_afs/numfilespercron',
+        get_string('settings:numfilespercron', 'block_afs'),
+        get_string('settings:numfilespercron_desc', 'block_afs'),
+        '5', PARAM_TEXT, 128));
 
-  $settings->add(new admin_setting_configtext('block_filescan/maxfilesize',
-    get_string('filescan_maxfilesize', 'block_filescan'),
-    get_string('filescan_maxfilesize_desc', 'block_filescan'),
-    128000000, PARAM_INT
-  ));
+    $settings->add(new admin_setting_configtext('block_afs/maxfilesize',
+        get_string('settings:maxfilesize', 'block_afs'),
+        get_string('settings:maxfilesize_desc', 'block_afs'),
+        128000000, PARAM_INT
+    ));
 
-  $settings->add(new admin_setting_configtext('block_filescan/maxretries',
-    get_string('filescan_maxretries', 'block_filescan'),
-    get_string('filescan_maxretries_desc', 'block_filescan'),
-    '3', PARAM_TEXT, 128));
+    $settings->add(new admin_setting_configtext('block_afs/maxretries',
+        get_string('settings:maxretries', 'block_afs'),
+        get_string('settings:maxretries_desc', 'block_afs'),
+        '3', PARAM_TEXT, 128));
 
-  $settings->add(new admin_setting_configtext('block_filescan/text_check_help',
-    get_string('filescan_text_check_help_desc', 'block_filescan'),
-    '',
-    'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-    PARAM_URL,
-    60
-  ));
+    $settings->add(new admin_setting_configtext('block_afs/text_check_help',
+        get_string('settings:text_check_help_desc', 'block_afs'),
+        '',
+        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+        PARAM_URL,
+        60
+    ));
 
-  $settings->add(new admin_setting_configtext('block_filescan/title_check_help',
-    get_string('filescan_title_check_help_desc', 'block_filescan'),
-    '',
-    'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-    PARAM_URL,
-    60
-  ));
+    $settings->add(new admin_setting_configtext('block_afs/title_check_help',
+        get_string('settings:title_check_help_desc', 'block_afs'),
+        '',
+        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+        PARAM_URL,
+        60
+    ));
 
-  $settings->add(new admin_setting_configtext('block_filescan/lang_check_help',
-    get_string('filescan_lang_check_help_desc', 'block_filescan'),
-    '',
-    'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-    PARAM_URL,
-    60
-  ));
+    $settings->add(new admin_setting_configtext('block_afs/lang_check_help',
+        get_string('settings:lang_check_help_desc', 'block_afs'),
+        '',
+        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+        PARAM_URL,
+        60
+    ));
 
-  $settings->add(new admin_setting_configtext('block_filescan/outline_check_help',
-    get_string('filescan_outline_check_help_desc', 'block_filescan'),
-    '',
-    'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-    PARAM_URL,
-    60
-  ));
+    $settings->add(new admin_setting_configtext('block_afs/outline_check_help',
+        get_string('settings:outline_check_help_desc', 'block_afs'),
+        '',
+        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+        PARAM_URL,
+        60
+    ));
 
 }

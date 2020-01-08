@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/filescan/db" VERSION="20170824" COMMENT="XMLDB file for Moodle block/filescan"
+<XMLDB PATH="blocks/afs/db" VERSION="20170824" COMMENT="XMLDB file for Moodle block/filescan"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
     <TABLES>
-        <TABLE NAME="block_filescan_files" COMMENT="Filescan results">
+        <TABLE NAME="block_afs" COMMENT="Accessibility file scanner results">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>

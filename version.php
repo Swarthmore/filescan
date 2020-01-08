@@ -1,5 +1,6 @@
 <?php
 
-$plugin->component = 'block_filescan';
-$plugin->version = 2019110901; //yyyymmdd##
+$plugin->component = "block_afs";
+$plugin->version = 2019122602;
 $plugin->requires = 2016052300;
+
