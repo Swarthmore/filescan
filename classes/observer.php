@@ -28,7 +28,7 @@ class block_afs_observer
             || (isset($event_data["eventname"]) && isset($event_data["other"]) && isset($event_data["other"]["modulename"]) && $event_data["eventname"] == "\\core\\event\\course_module_updated" && $event_data["other"]["modulename"] == "resource")
         ) {
             // Clear any existing cache data for this course
-            $cache = cache::make('block_afs', 'afs');
+            $cache = cache::make('block_afs', 'filescan');
             $afs_cache = $cache->delete($event_data["courseid"]);
         }
     }
