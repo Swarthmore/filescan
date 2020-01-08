@@ -10306,7 +10306,8 @@ object-assign
             };
           },
           x = function(e, t) {
-            return JSON.parse(t)[0][e];
+            var n = JSON.parse(t)[0];
+            return n ? n[e] : ((n[e] = ""), n[e]);
           },
           C = function(e) {
             return new Promise(function(t, n) {
@@ -10597,11 +10598,12 @@ object-assign
                     return a.a.createElement(
                       "tr",
                       { key: "row-" + t },
-                      a.a.createElement(
-                        "td",
-                        { style: _, className: "text-capitalize" },
-                        e.status
-                      ),
+                      e.status &&
+                        a.a.createElement(
+                          "td",
+                          { style: _, className: "text-capitalize" },
+                          e.status
+                        ),
                       a.a.createElement(
                         "td",
                         { style: _ },
@@ -10630,50 +10632,52 @@ object-assign
                           ? a.a.createElement("i", { className: S })
                           : a.a.createElement("i", { className: P })
                       ),
-                      a.a.createElement("td", { style: _ }, e.timechecked),
-                      a.a.createElement(
-                        "td",
-                        { style: _ },
+                      e.timechecked &&
+                        a.a.createElement("td", { style: _ }, e.timechecked),
+                      e.courseinfo &&
                         a.a.createElement(
-                          "p",
-                          { className: "lead" },
+                          "td",
+                          { style: _ },
                           a.a.createElement(
-                            "a",
-                            {
-                              href: ""
-                                .concat(w.wwwroot, "/course/view.php/?id=")
-                                .concat(x("courseid", e.courseinfo))
-                            },
-                            x("fullname", e.courseinfo)
+                            "p",
+                            { className: "lead" },
+                            a.a.createElement(
+                              "a",
+                              {
+                                href: ""
+                                  .concat(w.wwwroot, "/course/view.php/?id=")
+                                  .concat(x("courseid", e.courseinfo))
+                              },
+                              x("fullname", e.courseinfo)
+                            ),
+                            a.a.createElement(
+                              h,
+                              { variant: "info", className: "ml-2" },
+                              x("shortname", e.courseinfo)
+                            )
                           ),
                           a.a.createElement(
-                            h,
-                            { variant: "info", className: "ml-2" },
-                            x("shortname", e.courseinfo)
-                          )
-                        ),
-                        a.a.createElement(
-                          "p",
-                          null,
-                          a.a.createElement("i", {
-                            className: "fa fa-download mr-1",
-                            "aria-hidden": "true"
-                          }),
-                          a.a.createElement(
-                            "a",
-                            {
-                              href: ""
-                                .concat(
-                                  w.wwwroot,
-                                  "/mod/resource/view.php/?id="
-                                )
-                                .concat(x("instance_id", e.courseinfo)),
-                              className: "text-left"
-                            },
-                            x("filename", e.courseinfo)
+                            "p",
+                            null,
+                            a.a.createElement("i", {
+                              className: "fa fa-download mr-1",
+                              "aria-hidden": "true"
+                            }),
+                            a.a.createElement(
+                              "a",
+                              {
+                                href: ""
+                                  .concat(
+                                    w.wwwroot,
+                                    "/mod/resource/view.php/?id="
+                                  )
+                                  .concat(x("instance_id", e.courseinfo)),
+                                className: "text-left"
+                              },
+                              x("filename", e.courseinfo)
+                            )
                           )
                         )
-                      )
                     );
                   })
                 )

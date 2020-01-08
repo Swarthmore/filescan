@@ -150,7 +150,12 @@ const DataTable = () => {
   // Get field from courseinfo object
   const getCourseinfoField = (field, courseinfo) => {
     const data = JSON.parse(courseinfo)[0];
-    return data[field];
+    if (data) {
+      return data[field];
+    } else {
+      data[field] = "";
+      return data[field];
+    }
   };
 
   const handleSelectChange = e => {
@@ -327,9 +332,11 @@ const DataTable = () => {
             <tbody>
               {currentRows.map((data, i) => (
                 <tr key={"row-" + i}>
-                  <td style={tableCellStyles} className="text-capitalize">
-                    {data.status}
-                  </td>
+                  {data.status && (
+                    <td style={tableCellStyles} className="text-capitalize">
+                      {data.status}
+                    </td>
+                  )}
                   <td style={tableCellStyles}>
                     {data.hastext ? (
                       <i className={faSuccessClass} />
@@ -358,38 +365,42 @@ const DataTable = () => {
                       <i className={faFailClass} />
                     )}
                   </td>
-                  <td style={tableCellStyles}>{data.timechecked}</td>
-                  <td style={tableCellStyles}>
-                    <p className="lead">
-                      <a
-                        href={`${
-                          config.wwwroot
-                        }/course/view.php/?id=${getCourseinfoField(
-                          "courseid",
-                          data.courseinfo
-                        )}`}
-                      >
-                        {getCourseinfoField("fullname", data.courseinfo)}
-                      </a>
-                      <Badge variant="info" className="ml-2">
-                        {getCourseinfoField("shortname", data.courseinfo)}
-                      </Badge>
-                    </p>
-                    <p>
-                      <i className="fa fa-download mr-1" aria-hidden="true" />
-                      <a
-                        href={`${
-                          config.wwwroot
-                        }/mod/resource/view.php/?id=${getCourseinfoField(
-                          "instance_id",
-                          data.courseinfo
-                        )}`}
-                        className="text-left"
-                      >
-                        {getCourseinfoField("filename", data.courseinfo)}
-                      </a>
-                    </p>
-                  </td>
+                  {data.timechecked && (
+                    <td style={tableCellStyles}>{data.timechecked}</td>
+                  )}
+                  {data.courseinfo && (
+                    <td style={tableCellStyles}>
+                      <p className="lead">
+                        <a
+                          href={`${
+                            config.wwwroot
+                          }/course/view.php/?id=${getCourseinfoField(
+                            "courseid",
+                            data.courseinfo
+                          )}`}
+                        >
+                          {getCourseinfoField("fullname", data.courseinfo)}
+                        </a>
+                        <Badge variant="info" className="ml-2">
+                          {getCourseinfoField("shortname", data.courseinfo)}
+                        </Badge>
+                      </p>
+                      <p>
+                        <i className="fa fa-download mr-1" aria-hidden="true" />
+                        <a
+                          href={`${
+                            config.wwwroot
+                          }/mod/resource/view.php/?id=${getCourseinfoField(
+                            "instance_id",
+                            data.courseinfo
+                          )}`}
+                          className="text-left"
+                        >
+                          {getCourseinfoField("filename", data.courseinfo)}
+                        </a>
+                      </p>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
