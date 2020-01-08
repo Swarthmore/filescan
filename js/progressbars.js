@@ -163,52 +163,61 @@ const App = () => {
 
   return (
     <Col>
-      <Row>
-        {loading && (
-          <Spinner animation="border" role="status">
+      {loading && (
+        <Row>
+          <>
+            <Spinner animation="border" role="status"></Spinner>
             <span className={"text-muted"}>Generating your report...</span>
-          </Spinner>
-        )}
+          </>
+        </Row>
+      )}
+      <Row className={"mb-2"}>
+        <Col>
+          <p className={"text-lead"}>PDFs with text</p>
+          <ProgressBar
+            style={progressBarStyles}
+            animated
+            now={recordsWithText}
+            max={totalRecords}
+            label={` ${recordsWithText} / ${totalRecords}`}
+          />
+        </Col>
       </Row>
       <Row className={"mb-2"}>
-        <p className={"text-lead"}>PDFs with text</p>
-        <ProgressBar
-          style={progressBarStyles}
-          animated
-          now={recordsWithText}
-          max={totalRecords}
-          label={` ${recordsWithText} / ${totalRecords}`}
-        />
+        <Col>
+          <p className={"text-lead"}>PDFs with an outline</p>
+          <ProgressBar
+            style={progressBarStyles}
+            animated
+            now={recordsWithOutline}
+            max={totalRecords}
+            label={`${recordsWithOutline} / ${totalRecords}`}
+          />
+        </Col>
       </Row>
       <Row className={"mb-2"}>
-        <p className={"text-lead"}>PDFs with an outline</p>
-        <ProgressBar
-          style={progressBarStyles}
-          animated
-          now={recordsWithOutline}
-          max={totalRecords}
-          label={`${recordsWithOutline} / ${totalRecords}`}
-        />
+        <Col>
+          <p className={"text-lead"}>PDFs with a language</p>
+          <ProgressBar
+            style={progressBarStyles}
+            animated
+            now={recordsWithLanguage}
+            max={totalRecords}
+            label={`${recordsWithLanguage} / ${totalRecords}`}
+          />
+        </Col>
       </Row>
       <Row className={"mb-2"}>
-        <p className={"text-lead"}>PDFs with a language</p>
-        <ProgressBar
-          style={progressBarStyles}
-          animated
-          now={recordsWithLanguage}
-          max={totalRecords}
-          label={`${recordsWithLanguage} / ${totalRecords}`}
-        />
-      </Row>
-      <Row className={"mb-2"}>
-        <p className={"text-lead"}>PDFs with a title</p>
-        <ProgressBar
-          style={progressBarStyles}
-          animated
-          now={recordsWithTitle}
-          max={totalRecords}
-          label={`${recordsWithTitle} / ${totalRecords}`}
-        />
+        <Col>
+          <p className={"text-lead"}>PDFs with a title</p>
+          <ProgressBar
+            style={progressBarStyles}
+            animated
+            now={recordsWithTitle}
+            max={totalRecords}
+            label={`${recordsWithTitle} / ${totalRecords}`}
+          />
+        </Col>
       </Row>
     </Col>
   );

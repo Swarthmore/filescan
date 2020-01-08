@@ -546,7 +546,7 @@ object-assign
           (this.updater = n || g);
       }
       function k() {}
-      function x(e, t, n) {
+      function E(e, t, n) {
         (this.props = e),
           (this.context = t),
           (this.refs = b),
@@ -562,8 +562,8 @@ object-assign
           this.updater.enqueueForceUpdate(this, e, "forceUpdate");
         }),
         (k.prototype = w.prototype);
-      var E = (x.prototype = new k());
-      (E.constructor = x), r(E, w.prototype), (E.isPureReactComponent = !0);
+      var x = (E.prototype = new k());
+      (x.constructor = E), r(x, w.prototype), (x.isPureReactComponent = !0);
       var T = { current: null },
         S = { current: null },
         C = Object.prototype.hasOwnProperty,
@@ -768,7 +768,7 @@ object-assign
             return { current: null };
           },
           Component: w,
-          PureComponent: x,
+          PureComponent: E,
           createContext: function(e, t) {
             return (
               void 0 === t && (t = null),
@@ -965,8 +965,8 @@ object-assign
       function k(e, t, n, r, l, a, i, o, u) {
         (v = !1), (y = null), h.apply(w, arguments);
       }
-      var x = null,
-        E = null,
+      var E = null,
+        x = null,
         T = null;
       function S(e, t, n) {
         var r = e.type || "unknown-event";
@@ -1037,7 +1037,7 @@ object-assign
       function M(e, t) {
         var n = e.stateNode;
         if (!n) return null;
-        var r = x(n);
+        var r = E(n);
         if (!r) return null;
         n = r[t];
         e: switch (t) {
@@ -1179,9 +1179,9 @@ object-assign
         te = null,
         ne = null;
       function re(e) {
-        if ((e = E(e))) {
+        if ((e = x(e))) {
           if ("function" != typeof ee) throw Error(i(280));
-          var t = x(e.stateNode);
+          var t = E(e.stateNode);
           ee(e.stateNode, e.type, t);
         }
       }
@@ -1284,7 +1284,7 @@ object-assign
             return "";
         }
       }
-      function xe(e, t, n, r) {
+      function Ee(e, t, n, r) {
         var l = ge.hasOwnProperty(t) ? ge[t] : null;
         (null !== l
           ? 0 === l.type
@@ -1348,7 +1348,7 @@ object-assign
                     3 === (l = l.type) || (4 === l && !0 === n) ? "" : "" + n),
                   r ? e.setAttributeNS(r, t, n) : e.setAttribute(t, n))));
       }
-      function Ee(e) {
+      function xe(e) {
         var t = e.type;
         return (
           (e = e.nodeName) &&
@@ -1359,7 +1359,7 @@ object-assign
       function Te(e) {
         e._valueTracker ||
           (e._valueTracker = (function(e) {
-            var t = Ee(e) ? "checked" : "value",
+            var t = xe(e) ? "checked" : "value",
               n = Object.getOwnPropertyDescriptor(e.constructor.prototype, t),
               r = "" + e[t];
             if (
@@ -1403,7 +1403,7 @@ object-assign
         var n = t.getValue(),
           r = "";
         return (
-          e && (r = Ee(e) ? (e.checked ? "true" : "false") : e.value),
+          e && (r = xe(e) ? (e.checked ? "true" : "false") : e.value),
           (e = r) !== n && (t.setValue(e), !0)
         );
       }
@@ -1430,7 +1430,7 @@ object-assign
           });
       }
       function _e(e, t) {
-        null != (t = t.checked) && xe(e, "checked", t, !1);
+        null != (t = t.checked) && Ee(e, "checked", t, !1);
       }
       function Ne(e, t) {
         _e(e, t);
@@ -1852,7 +1852,7 @@ object-assign
         }
         e.blockedOn = null;
       }
-      function xt(e) {
+      function Et(e) {
         if (null !== e.blockedOn) return !1;
         var t = zn(e.topLevelType, e.eventSystemFlags, e.nativeEvent);
         if (null !== t) {
@@ -1861,8 +1861,8 @@ object-assign
         }
         return !0;
       }
-      function Et(e, t, n) {
-        xt(e) && n.delete(t);
+      function xt(e, t, n) {
+        Et(e) && n.delete(t);
       }
       function Tt() {
         for (ut = !1; 0 < ct.length; ) {
@@ -1874,11 +1874,11 @@ object-assign
           var t = zn(e.topLevelType, e.eventSystemFlags, e.nativeEvent);
           null !== t ? (e.blockedOn = t) : ct.shift();
         }
-        null !== st && xt(st) && (st = null),
-          null !== ft && xt(ft) && (ft = null),
-          null !== dt && xt(dt) && (dt = null),
-          pt.forEach(Et),
-          mt.forEach(Et);
+        null !== st && Et(st) && (st = null),
+          null !== ft && Et(ft) && (ft = null),
+          null !== dt && Et(dt) && (dt = null),
+          pt.forEach(xt),
+          mt.forEach(xt);
       }
       function St(e, t) {
         e.blockedOn === t &&
@@ -2461,8 +2461,8 @@ object-assign
         bn = a.unstable_UserBlockingPriority,
         wn = a.unstable_runWithPriority,
         kn = gn.getEventPriority,
-        xn = [];
-      function En(e) {
+        En = [];
+      function xn(e) {
         var t = e.targetInst,
           n = t;
         do {
@@ -2526,8 +2526,8 @@ object-assign
         wn(bn, On.bind(null, e, t, n));
       }
       function Nn(e, t, n, r) {
-        if (xn.length) {
-          var l = xn.pop();
+        if (En.length) {
+          var l = En.pop();
           (l.topLevelType = e),
             (l.eventSystemFlags = t),
             (l.nativeEvent = n),
@@ -2542,7 +2542,7 @@ object-assign
             ancestors: []
           };
         try {
-          if (((t = En), (n = e), fe)) t(n, void 0);
+          if (((t = xn), (n = e), fe)) t(n, void 0);
           else {
             fe = !0;
             try {
@@ -2556,7 +2556,7 @@ object-assign
             (e.nativeEvent = null),
             (e.targetInst = null),
             (e.ancestors.length = 0),
-            xn.length < 10 && xn.push(e);
+            En.length < 10 && En.push(e);
         }
       }
       function On(e, t, n) {
@@ -2958,8 +2958,8 @@ object-assign
         wr = null;
       J && "documentMode" in document && (wr = document.documentMode);
       var kr = J && "TextEvent" in window && !wr,
-        xr = J && (!br || (wr && 8 < wr && 11 >= wr)),
-        Er = String.fromCharCode(32),
+        Er = J && (!br || (wr && 8 < wr && 11 >= wr)),
+        xr = String.fromCharCode(32),
         Tr = {
           beforeInput: {
             phasedRegistrationNames: {
@@ -3042,7 +3042,7 @@ object-assign
                   (a = Tr.compositionStart);
             return (
               a
-                ? (xr &&
+                ? (Er &&
                     "ko" !== n.locale &&
                     (_r || a !== Tr.compositionStart
                       ? a === Tr.compositionEnd && _r && (l = hr())
@@ -3059,9 +3059,9 @@ object-assign
                       case "compositionend":
                         return Pr(t);
                       case "keypress":
-                        return 32 !== t.which ? null : ((Sr = !0), Er);
+                        return 32 !== t.which ? null : ((Sr = !0), xr);
                       case "textInput":
-                        return (e = t.data) === Er && Sr ? null : e;
+                        return (e = t.data) === xr && Sr ? null : e;
                       default:
                         return null;
                     }
@@ -3084,7 +3084,7 @@ object-assign
                         }
                         return null;
                       case "compositionend":
-                        return xr && "ko" !== t.locale ? null : t.data;
+                        return Er && "ko" !== t.locale ? null : t.data;
                       default:
                         return null;
                     }
@@ -3424,8 +3424,8 @@ object-assign
           " "
         )
       ),
-        (x = fr),
-        (E = cr),
+        (E = fr),
+        (x = cr),
         (T = sr),
         z.injectEventPluginsByName({
           SimpleEventPlugin: gn,
@@ -3495,7 +3495,7 @@ object-assign
           !0
         );
       }
-      function xl(e, t, n) {
+      function El(e, t, n) {
         var r = e.stateNode;
         if (!r) throw Error(i(169));
         n
@@ -3507,7 +3507,7 @@ object-assign
           : cl(pl),
           sl(pl, n);
       }
-      var El = a.unstable_runWithPriority,
+      var xl = a.unstable_runWithPriority,
         Tl = a.unstable_scheduleCallback,
         Sl = a.unstable_cancelCallback,
         Cl = a.unstable_shouldYield,
@@ -3564,7 +3564,7 @@ object-assign
         }
       }
       function Bl(e, t) {
-        return (e = $l(e)), El(e, t);
+        return (e = $l(e)), xl(e, t);
       }
       function Hl(e, t, n) {
         return (e = $l(e)), Tl(e, t, n);
@@ -3837,14 +3837,14 @@ object-assign
       }
       var wa = R.ReactCurrentBatchConfig,
         ka = new r.Component().refs;
-      function xa(e, t, n, r) {
+      function Ea(e, t, n, r) {
         (n = null == (n = n(r, (t = e.memoizedState))) ? t : l({}, t, n)),
           (e.memoizedState = n),
           null !== (r = e.updateQueue) &&
             0 === e.expirationTime &&
             (r.baseState = n);
       }
-      var Ea = {
+      var xa = {
         isMounted: function(e) {
           return !!(e = e._reactInternalFiber) && tt(e) === e;
         },
@@ -3896,7 +3896,7 @@ object-assign
           (t = new t(n, a)),
           (e.memoizedState =
             null !== t.state && void 0 !== t.state ? t.state : null),
-          (t.updater = Ea),
+          (t.updater = xa),
           (e.stateNode = t),
           (t._reactInternalFiber = e),
           r &&
@@ -3912,7 +3912,7 @@ object-assign
             t.componentWillReceiveProps(n, r),
           "function" == typeof t.UNSAFE_componentWillReceiveProps &&
             t.UNSAFE_componentWillReceiveProps(n, r),
-          t.state !== e && Ea.enqueueReplaceState(t, t.state, null);
+          t.state !== e && xa.enqueueReplaceState(t, t.state, null);
       }
       function Pa(e, t, n, r) {
         var l = e.stateNode;
@@ -3924,7 +3924,7 @@ object-assign
           null !== (a = e.updateQueue) &&
             (ya(e, a, n, l, r), (l.state = e.memoizedState)),
           "function" == typeof (a = t.getDerivedStateFromProps) &&
-            (xa(e, t, a, n), (l.state = e.memoizedState)),
+            (Ea(e, t, a, n), (l.state = e.memoizedState)),
           "function" == typeof t.getDerivedStateFromProps ||
             "function" == typeof l.getSnapshotBeforeUpdate ||
             ("function" != typeof l.UNSAFE_componentWillMount &&
@@ -3933,7 +3933,7 @@ object-assign
             "function" == typeof l.componentWillMount && l.componentWillMount(),
             "function" == typeof l.UNSAFE_componentWillMount &&
               l.UNSAFE_componentWillMount(),
-            t !== l.state && Ea.enqueueReplaceState(l, l.state, null),
+            t !== l.state && xa.enqueueReplaceState(l, l.state, null),
             null !== (a = e.updateQueue) &&
               (ya(e, a, n, l, r), (l.state = e.memoizedState))),
           "function" == typeof l.componentDidMount && (e.effectTag |= 4);
@@ -4576,7 +4576,7 @@ object-assign
       function ki(e, t) {
         return bi(516, 192, e, t);
       }
-      function xi(e, t) {
+      function Ei(e, t) {
         return "function" == typeof t
           ? ((e = e()),
             t(e),
@@ -4591,7 +4591,7 @@ object-assign
             })
           : void 0;
       }
-      function Ei() {}
+      function xi() {}
       function Ti(e, t) {
         return (fi().memoizedState = [e, void 0 === t ? null : t]), e;
       }
@@ -4680,7 +4680,7 @@ object-assign
           useImperativeHandle: function(e, t, n) {
             return (
               (n = null != n ? n.concat([e]) : null),
-              gi(4, 36, xi.bind(null, t, e), n)
+              gi(4, 36, Ei.bind(null, t, e), n)
             );
           },
           useLayoutEffect: function(e, t) {
@@ -4713,7 +4713,7 @@ object-assign
             return (e = { current: e }), (fi().memoizedState = e);
           },
           useState: hi,
-          useDebugValue: Ei,
+          useDebugValue: xi,
           useResponder: Ha,
           useDeferredValue: function(e, t) {
             var n = hi(e),
@@ -4769,7 +4769,7 @@ object-assign
           useImperativeHandle: function(e, t, n) {
             return (
               (n = null != n ? n.concat([e]) : null),
-              bi(4, 36, xi.bind(null, t, e), n)
+              bi(4, 36, Ei.bind(null, t, e), n)
             );
           },
           useLayoutEffect: function(e, t) {
@@ -4788,7 +4788,7 @@ object-assign
             return di().memoizedState;
           },
           useState: vi,
-          useDebugValue: Ei,
+          useDebugValue: xi,
           useResponder: Ha,
           useDeferredValue: function(e, t) {
             var n = vi(),
@@ -5040,7 +5040,7 @@ object-assign
           null !== p && (ya(t, p, r, i, l), (u = t.memoizedState)),
             o !== r || d !== u || pl.current || ua
               ? ("function" == typeof s &&
-                  (xa(t, n, s, r), (u = t.memoizedState)),
+                  (Ea(t, n, s, r), (u = t.memoizedState)),
                 (o = ua || Ta(t, n, o, r, d, u, c))
                   ? (f ||
                       ("function" != typeof i.UNSAFE_componentWillMount &&
@@ -5082,7 +5082,7 @@ object-assign
               (ya(t, p, r, i, l), (d = t.memoizedState)),
             o !== r || u !== d || pl.current || ua
               ? ("function" == typeof s &&
-                  (xa(t, n, s, r), (d = t.memoizedState)),
+                  (Ea(t, n, s, r), (d = t.memoizedState)),
                 (s = ua || Ta(t, n, o, r, u, d, c))
                   ? (f ||
                       ("function" != typeof i.UNSAFE_componentWillUpdate &&
@@ -5119,7 +5119,7 @@ object-assign
       function qi(e, t, n, r, l, a) {
         Hi(e, t);
         var i = 0 != (64 & t.effectTag);
-        if (!r && !i) return l && xl(t, n, !1), lo(e, t, a);
+        if (!r && !i) return l && El(t, n, !1), lo(e, t, a);
         (r = t.stateNode), (Li.current = t);
         var o =
           i && "function" != typeof n.getDerivedStateFromError
@@ -5132,7 +5132,7 @@ object-assign
               (t.child = Ma(t, null, o, a)))
             : Vi(e, t, o, a),
           (t.memoizedState = r.state),
-          l && xl(t, n, !0),
+          l && El(t, n, !0),
           t.child
         );
       }
@@ -5800,7 +5800,7 @@ object-assign
                     ? $e(n, u)
                     : "children" === o
                     ? Be(n, u)
-                    : xe(n, o, u, t);
+                    : Ee(n, o, u, t);
                 }
                 switch (e) {
                   case "input":
@@ -5902,8 +5902,8 @@ object-assign
             });
         }
       }
-      var xo = "function" == typeof WeakMap ? WeakMap : Map;
-      function Eo(e, t, n) {
+      var Eo = "function" == typeof WeakMap ? WeakMap : Map;
+      function xo(e, t, n) {
         ((n = fa(n, null)).tag = 3), (n.payload = { element: null });
         var r = t.value;
         return (
@@ -6368,7 +6368,7 @@ object-assign
                     var h = n.pingCache;
                     if (
                       (null === h
-                        ? ((h = n.pingCache = new xo()),
+                        ? ((h = n.pingCache = new Eo()),
                           (a = new Set()),
                           h.set(i, a))
                         : void 0 === (a = h.get(i)) &&
@@ -6397,7 +6397,7 @@ object-assign
                     (i = a),
                       (u.effectTag |= 4096),
                       (u.expirationTime = t),
-                      ma(u, Eo(u, i, t));
+                      ma(u, xo(u, i, t));
                     break e;
                   case 1:
                     i = a;
@@ -6647,7 +6647,7 @@ object-assign
                               "autoFocus" !== c &&
                               (p.hasOwnProperty(c)
                                 ? null != y && $n(d, c)
-                                : null != y && xe(h, c, y, m));
+                                : null != y && Ee(h, c, y, m));
                         }
                       switch (f) {
                         case "input":
@@ -7000,9 +7000,9 @@ object-assign
                 if ((16 & w && Be(Vo.stateNode, ""), 128 & w)) {
                   var k = Vo.alternate;
                   if (null !== k) {
-                    var x = k.ref;
-                    null !== x &&
-                      ("function" == typeof x ? x(null) : (x.current = null));
+                    var E = k.ref;
+                    null !== E &&
+                      ("function" == typeof E ? E(null) : (E.current = null));
                   }
                 }
                 switch (1038 & w) {
@@ -7032,10 +7032,10 @@ object-assign
             }
           } while (null !== Vo);
           if (
-            ((x = Gn),
+            ((E = Gn),
             (k = qn()),
-            (w = x.focusedElem),
-            (u = x.selectionRange),
+            (w = E.focusedElem),
+            (u = E.selectionRange),
             k !== w &&
               w &&
               w.ownerDocument &&
@@ -7056,52 +7056,52 @@ object-assign
             null !== u &&
               Yn(w) &&
               ((k = u.start),
-              void 0 === (x = u.end) && (x = k),
+              void 0 === (E = u.end) && (E = k),
               "selectionStart" in w
                 ? ((w.selectionStart = k),
-                  (w.selectionEnd = Math.min(x, w.value.length)))
-                : (x =
+                  (w.selectionEnd = Math.min(E, w.value.length)))
+                : (E =
                     ((k = w.ownerDocument || document) && k.defaultView) ||
                     window).getSelection &&
-                  ((x = x.getSelection()),
+                  ((E = E.getSelection()),
                   (s = w.textContent.length),
                   (o = Math.min(u.start, s)),
                   (u = void 0 === u.end ? o : Math.min(u.end, s)),
-                  !x.extend && o > u && ((s = u), (u = o), (o = s)),
+                  !E.extend && o > u && ((s = u), (u = o), (o = s)),
                   (s = Kn(w, o)),
                   (f = Kn(w, u)),
                   s &&
                     f &&
-                    (1 !== x.rangeCount ||
-                      x.anchorNode !== s.node ||
-                      x.anchorOffset !== s.offset ||
-                      x.focusNode !== f.node ||
-                      x.focusOffset !== f.offset) &&
+                    (1 !== E.rangeCount ||
+                      E.anchorNode !== s.node ||
+                      E.anchorOffset !== s.offset ||
+                      E.focusNode !== f.node ||
+                      E.focusOffset !== f.offset) &&
                     ((k = k.createRange()).setStart(s.node, s.offset),
-                    x.removeAllRanges(),
+                    E.removeAllRanges(),
                     o > u
-                      ? (x.addRange(k), x.extend(f.node, f.offset))
-                      : (k.setEnd(f.node, f.offset), x.addRange(k))))),
+                      ? (E.addRange(k), E.extend(f.node, f.offset))
+                      : (k.setEnd(f.node, f.offset), E.addRange(k))))),
               (k = []);
-            for (x = w; (x = x.parentNode); )
-              1 === x.nodeType &&
-                k.push({ element: x, left: x.scrollLeft, top: x.scrollTop });
+            for (E = w; (E = E.parentNode); )
+              1 === E.nodeType &&
+                k.push({ element: E, left: E.scrollLeft, top: E.scrollTop });
             for (
               "function" == typeof w.focus && w.focus(), w = 0;
               w < k.length;
               w++
             )
-              ((x = k[w]).element.scrollLeft = x.left),
-                (x.element.scrollTop = x.top);
+              ((E = k[w]).element.scrollLeft = E.left),
+                (E.element.scrollTop = E.top);
           }
           (Gn = null), (Tn = !!Xn), (Xn = null), (e.current = n), (Vo = l);
           do {
             try {
               for (w = r; null !== Vo; ) {
-                var E = Vo.effectTag;
-                if (36 & E) {
+                var x = Vo.effectTag;
+                if (36 & x) {
                   var T = Vo.alternate;
-                  switch (((x = w), (k = Vo).tag)) {
+                  switch (((E = w), (k = Vo).tag)) {
                     case 0:
                     case 11:
                     case 15:
@@ -7171,7 +7171,7 @@ object-assign
                       throw Error(i(163));
                   }
                 }
-                if (128 & E) {
+                if (128 & x) {
                   k = void 0;
                   var R = Vo.ref;
                   if (null !== R) {
@@ -7229,10 +7229,10 @@ object-assign
       function ku() {
         if (90 !== Ko) {
           var e = 97 < Ko ? 97 : Ko;
-          return (Ko = 90), Bl(e, xu);
+          return (Ko = 90), Bl(e, Eu);
         }
       }
-      function xu() {
+      function Eu() {
         if (null === Qo) return !1;
         var e = Qo;
         if (((Qo = null), 0 != (48 & No))) throw Error(i(331));
@@ -7255,16 +7255,16 @@ object-assign
         }
         return (No = t), Kl(), !0;
       }
-      function Eu(e, t, n) {
-        pa(e, (t = Eo(e, (t = uo(n, t)), 1073741823))),
+      function xu(e, t, n) {
+        pa(e, (t = xo(e, (t = uo(n, t)), 1073741823))),
           null !== (e = tu(e, 1073741823)) && ru(e);
       }
       function Tu(e, t) {
-        if (3 === e.tag) Eu(e, e, t);
+        if (3 === e.tag) xu(e, e, t);
         else
           for (var n = e.return; null !== n; ) {
             if (3 === n.tag) {
-              Eu(n, e, t);
+              xu(n, e, t);
               break;
             }
             if (1 === n.tag) {
@@ -7379,8 +7379,8 @@ object-assign
               t.memoizedState =
                 null !== l.state && void 0 !== l.state ? l.state : null;
               var o = r.getDerivedStateFromProps;
-              "function" == typeof o && xa(t, r, o, e),
-                (l.updater = Ea),
+              "function" == typeof o && Ea(t, r, o, e),
+                (l.updater = xa),
                 (t.stateNode = l),
                 (l._reactInternalFiber = t),
                 Pa(t, r, e, n),
@@ -8245,9 +8245,9 @@ object-assign
           b = null,
           w = -1,
           k = 5,
-          x = 0;
+          E = 0;
         (i = function() {
-          return t.unstable_now() >= x;
+          return t.unstable_now() >= E;
         }),
           (o = function() {}),
           (t.unstable_forceFrameRate = function(e) {
@@ -8257,12 +8257,12 @@ object-assign
                 )
               : (k = 0 < e ? Math.floor(1e3 / e) : 5);
           });
-        var E = new MessageChannel(),
-          T = E.port2;
-        (E.port1.onmessage = function() {
+        var x = new MessageChannel(),
+          T = x.port2;
+        (x.port1.onmessage = function() {
           if (null !== b) {
             var e = t.unstable_now();
-            x = e + k;
+            E = e + k;
             try {
               b(!0, e) ? T.postMessage(null) : ((g = !1), (b = null));
             } catch (e) {
@@ -8599,7 +8599,7 @@ object-assign
           b = a.variant,
           w = a.className,
           k = a.children,
-          x = Object(u.a)(a, [
+          E = Object(u.a)(a, [
             "min",
             "now",
             "max",
@@ -8614,7 +8614,7 @@ object-assign
           ]);
         return l.a.createElement(
           "div",
-          Object(o.a)({ ref: t }, x, { className: s()(w, g) }),
+          Object(o.a)({ ref: t }, E, { className: s()(w, g) }),
           k
             ? (function(e, t) {
                 var n = 0;
@@ -8679,7 +8679,7 @@ object-assign
           });
         };
       }
-      function x(e, t) {
+      function E(e, t) {
         return (
           (function(e) {
             if (Array.isArray(e)) return e;
@@ -8723,23 +8723,23 @@ object-assign
       }
       i.a.render(
         l.a.createElement(function() {
-          var e = x(Object(r.useState)(!1), 2),
+          var e = E(Object(r.useState)(!1), 2),
             t = e[0],
             n = e[1],
-            a = x(Object(r.useState)(""), 2),
-            i = (a[0], a[1], x(Object(r.useState)(0), 2)),
+            a = E(Object(r.useState)(""), 2),
+            i = (a[0], a[1], E(Object(r.useState)(0), 2)),
             o = i[0],
             u = i[1],
-            c = x(Object(r.useState)(0), 2),
+            c = E(Object(r.useState)(0), 2),
             s = c[0],
             f = c[1],
-            d = x(Object(r.useState)(0), 2),
+            d = E(Object(r.useState)(0), 2),
             p = d[0],
             m = d[1],
-            w = x(Object(r.useState)(0), 2),
-            E = w[0],
+            w = E(Object(r.useState)(0), 2),
+            x = w[0],
             T = w[1],
-            S = x(Object(r.useState)(0), 2),
+            S = E(Object(r.useState)(0), 2),
             C = S[0],
             P = S[1],
             _ = function(e, t) {
@@ -8883,83 +8883,103 @@ object-assign
           return l.a.createElement(
             g.a,
             null,
-            l.a.createElement(
-              y.a,
-              null,
-              t &&
+            t &&
+              l.a.createElement(
+                y.a,
+                null,
                 l.a.createElement(
-                  v.a,
-                  { animation: "border", role: "status" },
+                  l.a.Fragment,
+                  null,
+                  l.a.createElement(v.a, {
+                    animation: "border",
+                    role: "status"
+                  }),
                   l.a.createElement(
                     "span",
                     { className: "text-muted" },
                     "Generating your report..."
                   )
                 )
+              ),
+            l.a.createElement(
+              y.a,
+              { className: "mb-2" },
+              l.a.createElement(
+                g.a,
+                null,
+                l.a.createElement(
+                  "p",
+                  { className: "text-lead" },
+                  "PDFs with text"
+                ),
+                l.a.createElement(h, {
+                  style: z,
+                  animated: !0,
+                  now: s,
+                  max: o,
+                  label: " ".concat(s, " / ").concat(o)
+                })
+              )
             ),
             l.a.createElement(
               y.a,
               { className: "mb-2" },
               l.a.createElement(
-                "p",
-                { className: "text-lead" },
-                "PDFs with text"
-              ),
-              l.a.createElement(h, {
-                style: z,
-                animated: !0,
-                now: s,
-                max: o,
-                label: " ".concat(s, " / ").concat(o)
-              })
+                g.a,
+                null,
+                l.a.createElement(
+                  "p",
+                  { className: "text-lead" },
+                  "PDFs with an outline"
+                ),
+                l.a.createElement(h, {
+                  style: z,
+                  animated: !0,
+                  now: p,
+                  max: o,
+                  label: "".concat(p, " / ").concat(o)
+                })
+              )
             ),
             l.a.createElement(
               y.a,
               { className: "mb-2" },
               l.a.createElement(
-                "p",
-                { className: "text-lead" },
-                "PDFs with an outline"
-              ),
-              l.a.createElement(h, {
-                style: z,
-                animated: !0,
-                now: p,
-                max: o,
-                label: "".concat(p, " / ").concat(o)
-              })
+                g.a,
+                null,
+                l.a.createElement(
+                  "p",
+                  { className: "text-lead" },
+                  "PDFs with a language"
+                ),
+                l.a.createElement(h, {
+                  style: z,
+                  animated: !0,
+                  now: x,
+                  max: o,
+                  label: "".concat(x, " / ").concat(o)
+                })
+              )
             ),
             l.a.createElement(
               y.a,
               { className: "mb-2" },
               l.a.createElement(
-                "p",
-                { className: "text-lead" },
-                "PDFs with a language"
-              ),
-              l.a.createElement(h, {
-                style: z,
-                animated: !0,
-                now: E,
-                max: o,
-                label: "".concat(E, " / ").concat(o)
-              })
-            ),
-            l.a.createElement(
-              y.a,
-              { className: "mb-2" },
-              l.a.createElement(
-                "p",
-                { className: "text-lead" },
-                "PDFs with a title"
-              ),
-              l.a.createElement(h, {
-                style: z,
-                animated: !0,
-                now: C,
-                max: o,
-                label: "".concat(C, " / ").concat(o)
-              })
+                g.a,
+                null,
+                l.a.createElement(
+                  "p",
+                  { className: "text-lead" },
+                  "PDFs with a title"
+                ),
+                l.a.createElement(h, {
+                  style: z,
+                  animated: !0,
+                  now: C,
+                  max: o,
+                  label: "".concat(C, " / ").concat(o)
+                })
+              )
             )
           );
         }, null),
