@@ -4,6 +4,7 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
 import Ajax from "./lib/ajax";
 
 const App = () => {
@@ -162,64 +163,54 @@ const App = () => {
   };
 
   return (
-    <Col>
+    <Container fluid>
       {loading && (
-        <Row>
-          <>
-            <Spinner animation="border" role="status"></Spinner>
-            <span className={"text-muted"}>Generating your report...</span>
-          </>
-        </Row>
+        <div>
+          <Spinner animation="border" role="status"></Spinner>
+          <span className={"text-muted"}>Generating your report...</span>
+        </div>
       )}
-      <Row className={"mb-2"}>
-        <Col>
-          <p className={"text-lead"}>PDFs with text</p>
-          <ProgressBar
-            style={progressBarStyles}
-            animated
-            now={recordsWithText}
-            max={totalRecords}
-            label={` ${recordsWithText} / ${totalRecords}`}
-          />
-        </Col>
-      </Row>
-      <Row className={"mb-2"}>
-        <Col>
-          <p className={"text-lead"}>PDFs with an outline</p>
-          <ProgressBar
-            style={progressBarStyles}
-            animated
-            now={recordsWithOutline}
-            max={totalRecords}
-            label={`${recordsWithOutline} / ${totalRecords}`}
-          />
-        </Col>
-      </Row>
-      <Row className={"mb-2"}>
-        <Col>
-          <p className={"text-lead"}>PDFs with a language</p>
-          <ProgressBar
-            style={progressBarStyles}
-            animated
-            now={recordsWithLanguage}
-            max={totalRecords}
-            label={`${recordsWithLanguage} / ${totalRecords}`}
-          />
-        </Col>
-      </Row>
-      <Row className={"mb-2"}>
-        <Col>
-          <p className={"text-lead"}>PDFs with a title</p>
-          <ProgressBar
-            style={progressBarStyles}
-            animated
-            now={recordsWithTitle}
-            max={totalRecords}
-            label={`${recordsWithTitle} / ${totalRecords}`}
-          />
-        </Col>
-      </Row>
-    </Col>
+      <div className={"mb-2"}>
+        <p className={"text-lead"}>PDFs with text</p>
+        <ProgressBar
+          style={progressBarStyles}
+          animated
+          now={recordsWithText}
+          max={totalRecords}
+          label={` ${recordsWithText} / ${totalRecords}`}
+        />
+      </div>
+      <div className={"mb-2"}>
+        <p className={"text-lead"}>PDFs with an outline</p>
+        <ProgressBar
+          style={progressBarStyles}
+          animated
+          now={recordsWithOutline}
+          max={totalRecords}
+          label={`${recordsWithOutline} / ${totalRecords}`}
+        />
+      </div>
+      <div className={"mb-2"}>
+        <p className={"text-lead"}>PDFs with a language</p>
+        <ProgressBar
+          style={progressBarStyles}
+          animated
+          now={recordsWithLanguage}
+          max={totalRecords}
+          label={`${recordsWithLanguage} / ${totalRecords}`}
+        />
+      </div>
+      <div className={"mb-2"}>
+        <p className={"text-lead"}>PDFs with a title</p>
+        <ProgressBar
+          style={progressBarStyles}
+          animated
+          now={recordsWithTitle}
+          max={totalRecords}
+          label={`${recordsWithTitle} / ${totalRecords}`}
+        />
+      </div>
+    </Container>
   );
 };
 
