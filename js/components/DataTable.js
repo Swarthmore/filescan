@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 import Ajax from "../lib/ajax";
 import ReactPaginate from "react-paginate";
 import Button from "react-bootstrap/Button";
@@ -15,6 +16,9 @@ const DataTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState("");
   const [limitPerPage, setLimitPerPage] = useState(10);
+  const [error, setError] = useState(
+    "lorem ipsum asdiadsj sada sda d sdas asdasd "
+  );
 
   const [loadingAll, setLoadingAll] = useState(false);
   const [allRecords, setAllRecords] = useState(null);
@@ -24,7 +28,6 @@ const DataTable = () => {
 
   const useFetch = args => {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
     const [currentRows, setCurrentRows] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -51,7 +54,7 @@ const DataTable = () => {
       ]);
     }, [currentPage, filter, limitPerPage]);
 
-    return { currentRows, loading, totalRecords, totalPages, error };
+    return { currentRows, loading, totalRecords, totalPages };
   };
 
   // Return arguments required to make Moodle AJAX request
@@ -177,8 +180,33 @@ const DataTable = () => {
           methodname: "block_afs_request_files",
           args: makeArgs({ currentPage: 0, limitPerPage: count, filter: "" }),
           done: res => {
-            const records = res.data;
-            resolve(records);
+            const data = res.data;
+            // This will parse the courseinfo object into JSON so that we can use it
+            // Courseinfo may or may not be populated
+
+            resolve(
+              data.map((row, i) => {
+                if (row.courseinfo) {
+                  const [info] = JSON.parse([row.courseinfo]);
+                  delete row.courseinfo;
+
+                  const {
+                    fullname,
+                    shortname,
+                    filename,
+                    teachers,
+                    student_enrollment
+                  } = info;
+
+                  row.fullname = fullname;
+                  row.shortname = shortname;
+                  row.filename = filename;
+                  row.teachers = teachers;
+                  row.student_enrollment = student_enrollment;
+                }
+                return row;
+              })
+            );
           },
           fail: () => reject("Could not get all records!")
         }
@@ -215,15 +243,21 @@ const DataTable = () => {
     filter
   });
 
-  const { currentRows, loading, totalRecords, totalPages, error } = useFetch(
-    args
-  );
+  const { currentRows, loading, totalRecords, totalPages } = useFetch(args);
 
   return (
     <Container fluid>
+      {/* If there's an error, show it */}
+      {error && (
+        <Row>
+          <Alert variant={"danger"} dismissible onClose={setError("")}>
+            <p>{error}</p>
+          </Alert>
+        </Row>
+      )}
+
       <Row className={"mb-3"}>
         <Col>
-          {error && <p className={"text-error"}>{error}</p>}
           {loading && (
             <p>
               Fetching data...
@@ -251,7 +285,10 @@ const DataTable = () => {
                 { label: "Has Outline", key: "hasoutline" },
                 { label: "Has Language", key: "haslanguage" },
                 { label: "Time Checked", key: "timechecked" },
-                { label: "Course Info", key: "courseinfo" }
+                { label: "Course Name (Full)", key: "fullname" },
+                { label: "Course Name (Short)", key: "shortname" },
+                { label: "Students", key: "student_enrollment" },
+                { label: "Filename", key: "filename" }
               ]}
               data={allRecords}
             >
