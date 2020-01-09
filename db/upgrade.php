@@ -22,7 +22,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_block_filescan_upgrade($oldversion)
+function xmldb_block_afs_upgrade($oldversion)
 {
 
   global $DB;
@@ -32,7 +32,7 @@ function xmldb_block_filescan_upgrade($oldversion)
   if ($oldversion < 2017062810) {
 
     // Define field id to be added to block_filescan_files.
-    $table = new xmldb_table('block_filescan_files');
+    $table = new xmldb_table('block_afs_files');
     $field = new xmldb_field('timechecked', XMLDB_TYPE_DATETIME, null, null, XMLDB_NOTNULL, null, 0, null);
 
     // Conditionally launch add field timechecked.
@@ -41,7 +41,7 @@ function xmldb_block_filescan_upgrade($oldversion)
     }
 
     // Filescan savepoint reached.
-    upgrade_block_savepoint(true, 2017062810, 'filescan');
+    upgrade_block_savepoint(true, 2017062810, 'afs');
   }
 
 
@@ -49,7 +49,7 @@ function xmldb_block_filescan_upgrade($oldversion)
   if ($oldversion < 2017071414) {
 
     // Define field id to be added to block_filescan_files.
-    $table = new xmldb_table('block_filescan_files');
+    $table = new xmldb_table('block_afs_files');
 
 
     $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'pagecount');
@@ -117,14 +117,14 @@ function xmldb_block_filescan_upgrade($oldversion)
 
 
     // Filescan savepoint reached.
-    upgrade_block_savepoint(true, 2017071414, 'filescan');
+    upgrade_block_savepoint(true, 2017071414, 'afs');
   }
 
   /// Add a new column newcol to the mdl_myqtype_options
   if ($oldversion < 2017082410) {
 
     // Define field id to be added to block_filescan_files.
-    $table = new xmldb_table('block_filescan_files');
+    $table = new xmldb_table('block_afs_files');
     $field = new xmldb_field('statuscode', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'status');
 
     // Conditionally launch add field statuscode.
@@ -133,14 +133,14 @@ function xmldb_block_filescan_upgrade($oldversion)
     }
 
     // Filescan savepoint reached.
-    upgrade_block_savepoint(true, 2017082410, 'filescan');
+    upgrade_block_savepoint(true, 2017082410, 'afs');
   }
 
 
   if ($oldversion < 2017101308) {
 
     // Define field courseinfo to be added to block_filescan_files.
-    $table = new xmldb_table('block_filescan_files');
+    $table = new xmldb_table('block_afs_files');
     $field = new xmldb_field('courseinfo', XMLDB_TYPE_TEXT, null, null, null, null, null, 'timechecked');
 
     // Conditionally launch add field courseinfo.
@@ -149,13 +149,13 @@ function xmldb_block_filescan_upgrade($oldversion)
     }
 
     // Filescan savepoint reached.
-    upgrade_plugin_savepoint(true, 2017101308, 'error', 'filescan');
+    upgrade_plugin_savepoint(true, 2017101308, 'error', 'afs');
   }
 
   if ($oldversion < 2017101310) {
 
     // Define field timechecked to be added to block_filescan_files.
-    $table = new xmldb_table('block_filescan_files');
+    $table = new xmldb_table('block_afs_files');
     $field = new xmldb_field('timecourseinfo', XMLDB_TYPE_DATETIME, null, null, null, null, '0', 'courseinfo');
 
     // Conditionally launch add field timechecked.
@@ -164,13 +164,13 @@ function xmldb_block_filescan_upgrade($oldversion)
     }
 
     // Filescan savepoint reached.
-    upgrade_plugin_savepoint(true, 2017101310, 'error', 'filescan');
+    upgrade_plugin_savepoint(true, 2017101310, 'error', 'afs');
   }
 
   if ($oldversion < 2017101318) {
 
     // Define field timecourseinfo to be dropped from block_filescan_files.
-    $table = new xmldb_table('block_filescan_files');
+    $table = new xmldb_table('block_afs_files');
     $field = new xmldb_field('timecourseinfo');
 
     // Conditionally launch drop field timecourseinfo.
@@ -179,7 +179,7 @@ function xmldb_block_filescan_upgrade($oldversion)
     }
 
     // Filescan savepoint reached.
-    upgrade_plugin_savepoint(true, 2017101318, 'error', 'filescan');
+    upgrade_plugin_savepoint(true, 2017101318, 'error', 'afs');
   }
 
   if ($oldversion < 2018073100) {
@@ -191,9 +191,9 @@ function xmldb_block_filescan_upgrade($oldversion)
     );
 
     foreach ($settings as $name) {
-      $value = get_config('filescan', $name);
-      set_config($name, $value, 'block_filescan');
-      unset_config($name, 'filescan');
+      $value = get_config('afs', $name);
+      set_config($name, $value, 'block_afs');
+      unset_config($name, 'afs');
     }
   }
 
@@ -201,7 +201,7 @@ function xmldb_block_filescan_upgrade($oldversion)
 
       // Changing nullability of field timechecked on table block_filescan_files to null.
       // Changing the default of field timechecked on table block_filescan_files to drop it.
-      $table = new xmldb_table('block_filescan_files');
+      $table = new xmldb_table('block_afs_files');
       $field = new xmldb_field('timechecked', XMLDB_TYPE_DATETIME, null, null, null, null, null, 'haslanguage');
 
       // Launch change of nullability for field timechecked.
@@ -210,13 +210,13 @@ function xmldb_block_filescan_upgrade($oldversion)
       $dbman->change_field_default($table, $field);
 
       // Filescan savepoint reached.
-      upgrade_block_savepoint(true, 2019011616, 'filescan');
+      upgrade_block_savepoint(true, 2019011616, 'afs');
   }
 
   if ($oldversion < 2019100800) {
 
     // Define index contenthash (unique) to be added to block_filescan_files.
-    $table = new xmldb_table('block_filescan_files');
+    $table = new xmldb_table('block_afs_files');
     $index = new xmldb_index('contenthash', XMLDB_INDEX_UNIQUE, ['contenthash']);
 
     // Conditionally launch add index contenthash.
@@ -225,7 +225,7 @@ function xmldb_block_filescan_upgrade($oldversion)
     }
 
     // Filescan savepoint reached.
-    upgrade_block_savepoint(true, 2019100800, 'filescan');
+    upgrade_block_savepoint(true, 2019100800, 'afs');
   }
 
   return true;
