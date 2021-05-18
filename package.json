@@ -1,6 +1,9 @@
 {
   "name": "moodle-block_filescan",
   "description": "Moodle block to check PDFs for accessibility.",
+  "scripts": {
+      "build": "./node_modules/.bin/grunt --force -v"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/swarthmore/filescan.git"
