@@ -2,14 +2,16 @@ module.exports = function (grunt) {
 
   "use strict";
 
+  require("grunt-load-gruntfile")(grunt);
+
+  grunt.loadNpmTasks("grunt-contrib-watch");
+  grunt.loadNpmTasks("grunt-contrib-requirejs");
+  grunt.loadNpmTasks("grunt-contrib-jshint");
+
   grunt.initConfig({
 
-    filescan: {
-      files: "amd/src/**/*.js"
-    },
-
     jshint: {
-      files: ["Gruntfile.js", "<% filescan.files %>"],
+      files: ["Gruntfile.js", "amd/src/**/*.js"],
       options: {
         globals: {
           jQuery: true,
@@ -32,15 +34,11 @@ module.exports = function (grunt) {
     },
 
     watch: {
-      files: ["<%= filescan.files %>"],
+      files: ["amd/src/**/*.js"],
       tasks: ["jshint"]
     }
 
   });
-
-  grunt.loadNpmTasks("grunt-contrib-watch");
-  grunt.loadNpmTasks("grunt-contrib-requirejs");
-  grunt.loadNpmTasks("grunt-contrib-jshint");
 
   grunt.registerTask("default", ["jshint", "requirejs"]);
 
