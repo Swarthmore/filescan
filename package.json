@@ -1,28 +1,22 @@
 {
-  "name": "filescan",
-  "version": "1.0.0",
+  "name": "moodle-block_filescan",
   "description": "Moodle block to check PDFs for accessibility.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/swarthmore/filescan.git"
   },
   "keywords": [],
   "author": "Swarthmore College",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/swarthmore/filescan/issues"
   },
   "homepage": "https://github.com/swarthmore/filescan#readme",
-  "dependencies": {
-    "grunt": "^1.0.4"
-  },
   "devDependencies": {
+    "grunt": "^1.0.4",
     "grunt-contrib-jshint": "^2.1.0",
     "grunt-contrib-requirejs": "^1.0.0",
-    "grunt-contrib-watch": "^1.1.0"
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-load-gruntfile": "^0.0.2"
   }
 }
