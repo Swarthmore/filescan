@@ -1,6 +1,6 @@
 # moodle-block_a11y_check
 
-Moodle plugin to display results from the [https://github.com/Swarthmore/moodle-local_a11y_check](local_a11y_check) Moodle plugin.
+Moodle plugin to display results from the [local_a11y_check](https://github.com/Swarthmore/moodle-local_a11y_check) Moodle plugin.
 
 # Requirements
 * Moodle 4.0+
