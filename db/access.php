@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,16 +16,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   block_filescan
- * @copyright 2018 Swarthmore College ITS
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+* Version information for block_a11y_check
+*
+* @package   block_a11y_check
+* @copyright 2023 Swarthmore College
+* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
 
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-  'block/filescan:addinstance' => array(
+  'block/a11y_check:addinstance' => array(
     'riskbitmask' => RISK_SPAM | RISK_XSS,
     'captype' => 'write',
     'contextlevel' => CONTEXT_BLOCK,
@@ -36,7 +39,7 @@ $capabilities = array(
     'clonepermissionsfrom' => 'moodle/site:manageblocks'
   ),
 
-  'block/filescan:myaddinstance' => array(
+  'block/a11y_check:myaddinstance' => array(
     'captype' => 'write',
     'contextlevel' => CONTEXT_SYSTEM,
     'archetypes' => array(
@@ -44,7 +47,7 @@ $capabilities = array(
     )
   ),
 
-  'block/filescan:viewpages' => array(
+  'block/a11y_check:viewpages' => array(
     'captype' => 'read',
     'contextlevel' => CONTEXT_COURSE,
     'legacy' => array(
@@ -57,7 +60,7 @@ $capabilities = array(
     )
   ),
 
-  'block/filescan:managepages' => array(
+  'block/a11y_check:managepages' => array(
     'captype' => 'read',
     'contextlevel' => CONTEXT_COURSE,
     'legacy' => array(
@@ -70,7 +73,7 @@ $capabilities = array(
     )
   ),
 
-  'block/filescan:scan' => array(
+  'block/a11y_check:scan' => array(
     'riskbitmask' => RISK_PERSONAL,
     'captype' => 'read',
     'contextlevel' => CONTEXT_COURSE,
@@ -84,7 +87,7 @@ $capabilities = array(
     )
   ),
 
-  'block/filescan:viewadminreport' => array(
+  'block/a11y_check:viewadminreport' => array(
     'captype' => 'read',
     'contextlevel' => CONTEXT_BLOCK,
     'archetypes' => array(
