@@ -1,20 +1,22 @@
 {
-  "name": "moodle-block_filescan",
-  "description": "Moodle block to check PDFs for accessibility.",
+  "name": "moodle-block_a11y_check",
+  "description": "Moodle block to check to display results from local-a11y-check plugin for Moodle",
   "scripts": {
     "build": "./node_modules/.bin/grunt --force -v"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swarthmore/filescan.git"
+    "url": "https://github.com/devnoot/moode-block_a11y_check"
   },
-  "keywords": [],
+  "keywords": [
+    "a11y", "accessibility", "moodle", "plugin", "block"
+  ],
   "author": "Swarthmore College",
-  "license": "MIT",
+  "license": "http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later",
   "bugs": {
-    "url": "https://github.com/swarthmore/filescan/issues"
+    "url": "https://github.com/devnoot/moode-block_a11y_check/issues"
   },
-  "homepage": "https://github.com/swarthmore/filescan#readme",
+  "homepage": "https://github.com/devnoot/moode-block_a11y_check#readme",
   "devDependencies": {
     "grunt": "^1.4.0",
     "grunt-contrib-jshint": "^2.1.0",
