@@ -57,12 +57,12 @@ class block_a11y_check extends block_base {
 
         require_once($CFG->dirroot . '/course/lib.php');
 
-        $table = '';
+        // $table = '';
 
-        $results['pass'] = $DB->count_records($table, ['status' => 'pass']);
-        $results['fails'] = $DB->count_records($table, ['status' => 'fail']);
-        $results['errors'] = $DB->count_records($table, ['status' => 'error']);
-        $results['checks'] = $DB->count_records($table, ['status' => 'check']);
+        // $results['pass'] = $DB->count_records($table, ['status' => 'pass']);
+        // $results['fails'] = $DB->count_records($table, ['status' => 'fail']);
+        // $results['errors'] = $DB->count_records($table, ['status' => 'error']);
+        // $results['checks'] = $DB->count_records($table, ['status' => 'check']);
 
         $context = context_course::instance($COURSE->id);
         $canview = has_capability('block/a11y_check:viewpages', $context);
@@ -80,8 +80,8 @@ class block_a11y_check extends block_base {
             $courseshortname  = $COURSE->shortname;
             $courseurl = course_get_url($COURSE);
 
-            $filescansummary = $this->generate_summary($COURSE->id);
-            $result = $cache->set($COURSE->id, $filescansummary);
+            //$filescansummary = $this->generate_summary($COURSE->id);
+            //$result = $cache->set($COURSE->id, $filescansummary);
 
             $url = new moodle_url('/blocks/a11y_check/view.php', ['courseid' => $COURSE->id]);
             //$this->content->text = $filescansummary;

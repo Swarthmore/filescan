@@ -28,9 +28,9 @@ global $CFG;
 
 if ($hassiteconfig) {
 
-  $settings = new admin_settingspage('block_a11y_check', get_string('pluginname', 'block_a11y_check'));
+  $settings = new admin_settingpage('block_a11y_check', get_string('pluginname', 'block_a11y_check'));
 
-  $ADMIN->add('blockplugins', $settings); 
+  //$ADMIN->add('blockplugins', $settings); 
 
   $settings->add(new admin_setting_configtext('block_a11y_check/text_check_help',
         get_string('settings:text_check_help', 'block_a11y_check'),
