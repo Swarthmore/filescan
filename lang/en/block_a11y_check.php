@@ -13,16 +13,19 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * @package   block_filescan
- * @copyright 2018 Swarthmore College ITS
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+* Version information for block_a11y_check
+*
+* @package   block_a11y_check
+* @copyright 2023 Swarthmore College
+* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
 
 defined('MOODLE_INTERNAL') || die;
 
 // General
-$string['pluginname']                             = 'Accessibility File Scan';
+$string['pluginname'] = 'A11y Check';
 $string['filescan']                               = 'File Scan';
 $string['reportheading']                          = 'File Scan Report';
 $string['summaryview']                            = 'File Scan Summary';
