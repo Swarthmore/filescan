@@ -13,70 +13,55 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Accessibilty file scan
- *
- * @package   block_filescan
- * @copyright 2017 Swarthmore College ITS
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+* Version information for block_a11y_check
+*
+* @package   block_a11y_check
+* @copyright 2023 Swarthmore College
+* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 
 if ($hassiteconfig) {
 
-  $settings->add(new admin_setting_configtext('block_filescan/apiurl',
-    get_string('filescan_apiurl', 'block_filescan'),
-    get_string('filescan_apiurl_desc', 'block_filescan'),
-    '', PARAM_TEXT, 128));
+  $settings = new admin_settingspage('block_a11y_check', get_string('pluginname', 'block_a11y_check'));
 
-  $settings->add(new admin_setting_configtext('block_filescan/numfilespercron',
-    get_string('filescan_numfilespercron', 'block_filescan'),
-    get_string('filescan_numfilespercron_desc', 'block_filescan'),
-    '5', PARAM_TEXT, 128));
+  $ADMIN->add('blockplugins', $settings); 
 
-  $settings->add(new admin_setting_configtext('block_filescan/maxfilesize',
-    get_string('filescan_maxfilesize', 'block_filescan'),
-    get_string('filescan_maxfilesize_desc', 'block_filescan'),
-    128000000, PARAM_INT
-  ));
+  $settings->add(new admin_setting_configtext('block_a11y_check/text_check_help',
+        get_string('settings:text_check_help', 'block_a11y_check'),
+        get_string('settings:text_check_help_desc', 'block_a11y_check'),
+        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+        PARAM_URL,
+        60
+    ));
 
-  $settings->add(new admin_setting_configtext('block_filescan/maxretries',
-    get_string('filescan_maxretries', 'block_filescan'),
-    get_string('filescan_maxretries_desc', 'block_filescan'),
-    '3', PARAM_TEXT, 128));
+    $settings->add(new admin_setting_configtext('block_a11y_check/title_check_help',
+        get_string('settings:title_check_help', 'block_a11y_check'),
+        get_string('settings:title_check_help_desc', 'block_a11y_check'),
+        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+        PARAM_URL,
+        60
+    ));
 
-  $settings->add(new admin_setting_configtext('block_filescan/text_check_help',
-    get_string('filescan_text_check_help_desc', 'block_filescan'),
-    '',
-    'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-    PARAM_URL,
-    60
-  ));
+    $settings->add(new admin_setting_configtext('block_a11y_check/lang_check_help',
+        get_string('settings:lang_check_help', 'block_a11y_check'),
+        get_string('settings:lang_check_help_desc', 'block_a11y_check'),
+        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+        PARAM_URL,
+        60
+    ));
 
-  $settings->add(new admin_setting_configtext('block_filescan/title_check_help',
-    get_string('filescan_title_check_help_desc', 'block_filescan'),
-    '',
-    'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-    PARAM_URL,
-    60
-  ));
-
-  $settings->add(new admin_setting_configtext('block_filescan/lang_check_help',
-    get_string('filescan_lang_check_help_desc', 'block_filescan'),
-    '',
-    'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-    PARAM_URL,
-    60
-  ));
-
-  $settings->add(new admin_setting_configtext('block_filescan/outline_check_help',
-    get_string('filescan_outline_check_help_desc', 'block_filescan'),
-    '',
-    'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-    PARAM_URL,
-    60
-  ));
+    $settings->add(new admin_setting_configtext('block_a11y_check/outline_check_help',
+        get_string('settings:outline_check_help', 'block_a11y_check'),
+        get_string('settings:outline_check_help_desc', 'block_a11y_check'),
+        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
+        PARAM_URL,
+        60
+    ));
 
 }
