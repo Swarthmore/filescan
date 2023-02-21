@@ -112,17 +112,6 @@ class block_a11y_check extends block_base {
 
     }
 
-    // /**
-    //  * Generate the HTML summary of the accessibility checks for the course.
-    //  * @param arr $stats
-    //  * @return string
-    //  */
-    // private function generate_html_summary($stats) {
-    //     $html = html_writer::start_tag('div', array('class' => 'a11y-check-summary'));
-    //     $html = html_writer::p
-    //     $html .= html_writer::end_tag('div');
-    // }
-
     /**
      * @return stdClass
      */
@@ -141,33 +130,18 @@ class block_a11y_check extends block_base {
 
         $this->content = new stdClass;
 
-        if (!$canviewadmin && ($this->page->pagetype == 'site-index' || $this->page->pagetype == 'my-index')) {
-            $this->content = new stdClass;
-            $this->content->text = "Unauthorized";
-            $this->content->footer = "";
-        } else if ($canview) {
+        // Determine course metadata.
+        $coursename = $COURSE->fullname;
+        $courseshortname  = $COURSE->shortname;
+        $courseurl = course_get_url($COURSE);
 
-            // Determine course metadata.
-            $coursename = $COURSE->fullname;
-            $courseshortname  = $COURSE->shortname;
-            $courseurl = course_get_url($COURSE);
+        // Get the summary of the accessibility checks for the course.
+        $stats = $this->get_stats($COURSE->id);
 
-            // Get the summary of the accessibility checks for the course.
-            $stats = $this->get_stats($COURSE->id);
-
-            //$result = $cache->set($COURSE->id, $filescansummary);
-
-            $url = new moodle_url('/blocks/a11y_check/view.php', ['courseid' => $COURSE->id]);
-            $this->content->text = "I am a block";
-            $this->content->text = $OUTPUT->render_from_template('block_a11y_check/summary', $stats);
-            $this->content->footer = "I am a footer";
-            //$this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
-
-        } else {
-            $this->content = new stdClass;
-            $this->content->text = "";
-            $this->content->footer = "";
-        }
+        $url = new moodle_url('/blocks/a11y_check/view.php', ['courseid' => $COURSE->id]);
+        $this->content->text = "I am a block";
+        $this->content->text = $OUTPUT->render_from_template('block_a11y_check/summary', $stats);
+        $this->content->footer = "I am a footer";
 
         if ($this->content !== null) {
             return $this->content;
