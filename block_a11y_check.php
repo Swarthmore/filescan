@@ -45,6 +45,84 @@ class block_a11y_check extends block_base {
         ];
     }
 
+    /** 
+     * Get summary of the accessibility checks for the course.
+     * @param int $courseid
+     * @return string 
+     */
+    private function get_stats($courseid) {
+
+        global $DB;
+
+        // Placeholders to count the number of accessible files based on the accessibility checks.
+        $hasText = 0;
+        $hasTitle = 0;
+        $hasLanguage = 0;
+        $hasBookmarks = 0;
+        $isTagged = 0;
+        $totalPages = 0;
+        $totalFiles = 0;
+        $unscanned = 0;
+        $errors = array();
+
+        $sql = "SELECT ctx.id as ContextId, f.id as FileId, actp.scanid as ScanId, f.filename as FileName, actp.hastext as HasText, actp.hastitle as HasTitle, actp.haslanguage as HasLanguage, actp.hasbookmarks as HasBookmarks, actp.istagged as IsTagged, actp.pagecount as PageCount FROM {context} ctx INNER JOIN {course} c on ctx.instanceid = c.id INNER JOIN {files} f on ctx.id = f.contextid INNER JOIN {local_a11y_check_type_pdf} actp ON actp.contenthash = f.contenthash WHERE ctx.instanceid = :courseid";
+        $recordset = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
+
+        foreach ($recordset as $record) {
+
+            if ($record->hastext == 1) {
+                $hasText++;
+            }
+
+            if ($record->hastitle == 1) {
+                $hasTitle++;
+            }
+
+            if ($record->haslanguage == 1) {
+                $hasLanguage++;
+            }
+
+            if ($record->hasbookmarks == 1) {
+                $hasBookmarks++;
+            }
+
+            if ($record->istagged == 1) {
+                $isTagged++;
+            }
+
+            if ($record->pagecount > 0) {
+                $totalPages += $record->pagecount;
+            }
+
+        }
+
+        $stats = array(
+            "hasText" => $hasText,
+            "hasTitle" => $hasTitle,
+            "hasLanguage" => $hasLanguage,
+            "hasBookmarks" => $hasBookmarks,
+            "isTagged" => $isTagged,
+            "totalPages" => $totalPages,
+            "totalFiles" => $totalFiles,
+            "unscanned" => $unscanned,
+            "errors" => $errors
+        );
+
+        return $stats;
+
+    }
+
+    // /**
+    //  * Generate the HTML summary of the accessibility checks for the course.
+    //  * @param arr $stats
+    //  * @return string
+    //  */
+    // private function generate_html_summary($stats) {
+    //     $html = html_writer::start_tag('div', array('class' => 'a11y-check-summary'));
+    //     $html = html_writer::p
+    //     $html .= html_writer::end_tag('div');
+    // }
+
     /**
      * @return stdClass
      */
@@ -54,15 +132,9 @@ class block_a11y_check extends block_base {
         global $CFG;
         global $DB;
         global $PAGE;
+        global $OUTPUT;
 
         require_once($CFG->dirroot . '/course/lib.php');
-
-        $table = '';
-
-        $results['pass'] = $DB->count_records($table, ['status' => 'pass']);
-        $results['fails'] = $DB->count_records($table, ['status' => 'fail']);
-        $results['errors'] = $DB->count_records($table, ['status' => 'error']);
-        $results['checks'] = $DB->count_records($table, ['status' => 'check']);
 
         $context = context_course::instance($COURSE->id);
         $canview = has_capability('block/a11y_check:viewpages', $context);
@@ -71,7 +143,7 @@ class block_a11y_check extends block_base {
 
         if (!$canviewadmin && ($this->page->pagetype == 'site-index' || $this->page->pagetype == 'my-index')) {
             $this->content = new stdClass;
-            $this->content->text = "";
+            $this->content->text = "Unauthorized";
             $this->content->footer = "";
         } else if ($canview) {
 
@@ -80,12 +152,14 @@ class block_a11y_check extends block_base {
             $courseshortname  = $COURSE->shortname;
             $courseurl = course_get_url($COURSE);
 
-            $filescansummary = $this->generate_summary($COURSE->id);
-            $result = $cache->set($COURSE->id, $filescansummary);
+            // Get the summary of the accessibility checks for the course.
+            $stats = $this->get_stats($COURSE->id);
+
+            //$result = $cache->set($COURSE->id, $filescansummary);
 
             $url = new moodle_url('/blocks/a11y_check/view.php', ['courseid' => $COURSE->id]);
-            //$this->content->text = $filescansummary;
             $this->content->text = "I am a block";
+            $this->content->text = $OUTPUT->render_from_template('block_a11y_check/summary', $stats);
             $this->content->footer = "I am a footer";
             //$this->content->footer = html_writer::link($url, get_string('viewdetailspage', 'block_filescan'));
 
