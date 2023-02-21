@@ -68,33 +68,39 @@ class block_a11y_check extends block_base {
         $sql = "SELECT ctx.id as ContextId, f.id as FileId, actp.scanid as ScanId, f.filename as FileName, actp.hastext as HasText, actp.hastitle as HasTitle, actp.haslanguage as HasLanguage, actp.hasbookmarks as HasBookmarks, actp.istagged as IsTagged, actp.pagecount as PageCount FROM {context} ctx INNER JOIN {course} c on ctx.instanceid = c.id INNER JOIN {files} f on ctx.id = f.contextid INNER JOIN {local_a11y_check_type_pdf} actp ON actp.contenthash = f.contenthash WHERE ctx.instanceid = :courseid";
         $recordset = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
-        foreach ($recordset as $record) {
+        if ($recordset->valid()) {
+            foreach ($recordset as $record) {
 
-            if ($record->hastext == 1) {
-                $hasText++;
+                if ($record->hastext == 1) {
+                    $hasText++;
+                }
+
+                if ($record->hastitle == 1) {
+                    $hasTitle++;
+                }
+
+                if ($record->haslanguage == 1) {
+                    $hasLanguage++;
+                }
+
+                if ($record->hasbookmarks == 1) {
+                    $hasBookmarks++;
+                }
+
+                if ($record->istagged == 1) {
+                    $isTagged++;
+                }
+
+                if ($record->pagecount > 0) {
+                    $totalPages += $record->pagecount;
+                }
+
+                $totalFiles++;
+
             }
-
-            if ($record->hastitle == 1) {
-                $hasTitle++;
-            }
-
-            if ($record->haslanguage == 1) {
-                $hasLanguage++;
-            }
-
-            if ($record->hasbookmarks == 1) {
-                $hasBookmarks++;
-            }
-
-            if ($record->istagged == 1) {
-                $isTagged++;
-            }
-
-            if ($record->pagecount > 0) {
-                $totalPages += $record->pagecount;
-            }
-
         }
+
+        $recordset->close();
 
         $stats = array(
             "hasText" => $hasText,
