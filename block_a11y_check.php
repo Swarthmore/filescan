@@ -147,7 +147,7 @@ class block_a11y_check extends block_base {
         $url = new moodle_url('/blocks/a11y_check/view.php', ['courseid' => $COURSE->id]);
         $this->content->text = "I am a block";
         $this->content->text = $OUTPUT->render_from_template('block_a11y_check/summary', $stats);
-        $this->content->footer = "I am a footer";
+        $this->content->footer = $OUTPUT->render_from_template('block_a11y_check/footer', array('url' => $url)); 
 
         if ($this->content !== null) {
             return $this->content;
