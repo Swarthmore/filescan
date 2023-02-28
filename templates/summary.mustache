@@ -52,3 +52,10 @@
     <p>Total Scanned Files: {{totalFiles}}</p>
     <p>Total Unscanned Files: {{unscanned}}</p>
 </div>
+{{^element.frozen}}
+{{#js}}
+    require(['block_a11y_check/summary'], function(fn) {
+        fn();
+    });
+{{/js}}
+{{/element.frozen}}
