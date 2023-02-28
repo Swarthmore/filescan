@@ -318,6 +318,9 @@ $output_html = "<h1>" . $coursename . "</h1>";
 
 echo $OUTPUT->header();
 echo $output_html;
+
+$PAGE->requires->js('/blocks/a11y_check/js/summary.js', true);
+
 echo $OUTPUT->footer();
 
 // // From https://github.com/omer-ilhan/moodle-block_files/blob/master/block_files.php
