@@ -42,22 +42,36 @@
 }}
 
 <div class="a11y_check_summary">
-    <h6>Summary</h6>
-    <p>{{results.counts.total}} PDF files found</p>
-    <p><strong>A11y Results</strong></p>
-    <p>{{a11yresults.totals.pass}} ✅ Passing</p>
-    <p>{{a11yresults.totals.warn}} ⚠ Partially Passing</p>
-    <p>{{a11yresults.totals.fail}} ❌ Fail</p>
-    {{^a11yresults}}
-        <p>No results :(</p>
-    {{/a11yresults}}
-    <p><strong>Details</strong></p>
-    <p>{{results.counts.scanned}} files scanned</p>
-    <p>{{results.counts.inqueue}} files in scan queue</p>
-    <p>{{results.counts.notinqueue}} files not in scan queue</p>
-    {{^results}}
-        <p>No results :(</p>
-    {{/results}}
+
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center">PDF files found in course<span class="badge bg-primary text-bg-primary p-2">{{results.counts.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Files scanned <span class="badge bg-primary text-bg-primary p-2">{{results.counts.scanned}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Files in scan queue<span class="badge bg-primary text-bg-primary p-2">{{results.counts.inqueue}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Files not in scan queue<span class="badge bg-primary text-bg-primary p-2">{{results.counts.notinqueue}}</span></li>
+    </ul>
+
+<!--    <ul class="list-group list-group-flush">-->
+<!--        <li class="list-group-item">✅ {{a11yresults.totals.pass}} Passing</li>-->
+<!--        <li class="list-group-item">⚠ {{a11yresults.totals.warn}} Partially Passing</li>-->
+<!--        <li class="list-group-item">❌ {{a11yresults.totals.fail}} Fail</li>-->
+<!--    </ul>-->
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center">Passing <span class="badge bg-success text-bg-success p-2">{{a11yresults.totals.pass}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Partially passing <span class="badge bg-warning text-bg-warning p-2">{{a11yresults.totals.warn}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Failing <span class="badge bg-danger text-bg-danger p-2">{{a11yresults.totals.fail}}</span></li>
+    </ul>
+
+<!--    <p><strong>A11y Results</strong></p>-->
+<!--    {{^a11yresults}}-->
+<!--        <p>No results :(</p>-->
+<!--    {{/a11yresults}}-->
+<!--    <p><strong>Details</strong></p>-->
+<!--    {{^results}}-->
+<!--        <p>No results :(</p>-->
+<!--    {{/results}}-->
+
     <p>Last updated: 01/02/03 11:11PM</p>
 </div>
 
