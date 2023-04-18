@@ -42,18 +42,23 @@
 }}
 
 <div class="a11y_check_summary">
-
-    <h5>Scanned {{results.counts.scanned}}</h5>
-
-    <h5>In Scan Queue {{results.counts.inqueue}}</h5>
-
-    <h5>Not in Scan Queue {{results.counts.notinqueue}}</h5>
-
-    <div class="a11y_check_summary__details"></div>
-
+    <h6>Summary</h6>
+    <p>{{results.counts.total}} PDF files found</p>
+    <p><strong>A11y Results</strong></p>
+    <p>{{a11yresults.totals.pass}} ✅ Passing</p>
+    <p>{{a11yresults.totals.warn}} ⚠ Partially Passing</p>
+    <p>{{a11yresults.totals.fail}} ❌ Fail</p>
+    {{^a11yresults}}
+        <p>No results :(</p>
+    {{/a11yresults}}
+    <p><strong>Details</strong></p>
+    <p>{{results.counts.scanned}} files scanned</p>
+    <p>{{results.counts.inqueue}} files in scan queue</p>
+    <p>{{results.counts.notinqueue}} files not in scan queue</p>
     {{^results}}
         <p>No results :(</p>
     {{/results}}
+    <p>Last updated: 01/02/03 11:11PM</p>
 </div>
 
 <!--{{^element.frozen}}-->

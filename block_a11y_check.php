@@ -51,23 +51,11 @@ class block_a11y_check extends block_base {
      * @return array
      * @throws dml_exception
      */
-    private function get_aggregate_course_stats(string $courseid): array {
+    public function get_aggregate_course_stats(string $courseid): array {
 
         global $DB;
 
-        // [x] TODO: Fix hard-coding of courseid
-        // [x] TODO: Make sure using HEREDOC with variables is safe, or rewrite
-        // [x] TODO: Address concerns about half of a course's files may be picked up, while the other half may not show up in the results.
-        // [x] TODO: return NULL if there are no records found.. or a total count of scanned records, or a different structure completely that shows the status of each file and not just aggregates.
-
-//        $sql = 'select , '.
-//                'f.filename as "filename", f.filesize as "filesize" '.
-//            'from {local_a11y_check_type_pdf} lactp '.
-//            'inner join {local_a11y_check_pivot} lacp on lacp.scanid = lactp.scanid '.
-//            'inner join {files} f on f.id = lacp.fileid '.
-//            'where lacp.courseid = :courseid';
-
-
+        // Create the query.
         $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", '.
                 'c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname", '.
                 'lacq.id as "scanid", lactp.hastext as "hastext", lactp.hastitle as "hastitle", '.
@@ -86,11 +74,12 @@ class block_a11y_check extends block_base {
 
         $recordset = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
-        // [x] TODO: Put scanned and unscanned files into separate keys
+        // Create the results object that will eventually get returned to the invoker.
         $results = [
             "scanned" => [],
             "inqueue" => [],
-            "notinqueue" => []
+            "notinqueue" => [],
+            "total" => 0
         ];
 
         foreach ($recordset as $record) {
@@ -126,19 +115,125 @@ class block_a11y_check extends block_base {
                     "pagecount" => $record->pagecount
                 ];
             }
+
+            $results['total']++;
         }
 
+        // Aggregate the number of each type of result item.
         $results['counts'] = [
             'scanned' => count($results['scanned']),
             'notinqueue' => count($results['notinqueue']),
-            'inqueue' => count($results['inqueue'])
+            'inqueue' => count($results['inqueue']),
+            'total' => $results['total']
         ];
 
         $recordset->close();
+
         return $results;
 
     }
 
+    /**
+     * Return a11y totals for a course.
+     * @param string $courseid
+     * @return array
+     * @throws dml_exception
+     */
+    public function get_a11y_totals(string $courseid): array {
+
+        global $DB;
+
+        // Create the query.
+        $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", '.
+            'c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname", '.
+            'lacq.id as "scanid", lactp.hastext as "hastext", lactp.hastitle as "hastitle", '.
+            'lactp.haslanguage as "haslanguage", lactp.hasbookmarks as "hasbookmarks", '.
+            'lactp.istagged as "istagged", lactp.pagecount as "pagecount", lacq.status as "scanstatus" '.
+            'from {files} f '.
+            'inner join {context} ctx on ctx.id = f.contextid '.
+            'inner join {course_modules} cm on cm.id = ctx.instanceid '.
+            'inner join {course} c on c.id = cm.course '.
+            'left outer join {local_a11y_check_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id '.
+            'left outer join {local_a11y_check_queue} lacq on lacq.id = lacp.scanid '.
+            'left outer join {local_a11y_check_type_pdf} lactp on lacq.id = lactp.scanid '.
+            'where c.id = :courseid '.
+            "and f.mimetype = 'application/pdf' ".
+            'and ctx.contextlevel = 70';
+
+        $recordset = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
+
+        // Create the results object.
+        $results = [
+            "pass" => [],
+            "warn" => [],
+            "fail" => [],
+            "totals" => [
+                "pass" => 0,
+                "warn" => 0,
+                "fail" => 0
+            ]
+        ];
+
+        foreach ($recordset as $record) {
+
+            // Determine the a11y level of the file.
+            // ✅ Accessible if file passes all rules
+            // ⚠ Partially accessible if files passes any of the rules
+            // ❌ Inaccessible if no checks pass
+
+            // Ignore any files that haven't been scanned.
+            if (is_null($record->scanid) || $record->scanstatus == 0 ) {
+                continue;
+            }
+
+            // $mod is either "pass", "warn", or "fail"
+//            $mod = "";
+
+            // Set $mod based on a11y of file.
+            if (
+                $record->hastext == 1
+                && $record->hastitle == 1
+                && $record->haslanguage == 1
+                && $record->hasbookmarks == 1
+                && $record->istagged == 1
+            ) {
+                $mod = "pass";
+            } else if (
+                $record->hastext == 0
+                && $record->hastitle == 0
+                && $record->haslanguage == 0
+                && $record->hasbookmarks == 0
+                && $record->istagged == 0
+            ) {
+                $mod = "fail";
+            } else {
+                $mod = "warn";
+            }
+
+            $results[$mod] = [
+                "filename" => $record->filename,
+                "filesize" => $record->filesize,
+                "hastext" => $record->hastext,
+                "hastitle" => $record->hastitle,
+                "haslanguage" => $record->haslanguage,
+                "hasbookmarks" => $record->hasbookmarks,
+                "istagged" => $record->istagged,
+                "pagecount" => $record->pagecount,
+                "scanstatus" => $record->scanstatus
+            ];
+
+            $results["totals"][$mod]++;
+
+        }
+
+        $recordset->close();
+
+        // Before returning the results, we need to remove the passing files from the partially passing count.
+        $results["totals"]["warn"] -= $results["totals"]["pass"];
+
+        return $results;
+
+    }
 
     /**
      * @throws moodle_exception
@@ -148,23 +243,22 @@ class block_a11y_check extends block_base {
         global $COURSE;
         global $CFG;
         global $OUTPUT;
-        global $PAGE;
 
         require_once($CFG->dirroot . '/course/lib.php');
 
         $this->content = new stdClass;
 
-        $url = new moodle_url('/blocks/a11y_check/view.php', ['courseid' => $COURSE->id]);
-        $results = ['results' => $this->get_aggregate_course_stats($COURSE->id)];
+        $results = $this->get_aggregate_course_stats($COURSE->id);
+        $a11yresults = $this->get_a11y_totals($COURSE->id);
 
         $this->content->header = 'Header';
         $this->content->text = $OUTPUT->render_from_template(
             'block_a11y_check/summary',
-            $results
+            ['results' => $results, 'a11yresults' => $a11yresults]
         );
         $this->content->footer = $OUTPUT->render_from_template(
             'block_a11y_check/footer',
-            array('url' => $url)
+            ['url' => 'https://downloadmoreram.com']
         );
 
     }
