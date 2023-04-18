@@ -15,14 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Version information for block_a11y_check
-*
-* @package   block_a11y_check
-* @copyright 2023 Swarthmore College
-* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Version information for block_a11y_check
+ *
+ * @package   block_a11y_check
+ * @copyright 2023 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-$plugin->component = 'block_a11y_check';
-$plugin->version = 2023041804;
-$plugin->requires = 2022041906.02;
-$plugin->maturity = MATURITY_ALPHA;
+defined('MOODLE_INTERNAL') || die;
+
+global $CFG;
+
+require_once($CFG->dirroot . 'config.php');
+require_once($CFG->dirroot . '/course/lib.php');
+
+//require_login($course);

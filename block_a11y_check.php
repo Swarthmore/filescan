@@ -30,13 +30,12 @@ class block_a11y_check extends block_base {
         $this->title = get_string('pluginname', 'block_a11y_check');
     }
 
+
     public function has_config() {
         return true;
     }
 
-    /**
-     * @return array
-     */
+
     public function applicable_formats() {
         return [
             'site' => true,
@@ -45,112 +44,130 @@ class block_a11y_check extends block_base {
         ];
     }
 
-    /** 
+
+    /**
      * Get summary of the accessibility checks for the course.
-     * @param int $courseid
-     * @return string 
+     * @param string $courseid
+     * @return array
+     * @throws dml_exception
      */
-    private function get_stats($courseid) {
+    private function get_aggregate_course_stats(string $courseid): array {
 
         global $DB;
 
-        // Placeholders to count the number of accessible files based on the accessibility checks.
-        $hasText = 0;
-        $hasTitle = 0;
-        $hasLanguage = 0;
-        $hasBookmarks = 0;
-        $isTagged = 0;
-        $totalPages = 0;
-        $totalFiles = 0;
-        $unscanned = 0;
-        $errors = array();
+        // [x] TODO: Fix hard-coding of courseid
+        // [x] TODO: Make sure using HEREDOC with variables is safe, or rewrite
+        // [x] TODO: Address concerns about half of a course's files may be picked up, while the other half may not show up in the results.
+        // [x] TODO: return NULL if there are no records found.. or a total count of scanned records, or a different structure completely that shows the status of each file and not just aggregates.
 
-        $sql = "SELECT ctx.id as ContextId, f.id as FileId, actp.scanid as ScanId, f.filename as FileName, actp.hastext as HasText, actp.hastitle as HasTitle, actp.haslanguage as HasLanguage, actp.hasbookmarks as HasBookmarks, actp.istagged as IsTagged, actp.pagecount as PageCount FROM {context} ctx INNER JOIN {course} c on ctx.instanceid = c.id INNER JOIN {files} f on ctx.id = f.contextid INNER JOIN {local_a11y_check_type_pdf} actp ON actp.contenthash = f.contenthash WHERE ctx.instanceid = :courseid";
+//        $sql = 'select , '.
+//                'f.filename as "filename", f.filesize as "filesize" '.
+//            'from {local_a11y_check_type_pdf} lactp '.
+//            'inner join {local_a11y_check_pivot} lacp on lacp.scanid = lactp.scanid '.
+//            'inner join {files} f on f.id = lacp.fileid '.
+//            'where lacp.courseid = :courseid';
+
+
+        $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", '.
+                'c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname", '.
+                'lacq.id as "scanid", lactp.hastext as "hastext", lactp.hastitle as "hastitle", '.
+                'lactp.haslanguage as "haslanguage", lactp.hasbookmarks as "hasbookmarks", '.
+                'lactp.istagged as "istagged", lactp.pagecount as "pagecount", lacq.status as "scanstatus" '.
+                'from {files} f '.
+                'inner join {context} ctx on ctx.id = f.contextid '.
+                'inner join {course_modules} cm on cm.id = ctx.instanceid '.
+                'inner join {course} c on c.id = cm.course '.
+                'left outer join {local_a11y_check_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id '.
+                'left outer join {local_a11y_check_queue} lacq on lacq.id = lacp.scanid '.
+                'left outer join {local_a11y_check_type_pdf} lactp on lacq.id = lactp.scanid '.
+                'where c.id = :courseid '.
+                "and f.mimetype = 'application/pdf' ".
+                'and ctx.contextlevel = 70';
+
         $recordset = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
-        if ($recordset->valid()) {
-            foreach ($recordset as $record) {
+        // [x] TODO: Put scanned and unscanned files into separate keys
+        $results = [
+            "scanned" => [],
+            "inqueue" => [],
+            "notinqueue" => []
+        ];
 
-                if ($record->hastext == 1) {
-                    $hasText++;
-                }
+        foreach ($recordset as $record) {
 
-                if ($record->hastitle == 1) {
-                    $hasTitle++;
-                }
+            // If the record has yet to be queued, $record->scanid will be NULL
+            if (is_null($record->scanid)) {
+                $results['notinqueue'][] = [
+                    "filename" => $record->filename,
+                    "filesize" => $record->filesize,
+                ];
+            }
 
-                if ($record->haslanguage == 1) {
-                    $hasLanguage++;
-                }
+            // If the record is in the queue but hasn't been scanned, $record->scantatus will be '0'
+            // @ See local/a11y_check/locallib.php
+            else if ($record->scanstatus == 0) {
+                $results['inqueue'][] = [
+                    "filename" => $record->filename,
+                    "filesize" => $record->filesize
+                ];
+            }
 
-                if ($record->hasbookmarks == 1) {
-                    $hasBookmarks++;
-                }
-
-                if ($record->istagged == 1) {
-                    $isTagged++;
-                }
-
-                if ($record->pagecount > 0) {
-                    $totalPages += $record->pagecount;
-                }
-
-                $totalFiles++;
-
+            // If the record has already been scanned, $record->status will be 1
+            // @ See local/a11y_check/locallib.php
+            else if ($record->scanstatus == 1) {
+                $results['scanned'][] = [
+                    "filename" => $record->filename,
+                    "filesize" => $record->filesize,
+                    "hastext" => $record->hastext,
+                    "hastitle" => $record->hastitle,
+                    "haslanguage" => $record->haslanguage,
+                    "hasbookmarks" => $record->hasbookmarks,
+                    "istagged" => $record->istagged,
+                    "pagecount" => $record->pagecount
+                ];
             }
         }
 
+        $results['counts'] = [
+            'scanned' => count($results['scanned']),
+            'notinqueue' => count($results['notinqueue']),
+            'inqueue' => count($results['inqueue'])
+        ];
+
         $recordset->close();
-
-        $stats = array(
-            "hasText" => $hasText,
-            "hasTitle" => $hasTitle,
-            "hasLanguage" => $hasLanguage,
-            "hasBookmarks" => $hasBookmarks,
-            "isTagged" => $isTagged,
-            "totalPages" => $totalPages,
-            "totalFiles" => $totalFiles,
-            "unscanned" => $unscanned,
-            "errors" => $errors
-        );
-
-        return $stats;
+        return $results;
 
     }
 
+
     /**
-     * @return stdClass
+     * @throws moodle_exception
      */
     public function get_content() {
 
         global $COURSE;
         global $CFG;
-        global $DB;
-        global $PAGE;
         global $OUTPUT;
+        global $PAGE;
 
         require_once($CFG->dirroot . '/course/lib.php');
 
-        $context = context_course::instance($COURSE->id);
-        $canview = has_capability('block/a11y_check:viewpages', $context);
-
         $this->content = new stdClass;
 
-        // Determine course metadata.
-        $coursename = $COURSE->fullname;
-        $courseshortname  = $COURSE->shortname;
-        $courseurl = course_get_url($COURSE);
-
-        // Get the summary of the accessibility checks for the course.
-        $stats = $this->get_stats($COURSE->id);
-
         $url = new moodle_url('/blocks/a11y_check/view.php', ['courseid' => $COURSE->id]);
-        $this->content->text = "I am a block";
-        $this->content->text = $OUTPUT->render_from_template('block_a11y_check/summary', $stats);
-        $this->content->footer = $OUTPUT->render_from_template('block_a11y_check/footer', array('url' => $url)); 
+        $results = ['results' => $this->get_aggregate_course_stats($COURSE->id)];
 
-        if ($this->content !== null) {
-            return $this->content;
-        }
+        $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', $results);
+
+        $this->content->header = 'Header';
+//        $this->content->text = $OUTPUT->render_from_template(
+//            'block_a11y_check/summary',
+//            $results
+//        );
+        $this->content->footer = $OUTPUT->render_from_template(
+            'block_a11y_check/footer',
+            array('url' => $url)
+        );
+
     }
 }

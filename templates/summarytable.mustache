@@ -41,32 +41,18 @@
     }[]
 }}
 
-<div class="a11y_check_summary">
-
-    <h5>Scanned {{results.counts.scanned}}</h5>
-    {{#results.scanned}}
-        <p>{{filename}}</p>
-    {{/results.scanned}}
-
-    <h5>In Scan Queue {{results.counts.inqueue}}</h5>
-    {{#results.inqueue}}
-        <p>{{filename}}</p>
-    {{/results.inqueue}}
-
-    <h5>Not in Scan Queue {{resuluts.counts.notinqueue}}</h5>
-    {{#results.notinqueue}}
-        <p>{{filename}}</p>
-    {{/results.notinqueue}}
-
-    {{^results}}
-        <p>No results :(</p>
-    {{/results}}
-</div>
-
-<!--{{^element.frozen}}-->
-<!--{{#js}}-->
-<!--    require(['block_a11y_check/init'], function(module) {-->
-<!--        module.init(results)-->
-<!--    });-->
-<!--{{/js}}-->
-<!--{{/element.frozen}}-->
+<table>
+    <thead>
+        <tr>
+            <th>Filename</th>
+            <th>Status</th>
+            <th>Text</th>
+            <th>Title</th>
+            <th>Language</th>
+            <th>Outline</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{}}
+    </tbody>
+</table>

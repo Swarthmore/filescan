@@ -45,7 +45,7 @@ $PAGE->set_heading('A11y Check');
 
 $fs = get_file_storage();
 $context = context_course::instance($COURSE->id);
-$canview = has_capability('block/filescan:viewpages', $context);
+$canview = has_capability('block/a11y_check:viewpages', $context);
 
 // If the role can't view the block, return an empty string for the content
 // and exit (blocks with no content aren't shown)
