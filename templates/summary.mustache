@@ -44,19 +44,12 @@
 <div class="a11y_check_summary">
 
     <h5>Scanned {{results.counts.scanned}}</h5>
-    {{#results.scanned}}
-        <p>{{filename}}</p>
-    {{/results.scanned}}
 
     <h5>In Scan Queue {{results.counts.inqueue}}</h5>
-    {{#results.inqueue}}
-        <p>{{filename}}</p>
-    {{/results.inqueue}}
 
     <h5>Not in Scan Queue {{resuluts.counts.notinqueue}}</h5>
-    {{#results.notinqueue}}
-        <p>{{filename}}</p>
-    {{/results.notinqueue}}
+
+    <div class="a11y_check_summary__details"></div>
 
     {{^results}}
         <p>No results :(</p>

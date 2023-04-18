@@ -23,6 +23,6 @@
 */
 
 $plugin->component = 'block_a11y_check';
-$plugin->version = 2023041804;
+$plugin->version = 2023041805;
 $plugin->requires = 2022041906.02;
 $plugin->maturity = MATURITY_ALPHA;

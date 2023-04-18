@@ -157,13 +157,13 @@ class block_a11y_check extends block_base {
         $url = new moodle_url('/blocks/a11y_check/view.php', ['courseid' => $COURSE->id]);
         $results = ['results' => $this->get_aggregate_course_stats($COURSE->id)];
 
-        $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', $results);
+//        $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', $results);
 
         $this->content->header = 'Header';
-//        $this->content->text = $OUTPUT->render_from_template(
-//            'block_a11y_check/summary',
-//            $results
-//        );
+        $this->content->text = $OUTPUT->render_from_template(
+            'block_a11y_check/summary',
+            $results
+        );
         $this->content->footer = $OUTPUT->render_from_template(
             'block_a11y_check/footer',
             array('url' => $url)
