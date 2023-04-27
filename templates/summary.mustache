@@ -30,31 +30,51 @@
 
     Example context (json):
     {
-        filename: string
-        filesize: number
-        hastext: number
-        hastitle: number
-        haslanguage: number
-        hasbookmarks: number
-        istagged: number
-        pagecount: number
-    }[]
+        scanresults: {
+            totalpdfs: number,
+            scanned: {
+                total: number,
+                pdfs: []
+            },
+            inqueue: {
+                total: number,
+                pdfs: []
+            },
+            notinqueue: {
+                total: number,
+                pdfs: []
+            }
+        },
+        a11yresults: {
+            pass: {
+                total: number,
+                pdfs: []
+            },
+            warn: [
+                total: number,
+                pdfs: []
+            ],
+            fail: [
+                total: number,
+                pdfs: []
+            ],
+        }
+    }
+
 }}
 
 <div class="a11y_check_summary">
 
-
     <ul class="list-group list-group-flush">
-        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{results.counts.total}} PDFs found</strong></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Scanned <span>{{results.counts.scanned}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Awaiting scan<span>{{results.counts.inqueue}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Not in queue<span>{{results.counts.notinqueue}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{data.scanresults.totalpdfs}} PDFs found</strong></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Scanned <span>{{data.scanresults.scanned.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Awaiting scan<span>{{data.scanresults.inqueue.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Not in queue<span>{{data.scanresults.notinqueue.total}}</span></li>
         <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Results</strong></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Passing <span>{{a11yresults.totals.pass}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Partially passing <span>{{a11yresults.totals.warn}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Failing <span>{{a11yresults.totals.fail}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Passing <span>{{data.a11yresults.pass.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Partially passing <span>{{data.a11yresults.warn.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Failing <span>{{data.a11yresults.fail.total}}</span></li>
     </ul>
-
 
 <!--    <p><strong>A11y Results</strong></p>-->
 <!--    {{^a11yresults}}-->
@@ -71,8 +91,9 @@
 
 <!--{{^element.frozen}}-->
 <!--{{#js}}-->
-<!--    require(['block_a11y_check/init'], function(module) {-->
-<!--        module.init(results)-->
-<!--    });-->
+<!--    console.log(results)-->
+<!--&lt;!&ndash;    require(['block_a11y_check/init'], function(module) {&ndash;&gt;-->
+<!--&lt;!&ndash;        module.init(results)&ndash;&gt;-->
+<!--&lt;!&ndash;    });&ndash;&gt;-->
 <!--{{/js}}-->
 <!--{{/element.frozen}}-->

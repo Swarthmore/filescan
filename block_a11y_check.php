@@ -74,19 +74,27 @@ class block_a11y_check extends block_base {
 
         $recordset = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
-        // Create the results object that will eventually get returned to the invoker.
         $results = [
-            "scanned" => [],
-            "inqueue" => [],
-            "notinqueue" => [],
-            "total" => 0
+            "totalpdfs" => 0,
+            "scanned" => [
+                "total" => 0,
+                "pdfs" => []
+            ],
+            "inqueue" => [
+                "total" => 0,
+                "pdfs" => []
+            ],
+            "notinqueue" => [
+                "total" => 0,
+                "pdfs" => []
+            ]
         ];
 
         foreach ($recordset as $record) {
 
             // If the record has yet to be queued, $record->scanid will be NULL
             if (is_null($record->scanid)) {
-                $results['notinqueue'][] = [
+                $results['notinqueue']["pdfs"][] = [
                     "filename" => $record->filename,
                     "filesize" => $record->filesize,
                 ];
@@ -95,7 +103,7 @@ class block_a11y_check extends block_base {
             // If the record is in the queue but hasn't been scanned, $record->scantatus will be '0'
             // @ See local/a11y_check/locallib.php
             else if ($record->scanstatus == 0) {
-                $results['inqueue'][] = [
+                $results['inqueue']["pdfs"][] = [
                     "filename" => $record->filename,
                     "filesize" => $record->filesize
                 ];
@@ -104,7 +112,7 @@ class block_a11y_check extends block_base {
             // If the record has already been scanned, $record->status will be 1
             // @ See local/a11y_check/locallib.php
             else if ($record->scanstatus == 1) {
-                $results['scanned'][] = [
+                $results['scanned']["pdfs"] = [
                     "filename" => $record->filename,
                     "filesize" => $record->filesize,
                     "hastext" => $record->hastext,
@@ -116,16 +124,13 @@ class block_a11y_check extends block_base {
                 ];
             }
 
-            $results['total']++;
+            $results["totalpdfs"]++;
         }
 
         // Aggregate the number of each type of result item.
-        $results['counts'] = [
-            'scanned' => count($results['scanned']),
-            'notinqueue' => count($results['notinqueue']),
-            'inqueue' => count($results['inqueue']),
-            'total' => $results['total']
-        ];
+        $results['scanned']['total'] = count($results['scanned']['pdfs']);
+        $results['inqueue']['total'] = count($results['inqueue']['pdfs']);
+        $results['notinqueue']['total'] = count($results['notinqueue']['pdfs']);
 
         $recordset->close();
 
@@ -164,14 +169,18 @@ class block_a11y_check extends block_base {
 
         // Create the results object.
         $results = [
-            "pass" => [],
-            "warn" => [],
-            "fail" => [],
-            "totals" => [
-                "pass" => 0,
-                "warn" => 0,
-                "fail" => 0
-            ]
+            "pass" => [
+                "total" => 0,
+                "pdfs" => []
+            ],
+            "warn" => [
+                "total" => 0,
+                "pdfs" => []
+            ],
+            "fail" => [
+                "total" => 0,
+                "pdfs" => []
+            ],
         ];
 
         foreach ($recordset as $record) {
@@ -187,8 +196,6 @@ class block_a11y_check extends block_base {
             }
 
             // $mod is either "pass", "warn", or "fail"
-//            $mod = "";
-
             // Set $mod based on a11y of file.
             if (
                 $record->hastext == 1
@@ -210,7 +217,7 @@ class block_a11y_check extends block_base {
                 $mod = "warn";
             }
 
-            $results[$mod] = [
+            $results[$mod]['pdfs'] = [
                 "filename" => $record->filename,
                 "filesize" => $record->filesize,
                 "hastext" => $record->hastext,
@@ -222,14 +229,14 @@ class block_a11y_check extends block_base {
                 "scanstatus" => $record->scanstatus
             ];
 
-            $results["totals"][$mod]++;
+            $results[$mod]["total"]++;
 
         }
 
         $recordset->close();
 
         // Before returning the results, we need to remove the passing files from the partially passing count.
-        $results["totals"]["warn"] -= $results["totals"]["pass"];
+        $results["warn"]["total"] -= $results["pass"]["total"];
 
         return $results;
 
@@ -254,7 +261,7 @@ class block_a11y_check extends block_base {
         $this->content->header = 'Header';
         $this->content->text = $OUTPUT->render_from_template(
             'block_a11y_check/summary',
-            ['results' => $results, 'a11yresults' => $a11yresults]
+            ['data' => [ 'scanresults' => $results, 'a11yresults' => $a11yresults ]]
         );
         $this->content->footer = $OUTPUT->render_from_template(
             'block_a11y_check/footer',
