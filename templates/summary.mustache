@@ -64,9 +64,17 @@
 
 <div class="a11y_check_summary">
 
-    <div class="a11y-pie-chart">
+    <section class="a11y-scan-chart my-5">
+      <canvas id="a11yScanChart"></canvas>
+    </section>
+
+    <section class="a11y-pie-chart my-5">
       <canvas id="a11yPieChart"></canvas>
-    </div>
+    </section>
+
+    <section class="a11y-radar-chart my-5">
+      <canvas id="a11yRadarChart"></canvas>
+    </section>
 
     <ul class="list-group list-group-flush">
         <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{results.totalpdfs}} PDFs found</strong></li>
