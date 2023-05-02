@@ -29,7 +29,6 @@
     * none
 
     Example context (json):
-    {
         scanresults: {
             totalpdfs: number,
             scanned: {
@@ -59,41 +58,42 @@
                 pdfs: []
             ],
         }
-    }
-
+        chartdata: any,
+        withtable: boolean
 }}
 
 <div class="a11y_check_summary">
 
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{data.scanresults.totalpdfs}} PDFs found</strong></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Scanned <span>{{data.scanresults.scanned.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Awaiting scan<span>{{data.scanresults.inqueue.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Not in queue<span>{{data.scanresults.notinqueue.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Results</strong></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Passing <span>{{data.a11yresults.pass.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Partially passing <span>{{data.a11yresults.warn.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Failing <span>{{data.a11yresults.fail.total}}</span></li>
-    </ul>
+    <div class="a11y-pie-chart">
+      <canvas id="a11yPieChart"></canvas>
+    </div>
 
-<!--    <p><strong>A11y Results</strong></p>-->
-<!--    {{^a11yresults}}-->
-<!--        <p>No results :(</p>-->
-<!--    {{/a11yresults}}-->
-<!--    <p><strong>Details</strong></p>-->
-<!--    {{^results}}-->
-<!--        <p>No results :(</p>-->
-<!--    {{/results}}-->
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{results.totalpdfs}} PDFs found</strong></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Scanned <span>{{results.scanned.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Awaiting scan<span>{{results.inqueue.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Not in queue<span>{{results.notinqueue.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Results</strong></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Passing <span>{{a11yresults.pass.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Partially passing <span>{{a11yresults.warn.total}}</span></li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">Failing <span>{{a11yresults.fail.total}}</span></li>
+    </ul>
 
     <p class="mt-2">Last updated: 01/02/03 11:11PM</p>
 
 </div>
 
-<!--{{^element.frozen}}-->
-<!--{{#js}}-->
-<!--    console.log(results)-->
-<!--&lt;!&ndash;    require(['block_a11y_check/init'], function(module) {&ndash;&gt;-->
-<!--&lt;!&ndash;        module.init(results)&ndash;&gt;-->
-<!--&lt;!&ndash;    });&ndash;&gt;-->
-<!--{{/js}}-->
-<!--{{/element.frozen}}-->
+{{!
+require([
+    'jquery',
+    'core/chart_builder',
+    'core/chart_output_chartjs',
+    'core/chart_output_htmltable'
+    ], function ($, Builder, Output, OutputTable) {
+        const uniqueid = "{{uniqid}}"
+        console.log({{{a11yresults}}})
+        console.log({{{data}}})
+        console.log({{{scanresults}}})
+        console.log({{{data.scanresults}}})
+    });
+}}

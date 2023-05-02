@@ -250,23 +250,22 @@ class block_a11y_check extends block_base {
         global $COURSE;
         global $CFG;
         global $OUTPUT;
+        global $PAGE;
 
         require_once($CFG->dirroot . '/course/lib.php');
 
-        $this->content = new stdClass;
-
+        // Generate the results.
         $results = $this->get_aggregate_course_stats($COURSE->id);
         $a11yresults = $this->get_a11y_totals($COURSE->id);
 
-        $this->content->header = 'Header';
-        $this->content->text = $OUTPUT->render_from_template(
-            'block_a11y_check/summary',
-            ['data' => [ 'scanresults' => $results, 'a11yresults' => $a11yresults ]]
-        );
-        $this->content->footer = $OUTPUT->render_from_template(
-            'block_a11y_check/footer',
-            ['url' => 'https://downloadmoreram.com']
-        );
+        // Create the response. This gets ingested by the template.
+        $data = [
+            'scanresults' => $results,
+            'a11yresults' => $a11yresults
+        ];
+
+        // This pages requires an AMD module.
+        $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', [$results, $a11yresults]);
 
     }
 }
