@@ -58,38 +58,31 @@
                 pdfs: []
             ],
         }
-        chartdata: any,
-        withtable: boolean
 }}
 
-<div class="a11y_check_summary">
 
-    <section class="a11y-scan-chart my-5">
-      <canvas id="a11yScanChart"></canvas>
-    </section>
+<div class="d-flex flex-column align-items-start">
 
-    <section class="a11y-pie-chart my-5">
-      <canvas id="a11yPieChart"></canvas>
-    </section>
+  <section class="a11y-details-progress my-3 w-100">
+    <div id="a11yDetailsProgress"></div>
+  </section>
 
-    <section class="a11y-radar-chart my-5">
-      <canvas id="a11yRadarChart"></canvas>
-    </section>
+  <section class="a11y-pie-chart my-3 w-100">
+    <canvas id="a11yPieChart" aria-label="A11y check pie chart describing the a11y status of the course PDFs.">
+    {{! This is a text fallback for a11y. @see https://www.chartjs.org/docs/3.8.2/general/accessibility.html }}
+    <p>
+      There are {{a11yresults.pass.total}} PDFs that passed all a11y checks.
+      There are {{a11yresults.warn.total}} PDFs that are partially accessible.
+      There are {{a11yresults.fail.total}} PDFs that failed all a11y checks.
+    </p>
+    </canvas>
+  </section>
 
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{results.totalpdfs}} PDFs found</strong></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Scanned <span>{{results.scanned.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Awaiting scan<span>{{results.inqueue.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Not in queue<span>{{results.notinqueue.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Results</strong></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Passing <span>{{a11yresults.pass.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Partially passing <span>{{a11yresults.warn.total}}</span></li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">Failing <span>{{a11yresults.fail.total}}</span></li>
-    </ul>
-
-    <p class="mt-2">Last updated: 01/02/03 11:11PM</p>
+  {{! TODO - Get teh last updated date }}
+  <p class="mt-2 text-center w-100">Last updated: 01/02/03 11:11PM</p>
 
 </div>
+
 
 {{!
 require([

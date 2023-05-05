@@ -112,7 +112,7 @@ class block_a11y_check extends block_base {
             // If the record has already been scanned, $record->status will be 1
             // @ See local/a11y_check/locallib.php
             else if ($record->scanstatus == 1) {
-                $results['scanned']["pdfs"] = [
+                $results['scanned']["pdfs"][] = [
                     "filename" => $record->filename,
                     "filesize" => $record->filesize,
                     "hastext" => $record->hastext,
@@ -217,7 +217,7 @@ class block_a11y_check extends block_base {
                 $mod = "warn";
             }
 
-            $results[$mod]['pdfs'] = [
+            $results[$mod]['pdfs'][] = [
                 "filename" => $record->filename,
                 "filesize" => $record->filesize,
                 "hastext" => $record->hastext,
@@ -254,9 +254,19 @@ class block_a11y_check extends block_base {
 
         require_once($CFG->dirroot . '/course/lib.php');
 
+        if ($this->content !== null) {
+            return $this->content;
+        }
+
+        // Create the DOM element the plugin will attach to.
+        $this->content = new stdClass();
+        $this->content->text = '<div id="block_a11y_check_root"></div>';
+        $this->content->footer = '';
+
         // Generate the results.
         $results = $this->get_aggregate_course_stats($COURSE->id);
         $a11yresults = $this->get_a11y_totals($COURSE->id);
+
 
         // Create the response. This gets ingested by the template.
         $data = [
