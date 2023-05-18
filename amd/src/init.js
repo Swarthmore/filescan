@@ -33,16 +33,10 @@ export const init = (results, a11yresults) => {
 
     })
 
-
-    const html = `<div class="progress">${elementArray.join(' ').replace(/\n\s+/g, '')}</div>\
-      <ul class="list-unstyled">\
-      <li class="mb-2 p-1"><strong>${results.totalpdfs} PDFs found</strong></li>\
-      <li class="bg-success text-white p-1">${results.scanned.total} PDFs scanned</li>\
-      <li class="bg-secondary p-1">${results.inqueue.total} PDFs in queue</li>
-      `;
-
-    // Add to DOM
-    $('#a11yDetailsProgress').html(html)
+    $('#a11yDetailsProgress')
+      .append($(`<h6>PDF Scan Progress</h6>`))
+      .append($(`<div class="progress">${elementArray.join(' ').replace(/\n\s+/g, '')}</div>`))
+      .append($(`<div class="d-flex justify-content-between"><p>${results.inqueue.total} in queue</p><p>${results.notinqueue.total + results.scanned.total} found</p></div>`))
 
   }
 
@@ -105,13 +99,25 @@ export const init = (results, a11yresults) => {
 //  }
 
   function renderA11yPieChart() {
-    const canvas = document.querySelector('#a11yPieChart')
 
-    if (!canvas) {
-      throw new Error('Could not find canvas {#a11yPieChart}')
-    }
+    // Create the canvas element.
+    const canvas = $('<canvas/>').attr({
+      id: '#a11yPieChart',
+      'aria-label': 'A11y check pie chart describing the a11y status of the course PDFs.'
+    })
 
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas[0].getContext('2d')
+
+    // Append a11y fallback
+
+    // canvas.append(```<p>
+    //   There are {{a11yresults.pass.total}} PDFs that passed all a11y checks.
+    //   There are {{a11yresults.warn.total}} PDFs that are partially accessible.
+    //   There are {{a11yresults.fail.total}} PDFs that failed all a11y checks.
+    // </p>```)
+
+    // Append the canvas to the DOM
+    $('#a11y-chart-container').append(canvas)
 
     const chartData = {
       labels: [`Pass (${a11yresults.pass.total})`, `Warn (${a11yresults.warn.total})`, `Fail (${a11yresults.fail.total})`],
@@ -140,9 +146,12 @@ export const init = (results, a11yresults) => {
       // Render the template.
       Templates.appendNodeContents("#block_a11y_check_root", html, js);
 
-      // Render the charts.
+      // Render the queue stats.
       renderQueueStats()
-      renderA11yPieChart()
+      // Only render the chart if there's data.
+      if (results.scanned.total > 0) {
+        renderA11yPieChart()
+      }
   })
   // Deal with this exception (Using core/notify exception function is recommended).
   .catch((error) => displayException(error));

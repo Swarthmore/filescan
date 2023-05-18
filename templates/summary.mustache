@@ -57,7 +57,8 @@
                 total: number,
                 pdfs: []
             ],
-        }
+        },
+        lastScan: string
 }}
 
 
@@ -67,34 +68,6 @@
     <div id="a11yDetailsProgress"></div>
   </section>
 
-  <section class="a11y-pie-chart my-3 w-100">
-    <canvas id="a11yPieChart" aria-label="A11y check pie chart describing the a11y status of the course PDFs.">
-    {{! This is a text fallback for a11y. @see https://www.chartjs.org/docs/3.8.2/general/accessibility.html }}
-    <p>
-      There are {{a11yresults.pass.total}} PDFs that passed all a11y checks.
-      There are {{a11yresults.warn.total}} PDFs that are partially accessible.
-      There are {{a11yresults.fail.total}} PDFs that failed all a11y checks.
-    </p>
-    </canvas>
-  </section>
-
-  {{! TODO - Get teh last updated date }}
-  <p class="mt-2 text-center w-100">Last updated: 01/02/03 11:11PM</p>
+  <section id="a11y-chart-container" class="a11y-pie-chart my-3 w-100"></section>
 
 </div>
-
-
-{{!
-require([
-    'jquery',
-    'core/chart_builder',
-    'core/chart_output_chartjs',
-    'core/chart_output_htmltable'
-    ], function ($, Builder, Output, OutputTable) {
-        const uniqueid = "{{uniqid}}"
-        console.log({{{a11yresults}}})
-        console.log({{{data}}})
-        console.log({{{scanresults}}})
-        console.log({{{data.scanresults}}})
-    });
-}}
