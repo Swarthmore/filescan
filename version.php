@@ -25,6 +25,6 @@
 
 /** @var mixed $plugin */
 $plugin->component = 'block_a11y_check';
-$plugin->version = 2023050400;
+$plugin->version = 2023072000;
 $plugin->requires = 2022041906.02;
 $plugin->maturity = MATURITY_ALPHA;

@@ -1,12 +1,15 @@
 /* eslint-disable */
+import $ from 'jquery';
 import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import ChartJS from 'core/chartjs';
-import $ from 'jquery';
+import ModalFactory from 'core/modal_factory';
 
 export const init = (results, a11yresults) => {
 
-  function renderQueueStats() {
+  console.log({ DEBUG: true, results, a11yresults })
+
+  async function renderQueueStats() {
     // Create the data for the chart.
     // [0] = text, [1] = language, [3] = layout
     const data = [
@@ -37,6 +40,49 @@ export const init = (results, a11yresults) => {
       .append($(`<h6>PDF Scan Progress</h6>`))
       .append($(`<div class="progress">${elementArray.join(' ').replace(/\n\s+/g, '')}</div>`))
       .append($(`<div class="d-flex justify-content-between"><p>${results.inqueue.total} in queue</p><p>${results.notinqueue.total + results.scanned.total} found</p></div>`))
+
+    // Create the results table.
+    let tablecontent = '<table class="table table-hover table-sm">';
+    tablecontent += `<thead><tr><th>Filename</th><th>Filesize</th><th>Has Bookmarks</th><th>Has Lang</th><th>Has text</th><th>Has title</th><th>Is tagged</th><th>Pages</th><th>status</th></tr></thead>`
+
+    // Get all pdfs in a11yresults.fail, a11yresults.pass, and a11yresults.warn
+
+    const failingpdfs = a11yresults.fail.pdfs
+    const passingpdfs = a11yresults.pass.pdfs
+    const warningpdfs = a11yresults.warn.pdfs
+
+    const allpdfs = [].concat(failingpdfs, passingpdfs, warningpdfs)
+
+    for (let i=0; i<allpdfs.length; i++) {
+      tablecontent += '<tr>' +
+          `<td>${allpdfs[i].filename}</td>` +
+          `<td>${allpdfs[i].filesize}</td>` +
+          `<td>${allpdfs[i].hasbookmarks ? 'Yes' : 'No'}</td>` +
+          `<td>${allpdfs[i].haslanguage ? 'Yes' : 'No'}</td>` +
+          `<td>${allpdfs[i].hastext ? 'Yes' : 'No'}</td>` +
+          `<td>${allpdfs[i].hastitle ? 'Yes' : 'No'}</td>` +
+          `<td>${allpdfs[i].istagged ? 'Yes' : 'No'}</td>` +
+          `<td>${allpdfs[i].pagecount || 'No'}</td>` +
+          `<td>${allpdfs[i].hastitle ? 'Yes' : 'No'}</td>` +
+          `<td>${allpdfs[i].scanstatus}</td>`
+    '</tr>'
+    }
+
+    tablecontent += '</table>';
+
+    const modal = await ModalFactory.create({
+      title: 'A11y Check Details',
+      body: tablecontent,
+      footer: '<p>Last updated</p>',
+      large: true
+    })
+
+    const $modalbtn = $('<button class="btn btn-secondary">Details</button>')
+
+    $modalbtn.click(() => modal.show())
+
+    $("#more-details-container").append($modalbtn)
+    // html(`<button type="button" class="btn btn-primary" data-modal="alert" data-modal-title-str="Course Material Accessibility" data-modal-content-str='["modal", "block_a11y_check"]'>Show Details</button>`)
 
   }
 
