@@ -5,9 +5,46 @@ import Templates from 'core/templates';
 import ChartJS from 'core/chartjs';
 import ModalFactory from 'core/modal_factory';
 
-export const init = (results, a11yresults) => {
+// Helper function to convert bytes to megabytes
+const sizeInMb = sizeInBytes => (sizeInBytes / (1024*1024)).toFixed(2);
 
-  console.log({ DEBUG: true, results, a11yresults })
+// Helper function to convert an HTML table into a CSV
+function downloadAsCSV(tableEle, separator = ','){
+  let csvRows = []
+  //only get direct children of the table in question (thead, tbody)
+  Array.from(tableEle.children).forEach(function(node){
+    //using scope to only get direct tr of node
+    node.querySelectorAll(':scope > tr').forEach(function(tr){
+      let csvLine = []
+      //again scope to only get direct children
+      tr.querySelectorAll(':scope > td').forEach(function(td){
+        //clone as to not remove anything from original
+        let copytd = td.cloneNode(true)
+        let data
+        if(copytd.dataset.val) data = copytd.dataset.val.replace(/(\r\n|\n|\r)/gm, '')
+        else {
+          Array.from(copytd.children).forEach(function(remove){
+            //remove nested elements before getting text
+            remove.parentNode.removeChild(remove)
+          })
+          data = copytd.textContent.replace(/(\r\n|\n|\r)/gm, '')
+        }
+        data = data.replace(/(\s\s)/gm, ' ').replace(/"/g, '""')
+        csvLine.push('"'+data+'"')
+      })
+      csvRows.push(csvLine.join(separator))
+    })
+  })
+  var a = document.createElement("a")
+  a.style = "display: none; visibility: hidden" //safari needs visibility hidden
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvRows.join('\n'))
+  a.download = 'testfile.csv'
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+}
+
+export const init = (results, a11yresults) => {
 
   async function renderQueueStats() {
     // Create the data for the chart.
@@ -42,11 +79,10 @@ export const init = (results, a11yresults) => {
       .append($(`<div class="d-flex justify-content-between"><p>${results.inqueue.total} in queue</p><p>${results.notinqueue.total + results.scanned.total} found</p></div>`))
 
     // Create the results table.
-    let tablecontent = '<table class="table table-hover table-sm">';
-    tablecontent += `<thead><tr><th>Filename</th><th>Filesize</th><th>Has Bookmarks</th><th>Has Lang</th><th>Has text</th><th>Has title</th><th>Is tagged</th><th>Pages</th><th>status</th></tr></thead>`
+    let tablecontent = '<table id="a11y-check-details-table" class="table table-bordered table-hover table-sm">';
+    tablecontent += `<thead><tr><th>Filename</th><th>Filesize</th><th>Bookmarks</th><th>Has Lang</th><th>Has text</th><th>Has title</th><th>Is tagged</th><th>Pages</th><th>status</th></tr></thead>`
 
     // Get all pdfs in a11yresults.fail, a11yresults.pass, and a11yresults.warn
-
     const failingpdfs = a11yresults.fail.pdfs
     const passingpdfs = a11yresults.pass.pdfs
     const warningpdfs = a11yresults.warn.pdfs
@@ -56,7 +92,7 @@ export const init = (results, a11yresults) => {
     for (let i=0; i<allpdfs.length; i++) {
       tablecontent += '<tr>' +
           `<td>${allpdfs[i].filename}</td>` +
-          `<td>${allpdfs[i].filesize}</td>` +
+          `<td>${sizeInMb(allpdfs[i].filesize)}</td>` +
           `<td>${allpdfs[i].hasbookmarks ? 'Yes' : 'No'}</td>` +
           `<td>${allpdfs[i].haslanguage ? 'Yes' : 'No'}</td>` +
           `<td>${allpdfs[i].hastext ? 'Yes' : 'No'}</td>` +
@@ -70,19 +106,30 @@ export const init = (results, a11yresults) => {
 
     tablecontent += '</table>';
 
+    // Create the download to csv button
+    const $downloadToCsvButton = $('<button>Download to CSV</button>')
+
+    // Create the modal body
+    const $modalbody = $('<div></div>')
+    $modalbody.append(tablecontent).append($downloadToCsvButton)
+
+    // Create the modal
     const modal = await ModalFactory.create({
       title: 'A11y Check Details',
-      body: tablecontent,
+      body: $modalbody,
       footer: '<p>Last updated</p>',
       large: true
     })
 
-    const $modalbtn = $('<button class="btn btn-secondary">Details</button>')
+    // I think this needs to come after the modal is created...
+    $downloadToCsvButton.click(() => downloadAsCSV(document.getElementById('a11y-check-details-table')))
 
+    // Create the button triggering the modal
+    const $modalbtn = $('<button class="btn btn-secondary">Details</button>')
     $modalbtn.click(() => modal.show())
 
+    // Append the button trigger to the DOM
     $("#more-details-container").append($modalbtn)
-    // html(`<button type="button" class="btn btn-primary" data-modal="alert" data-modal-title-str="Course Material Accessibility" data-modal-content-str='["modal", "block_a11y_check"]'>Show Details</button>`)
 
   }
 
