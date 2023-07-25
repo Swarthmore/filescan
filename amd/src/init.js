@@ -55,32 +55,30 @@ export const init = (results, a11yresults) => {
       results.notinqueue.total
     ];
 
-    // Create the progress element.
-    const elementArray = ['Scanned', 'In Queue', 'Not in Queue'].map((mod, index) => {
-      let background;
-      if (mod === 'Scanned') {
-        background = 'bg-success'
-      }
-      if (mod === 'In Queue') {
-        background = 'bg-secondary'
-      }
-      if (mod === 'Not in Queue') {
-        background = 'bg-warning'
-      }
-      // layout gets default progressbar
-
-      return `<div class="progress-bar ${background}" role="progressbar" aria-label="${mod}" aria-valuenow="${data[index]}" aria-valuemin="0" aria-valuemax="${results.totalpdfs}" style="width: ${data[index]}%"></div>`;
-
-    })
-
-    $('#a11yDetailsProgress')
-      .append($(`<h6>PDF Scan Progress</h6>`))
-      .append($(`<div class="progress">${elementArray.join(' ').replace(/\n\s+/g, '')}</div>`))
-      .append($(`<div class="d-flex justify-content-between"><p>${results.inqueue.total} in queue</p><p>${results.notinqueue.total + results.scanned.total} found</p></div>`))
+    $('#a11yDetailsProgress').append(`
+      <h6>Scan Queue Details</h6>
+          <ul>
+              <li>Scanned ${results.scanned.total}</li>
+              <li>Queued ${results.inqueue.total}</li>
+              <li>Not in queue ${results.notinqueue.total}</li>
+          </ul>
+      </div>`)
 
     // Create the results table.
     let tablecontent = '<table id="a11y-check-details-table" class="table table-bordered table-hover table-sm">';
-    tablecontent += `<thead><tr><th>Filename</th><th>Filesize</th><th>Bookmarks</th><th>Has Lang</th><th>Has text</th><th>Has title</th><th>Is tagged</th><th>Pages</th><th>status</th></tr></thead>`
+    // TODO: Add explanations for what each header item actually represents
+    tablecontent += `<thead>
+      <tr>
+        <th scope="col">Filename</th>
+        <th scope="col">Filesize (MB)</th>
+        <th scope="col">Bookmarks</th>
+        <th scope="col">Lang</th>
+        <th scope="col">Text</th>
+        <th scope="col">Title</th>
+        <th scope="col">Tagged</th>
+        <th scope="col">Pages</th>
+      </tr>
+    </thead>`
 
     // Get all pdfs in a11yresults.fail, a11yresults.pass, and a11yresults.warn
     const failingpdfs = a11yresults.fail.pdfs
@@ -89,37 +87,46 @@ export const init = (results, a11yresults) => {
 
     const allpdfs = [].concat(failingpdfs, passingpdfs, warningpdfs)
 
+    tablecontent += '<tbody>';
+
     for (let i=0; i<allpdfs.length; i++) {
+      // TODO: Clean this up with a template literal
+      // TODO: Split up the table by context, OR add contextual color representing if a PDF is passing or not.
       tablecontent += '<tr>' +
-          `<td>${allpdfs[i].filename}</td>` +
+          `<td class="text-truncate">${allpdfs[i].filename}</td>` +
           `<td>${sizeInMb(allpdfs[i].filesize)}</td>` +
-          `<td>${allpdfs[i].hasbookmarks ? 'Yes' : 'No'}</td>` +
-          `<td>${allpdfs[i].haslanguage ? 'Yes' : 'No'}</td>` +
-          `<td>${allpdfs[i].hastext ? 'Yes' : 'No'}</td>` +
-          `<td>${allpdfs[i].hastitle ? 'Yes' : 'No'}</td>` +
-          `<td>${allpdfs[i].istagged ? 'Yes' : 'No'}</td>` +
-          `<td>${allpdfs[i].pagecount || 'No'}</td>` +
-          `<td>${allpdfs[i].hastitle ? 'Yes' : 'No'}</td>` +
-          `<td>${allpdfs[i].scanstatus}</td>`
+          `<td>${allpdfs[i].hasbookmarks || '0'}</td>` +
+          `<td>${allpdfs[i].haslanguage || '0'}</td>` +
+          `<td>${allpdfs[i].hastext || '0'}</td>` +
+          `<td>${allpdfs[i].hastitle || '0'}</td>` +
+          `<td>${allpdfs[i].istagged || '0'}</td>` +
+          `<td>${allpdfs[i].pagecount || 'N/A'}</td>` +
     '</tr>'
     }
 
+    tablecontent += '</tbody>';
     tablecontent += '</table>';
 
     // Create the download to csv button
-    const $downloadToCsvButton = $('<button>Download to CSV</button>')
+    const $downloadToCsvButton = $('<button class="btn btn-secondary mb-2">Download to CSV</button>')
 
     // Create the modal body
     const $modalbody = $('<div></div>')
-    $modalbody.append(tablecontent).append($downloadToCsvButton)
+
+    $modalbody
+        .append($downloadToCsvButton)
+        .append(tablecontent)
 
     // Create the modal
     const modal = await ModalFactory.create({
       title: 'A11y Check Details',
       body: $modalbody,
-      footer: '<p>Last updated</p>',
+      // TODO: Add last updated timestamp
+      footer: '<p></p>',
       large: true
     })
+
+    modal.getRoot()[0].childNodes[1].style.maxWidth = '75vw' || undefined
 
     // I think this needs to come after the modal is created...
     $downloadToCsvButton.click(() => downloadAsCSV(document.getElementById('a11y-check-details-table')))
@@ -133,64 +140,6 @@ export const init = (results, a11yresults) => {
 
   }
 
-//  function renderA11yScanChart() {
-//    const canvas = document.querySelector('#a11yScanChart')
-//
-//    if (!canvas) {
-//      throw new Error('Could not find canvas {#a11yRadarChart}')
-//    }
-//
-//    const ctx = canvas.getContext('2d')
-//
-//    new ChartJS(ctx, {
-//      type: 'pie',
-//      data: {
-//        labels: ['Scanned', 'In queue', 'Not in queue'],
-//        datasets: [{
-//          label: 'Scan Queue',
-//          data: [results.scanned.total, results.inqueue.total, results.notinqueue.total],
-//          backgroundColor: ['blue', 'green', 'orange']
-//        }],
-//      }
-//    })
-//  }
-//
-//  function renderA11yDetailsChart() {
-//    const canvas = document.querySelector('#a11yRadarChart')
-//
-//    if (!canvas) {
-//      throw new Error('Could not find canvas {#a11yRadarChart}')
-//    }
-//
-//    const ctx = canvas.getContext('2d')
-//
-//    const chartData = {
-//      labels: [
-//        'Has Text',
-//        'Has Title',
-//        'Has Language',
-//        'Is Tagged'
-//      ],
-//      datasets: [{
-//        label: 'A11y Breakdown',
-//        data: [80, 70, 55, 99],
-//        fill: true,
-//        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-//        borderColor: 'rgb(255, 99, 132)',
-//        pointBackgroundColor: 'rgb(255, 99, 132)',
-//        pointBorderColor: '#fff',
-//        pointHoverBackgroundColor: '#fff',
-//        pointHoverBorderColor: 'rgb(255, 99, 132)'
-//      }]
-//    }
-//
-//    new ChartJS(ctx, {
-//      type: 'radar',
-//      data: chartData
-//    })
-//
-//  }
-
   function renderA11yPieChart() {
 
     // Create the canvas element.
@@ -201,16 +150,10 @@ export const init = (results, a11yresults) => {
 
     const ctx = canvas[0].getContext('2d')
 
-    // Append a11y fallback
-
-    // canvas.append(```<p>
-    //   There are {{a11yresults.pass.total}} PDFs that passed all a11y checks.
-    //   There are {{a11yresults.warn.total}} PDFs that are partially accessible.
-    //   There are {{a11yresults.fail.total}} PDFs that failed all a11y checks.
-    // </p>```)
-
     // Append the canvas to the DOM
-    $('#a11y-chart-container').append(canvas)
+    $('#a11y-chart-container')
+        .append(`<h6 class="mb-2">PDF A11y Stats</h6>`)
+        .append(canvas)
 
     const chartData = {
       labels: [`Pass (${a11yresults.pass.total})`, `Warn (${a11yresults.warn.total})`, `Fail (${a11yresults.fail.total})`],
