@@ -6,6 +6,26 @@ import ChartJS from 'core/chartjs';
 import ModalFactory from 'core/modal_factory';
 import { downloadAsCSV, renderFailIcon, renderWarningIcon, renderSuccessIcon } from './util'
 
+/**
+ * This function acts as the main entry point and renderer for the plugin. It will attach to DOM elements created in
+ * the templates/**.mustache, and populate them with data.
+ *
+ * @param {object} data Information about the scan queue and scan results
+ * @param {object} data.queue Information about the scan queue
+ * @param {object} data.queue.totals
+ * @param {number} data.queue.totals.scanned How many document have been scanned
+ * @param {number} data.queue.totals.inqueue How many documents are waiting to be scanned
+ * @param {number} data.queue.totals.notinqueue How many documents are not yet in the queue
+ * @param {object} data.results Information about the scan results
+ * @param {number} data.results.totals.pass How many documents meet 100% of a11y checks performed by scanner
+ * @param {number} data.results.totals.warn How many documents meet between 100% and 0% of a11y checks performed by scanner
+ * @param {number} data.results.totals.fail How many documents meet 0% of a11y checks performed by scanner
+ * @param {object[]} data.results.pass An array of PDFs that meet 100% of a11y checks performed by scanner
+ * @param {object[]} data.results.warn An array of PDFs that meet between 100% and 0% of a11y checks performed by scanner
+ * @param {object[]} data.results.fail An array of PDFs that meet 0% of a11y checks performed by scanner
+ **/
+export const init = (data) => {}
+
 export const init = (results, a11yresults) => {
 
   async function renderQueueStats() {
