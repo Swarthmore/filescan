@@ -4,45 +4,7 @@ import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import ChartJS from 'core/chartjs';
 import ModalFactory from 'core/modal_factory';
-
-// Helper function to convert bytes to megabytes
-const sizeInMb = sizeInBytes => (sizeInBytes / (1024*1024)).toFixed(2);
-
-// Helper function to convert an HTML table into a CSV
-function downloadAsCSV(tableEle, separator = ','){
-  let csvRows = []
-  //only get direct children of the table in question (thead, tbody)
-  Array.from(tableEle.children).forEach(function(node){
-    //using scope to only get direct tr of node
-    node.querySelectorAll(':scope > tr').forEach(function(tr){
-      let csvLine = []
-      //again scope to only get direct children
-      tr.querySelectorAll(':scope > td').forEach(function(td){
-        //clone as to not remove anything from original
-        let copytd = td.cloneNode(true)
-        let data
-        if(copytd.dataset.val) data = copytd.dataset.val.replace(/(\r\n|\n|\r)/gm, '')
-        else {
-          Array.from(copytd.children).forEach(function(remove){
-            //remove nested elements before getting text
-            remove.parentNode.removeChild(remove)
-          })
-          data = copytd.textContent.replace(/(\r\n|\n|\r)/gm, '')
-        }
-        data = data.replace(/(\s\s)/gm, ' ').replace(/"/g, '""')
-        csvLine.push('"'+data+'"')
-      })
-      csvRows.push(csvLine.join(separator))
-    })
-  })
-  var a = document.createElement("a")
-  a.style = "display: none; visibility: hidden" //safari needs visibility hidden
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvRows.join('\n'))
-  a.download = 'testfile.csv'
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-}
+import { downloadAsCSV, renderFailIcon, renderWarningIcon, renderSuccessIcon } from './util'
 
 export const init = (results, a11yresults) => {
 
@@ -72,7 +34,6 @@ export const init = (results, a11yresults) => {
     tablecontent += `<thead>
       <tr>
         <th scope="col">Filename</th>
-        <th scope="col">Filesize (MB)</th>
         <th scope="col">Bookmarks</th>
         <th scope="col">Lang</th>
         <th scope="col">Text</th>
@@ -91,18 +52,19 @@ export const init = (results, a11yresults) => {
 
     tablecontent += '<tbody>';
 
+    // console.log({allpdfs})
+
     for (let i=0; i<allpdfs.length; i++) {
       // TODO: Clean this up with a template literal
       // TODO: Split up the table by context, OR add contextual color representing if a PDF is passing or not.
       tablecontent += '<tr>' +
           `<td class="text-truncate">${allpdfs[i].filename}</td>` +
-          `<td>${sizeInMb(allpdfs[i].filesize)}</td>` +
-          `<td>${allpdfs[i].hasbookmarks || '0'}</td>` +
-          `<td>${allpdfs[i].haslanguage || '0'}</td>` +
-          `<td>${allpdfs[i].hastext || '0'}</td>` +
-          `<td>${allpdfs[i].hastitle || '0'}</td>` +
-          `<td>${allpdfs[i].istagged || '0'}</td>` +
-          `<td>${allpdfs[i].pagecount || 'N/A'}</td>` +
+          `<td>${allpdfs[i].hasbookmarks === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
+          `<td>${allpdfs[i].haslanguage === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
+          `<td>${allpdfs[i].hastext === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
+          `<td>${allpdfs[i].hastitle === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
+          `<td>${allpdfs[i].istagged === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
+          `<td>${+allpdfs[i].pagecount >= 1 ? allpdfs[i].pagecount : renderFailIcon()}</td>` +
     '</tr>'
     }
 
