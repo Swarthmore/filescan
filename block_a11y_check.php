@@ -72,6 +72,9 @@ class block_a11y_check extends block_base {
                 "and f.mimetype = 'application/pdf' ".
                 'and ctx.contextlevel = 70';
 
+        // TODO: get file object from moodle file API
+//        $url = moodle_url::make_pluginfile_url();
+
         $recordset = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
         $results = [
@@ -236,7 +239,7 @@ class block_a11y_check extends block_base {
         $recordset->close();
 
         // Before returning the results, we need to remove the passing files from the partially passing count.
-        $results["warn"]["total"] -= $results["pass"]["total"];
+        // $results["warn"]["total"] -= $results["pass"]["total"];
 
         return $results;
 

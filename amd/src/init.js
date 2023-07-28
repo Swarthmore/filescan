@@ -55,6 +55,8 @@ export const init = (results, a11yresults) => {
       results.notinqueue.total
     ];
 
+    // console.log({ results, a11yresults })
+
     $('#a11yDetailsProgress').append(`
       <h6>Scan Queue Details</h6>
           <ul>
