@@ -34,3 +34,5 @@ $string['settings:lang_check_help'] = "Language Check Help Link";
 $string['settings:lang_check_help_desc'] = "Link to help documentation for the language check";
 $string['settings:outline_check_help'] = "Outline Check Help Link";
 $string['settings:outline_check_help_desc'] = "Link to help documentation for the outline check";
+
+$string['cachedef_a11y_check'] = 'This caches the a11y_check details of a course block';
