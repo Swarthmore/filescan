@@ -71,12 +71,12 @@ class block_a11y_check extends block_base
       'left outer join {local_a11y_check_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id ' .
       'left outer join {local_a11y_check_queue} lacq on lacq.id = lacp.scanid ' .
       'left outer join {local_a11y_check_type_pdf} lactp on lacq.id = lactp.scanid ' .
-      'where c.id = :courseId ' .
+      'where c.id = :course ' .
       "and f.mimetype = 'application/pdf' " .
       'and ctx.contextlevel = 70';
 
     // Query the database and save the results as a recordset.
-    $recordset = $DB->get_recordset_sql($sql, ['courseid' => $courseId]);
+    $recordset = $DB->get_recordset_sql($sql, ['course' => $courseId]);
 
     // Create the results object.
     $results = [
@@ -88,9 +88,11 @@ class block_a11y_check extends block_base
         "warn" => 0,
         "fail" => 0
       ],
-      "pass" => [],
-      "warn" => [],
-      "fail" => []
+      "pdfs" => [
+        "pass" => [],
+        "warn" => [],
+        "fail" => []
+      ]
     ];
 
     // Iterate through each $record in $recordset, adding both the queue status and scan
@@ -151,7 +153,7 @@ class block_a11y_check extends block_base
         $results["totals"]["warn"]++;
       }
 
-      $results[$mod][] = [
+      $results["pdfs"][$mod][] = [
         "filename" => $record->filename,
         "filesize" => $record->filesize,
         "hastext" => $record->hastext,
@@ -199,7 +201,7 @@ class block_a11y_check extends block_base
     $data = $this->get_stats(strval($COURSE->id));
 
     // This pages requires an AMD module.
-    $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', $data);
+    $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', [$data]);
 
   }
 }

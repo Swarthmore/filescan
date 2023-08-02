@@ -11,20 +11,19 @@ import {downloadAsCSV, renderFailIcon, renderSuccessIcon} from './util'
  * the templates/**.mustache, and populate them with data.
  *
  * @param {object} data Information about the scan queue and scan results
- * @param {object} data.queue Information about the scan queue
- * @param {object} data.queue.totals
- * @param {number} data.queue.totals.scanned How many document have been scanned
- * @param {number} data.queue.totals.inqueue How many documents are waiting to be scanned
- * @param {number} data.queue.totals.notinqueue How many documents are not yet in the queue
- * @param {object} data.results Information about the scan results
- * @param {number} data.results.totals.pass How many documents meet 100% of a11y checks performed by scanner
- * @param {number} data.results.totals.warn How many documents meet between 100% and 0% of a11y checks performed by scanner
- * @param {number} data.results.totals.fail How many documents meet 0% of a11y checks performed by scanner
- * @param {object[]} data.results.pass An array of PDFs that meet 100% of a11y checks performed by scanner
- * @param {object[]} data.results.warn An array of PDFs that meet between 100% and 0% of a11y checks performed by scanner
- * @param {object[]} data.results.fail An array of PDFs that meet 0% of a11y checks performed by scanner
+ * @param {object} data.totals
+ * @param {number} data.totals.scanned How many document have been scanned
+ * @param {number} data.totals.inqueue How many documents are waiting to be scanned
+ * @param {number} data.totals.notinqueue How many documents are not yet in the queue
+ * @param {object} data.pdfs
+ * @param {object[]} data.pdfs.pass An array of PDFs that meet 100% of a11y checks performed by scanner
+ * @param {object[]} data.pdfs.warn An array of PDFs that meet between 100% and 0% of a11y checks performed by scanner
+ * @param {object[]} data.pdfs.fail An array of PDFs that meet 0% of a11y checks performed by scanner
  **/
 export const init = (data) => {
+
+  console.log({ data })
+
   /**
    * Create stats breakdown in pie graph and attach to the DOM.
    * Pie slices are pas, warn, and fail.
@@ -42,17 +41,21 @@ export const init = (data) => {
 
     // Append the canvas to the DOM.
     $('#block-a11y-check-pie-chart-root')
-      .append(`<h6 class="mb-2">Course PDF A11y</h6>`)
+      .append(
+        $('<h6/>')
+          .addClass('mb-2')
+          .text('PDF Accessibility')
+      )
       .append(canvas)
 
     const chartData = {
-      labels: [`Pass (${data.results.totals.pass})`, `Warn (${data.results.totals.warn})`, `Fail (${data.results.totals.fail})`],
+      labels: [`Pass (${data.pdfs.pass.length})`, `Warn (${data.pdfs.warn.length})`, `Fail (${data.pdfs.fail.length})`],
       datasets: [{
         label: 'A11y Check',
         data: [
-          data.results.totals.pass,
-          data.results.totals.warn,
-          data.results.totals.fail
+          data.pdfs.pass.length,
+          data.pdfs.warn.length,
+          data.pdfs.fail.length
         ],
         backgroundColor: [
           // Green.
@@ -134,9 +137,9 @@ export const init = (data) => {
 
     // Concatenate an array with all pdfs in data arg.
     const pdfs = [].concat(
-      data.results.pass,
-      data.results.warn,
-      data.results.fail
+      data.pdfs.pass,
+      data.pdfs.warn,
+      data.pdfs.fail
     )
 
     // Generate the table rows
@@ -198,7 +201,7 @@ export const init = (data) => {
    */
   function createDownloadButton($table) {
     // Create the download to csv button.
-    return  $('<button/>')
+    return  $('button')
       .addClass('btn btn-secondary mb-2')
       .text('Download to CSV')
       .click(() => downloadAsCSV($table))
@@ -211,7 +214,7 @@ export const init = (data) => {
    */
   function createModalTriggerButton(modal) {
     // Create the button triggering the modal.
-    return ('<button/>')
+    return $('button')
       .addClass('btn btn-secondary')
       .text('Details')
       .click(() => modal.show())
@@ -267,7 +270,7 @@ export const init = (data) => {
         )
 
         // Render the queue stats.
-        if (data.results.totals.pass > 0 || data.results.totals.warn > 0 || data.results.totals.fail > 0) {
+        if (data.pdfs.pass.length > 0 || data.pdfs.warn.length > 0 || data.pdfs.fail.length > 0) {
           renderPieChart()
         } else {
           $('#block-a11y-check-root').append(
