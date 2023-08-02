@@ -48,6 +48,75 @@ class block_a11y_check extends block_base
     ];
   }
 
+
+  /**
+   * Get all files (either as a resource or folder activity) within a course's course modules and create URLs for them.
+   * @returns string[]
+   */
+  private function get_course_file_urls()
+  {
+
+    global $COURSE;
+    global $CFG;
+
+    require_once($CFG->dirroot . '/course/lib.php');
+
+    // Get the course modules.
+    $cms = get_fast_modinfo($COURSE)->get_cms();
+
+    // Array containing detailed file info.
+    $files = [];
+
+    // Moodle file storage.
+    $fs = get_file_storage();
+
+    // Loop through each course module and look for PDF files.
+    foreach ($cms as $cm) {
+
+      if ($cm->is_user_access_restricted_by_capability()) {
+        continue;
+      }
+
+      $cmtype = $cm->modname;
+      $sectionnumber = $cm->get_course_module_record(true)->sectionnum;
+
+      // Check if the resource is a folder. If it is a folder, then get all files with a mime type
+      // of application/pdf and push them to $filelist
+      // If the resourse is a file, then get all pdf files in the "file" resource.
+
+      if ($cmtype === 'folder') {
+        $cmfiles = $fs->get_area_files($cm->context->id, 'mod_folder', 'content', false, 'timemodified', false);
+        foreach ($cmfiles as $f) {
+          if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
+            $files[$f->get_id()] = moodle_url::make_pluginfile_url(
+              $f->get_contextid(),
+              $f->get_component(),
+              $f->get_filearea(),
+              $f->get_itemid(),
+              $f->get_filepath(),
+              $f->get_filename()
+            );
+          }
+        }
+      } else if ($cmtype === 'resource') {
+        $files = $fs->get_area_files($cm->context->id, 'mod_resource', 'content', false, 'timemodified', false);
+        foreach ($files as $f) {
+          if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
+            $files[$f->get_id()] = moodle_url::make_pluginfile_url(
+              $f->get_contextid(),
+              $f->get_component(),
+              $f->get_filearea(),
+              $f->get_itemid(),
+              $f->get_filepath(),
+              $f->get_filename()
+            );
+          }
+        }
+      }
+    }
+    return $files;
+  }
+
   /**
    * Get the data required to render the block.
    */
@@ -56,6 +125,9 @@ class block_a11y_check extends block_base
 
     // Moodle global to access database operations.
     global $DB;
+
+    // Moodle global to access config.
+    global $CFG;
 
     // This query joins the {files} table with the local_a11y_check tables, returning stats
     // about the files themselves, and their scan results.
@@ -94,6 +166,9 @@ class block_a11y_check extends block_base
         "fail" => []
       ]
     ];
+
+    // Get the coursefileurls. We will later use this to grab a file's URL by file id.
+    $coursefileurls = $this->get_course_file_urls();
 
     // Iterate through each $record in $recordset, adding both the queue status and scan
     // results (if they exist) to $results along the way.
@@ -153,6 +228,7 @@ class block_a11y_check extends block_base
         $results["totals"]["warn"]++;
       }
 
+      // This will add the file to the appropriate array.
       $results["pdfs"][$mod][] = [
         "filename" => $record->filename,
         "filesize" => $record->filesize,
@@ -162,7 +238,8 @@ class block_a11y_check extends block_base
         "hasbookmarks" => $record->hasbookmarks,
         "istagged" => $record->istagged,
         "pagecount" => $record->pagecount,
-        "scanstatus" => $record->scanstatus
+        "scanstatus" => $record->scanstatus,
+        "url" => $coursefileurls[$record->fileid]->out()
       ];
 
       $results["totals"][$mod]++;

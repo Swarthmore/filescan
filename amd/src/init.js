@@ -22,8 +22,6 @@ import {downloadAsCSV, renderFailIcon, renderSuccessIcon} from './util'
  **/
 export const init = (data) => {
 
-  console.log({data})
-
   /**
    * Create stats breakdown in pie graph and attach to the DOM.
    * Pie slices are pas, warn, and fail.
@@ -143,7 +141,11 @@ export const init = (data) => {
         .append(
           $('<td/>')
             .addClass('text-truncate')
-            .text(pdf.filename)
+            .append(
+              $('<a/>')
+                .attr('href', pdf.url)
+                .text(pdf.filename)
+            )
         )
         .append(
           $('<td/>')
