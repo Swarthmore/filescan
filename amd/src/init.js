@@ -22,7 +22,7 @@ import {downloadAsCSV, renderFailIcon, renderSuccessIcon} from './util'
  **/
 export const init = (data) => {
 
-  console.log({ data })
+  console.log({data})
 
   /**
    * Create stats breakdown in pie graph and attach to the DOM.
@@ -84,54 +84,49 @@ export const init = (data) => {
    */
   function createDetailsTable() {
     // Create the table content.
-    const $table = $('#block-a11y-check-details-table')
+    const $table = $('<table/>')
+      .addClass('table table-bordered table-hover table-responsive table-sm')
       .append(
-        $('<table/>')
-          .addClass('table table-bordered table-hover table-responsive table-sm')
+        $('<thead/>')
           .append(
-            $('<thead/>')
+            $('<tr/>')
               .append(
-                $('<tr/>')
-                  .append(
-                    $('<th/>')
-                      .attr('scope', 'col')
-                      .text('Filename')
-                  )
-                  .append(
-                    $('<th/>')
-                      .attr('scope', 'col')
-                      .text('Bookmarks')
-                  )
-                  .append(
-                    $('<th/>')
-                      .attr('scope', 'col')
-                      .text('Lang')
-                  )
-                  .append(
-                    $('<th/>')
-                      .attr('scope', 'col')
-                      .text('Text')
-                  )
-                  .append(
-                    $('<th/>')
-                      .attr('scope', 'col')
-                      .text('Title')
-                  )
-                  .append(
-                    $('<th/>')
-                      .attr('scope', 'col')
-                      .text('Tagged')
-                  )
-                  .append(
-                    $('<th/>')
-                      .attr('scope', 'col')
-                      .text('Pages')
-                  )
+                $('<th/>')
+                  .attr('scope', 'col')
+                  .text('Filename')
+              )
+              .append(
+                $('<th/>')
+                  .attr('scope', 'col')
+                  .text('Bookmarks')
+              )
+              .append(
+                $('<th/>')
+                  .attr('scope', 'col')
+                  .text('Lang')
+              )
+              .append(
+                $('<th/>')
+                  .attr('scope', 'col')
+                  .text('Text')
+              )
+              .append(
+                $('<th/>')
+                  .attr('scope', 'col')
+                  .text('Title')
+              )
+              .append(
+                $('<th/>')
+                  .attr('scope', 'col')
+                  .text('Tagged')
+              )
+              .append(
+                $('<th/>')
+                  .attr('scope', 'col')
+                  .text('Pages')
               )
           )
-          .append('<tr/>')
       )
-
     // Create the table body.
     const $tableBody = $('<tbody/>')
 
@@ -152,44 +147,45 @@ export const init = (data) => {
         )
         .append(
           $('<td/>')
-            .text(pdf.hasbookmarks === "1"
-              ? renderSuccessIcon()
-              : renderFailIcon())
+            .append(pdf.hasbookmarks === "1"
+              ? $(renderSuccessIcon())
+              : $(renderFailIcon()))
         )
         .append(
           $('<td/>')
-            .text(pdf.haslanguage === "1"
-              ? renderSuccessIcon()
-              : renderFailIcon())
+            .append(pdf.haslanguage === "1"
+              ? $(renderSuccessIcon())
+              : $(renderFailIcon()))
         )
         .append(
           $('<td/>')
-            .text(pdf.hastext === "1"
-              ? renderSuccessIcon()
-              : renderFailIcon())
+            .append(pdf.hastext === "1"
+              ? $(renderSuccessIcon())
+              : $(renderFailIcon()))
         )
         .append(
           $('<td/>')
-            .text(pdf.hastitle === "1"
-              ? renderSuccessIcon()
-              : renderFailIcon())
+            .append(pdf.hastitle === "1"
+              ? $(renderSuccessIcon())
+              : $(renderFailIcon()))
         )
         .append(
           $('<td/>')
-            .text(pdf.istagged === "1"
-              ? renderSuccessIcon()
-              : renderFailIcon())
+            .append(pdf.istagged === "1"
+              ? $(renderSuccessIcon())
+              : $(renderFailIcon()))
         )
         .append(
           $('<td/>')
-            .text(pdf.pagecount >= 1
-              ? pdf.pagecount
-              : renderFailIcon())
+            .append(pdf.pagecount >= 1
+              ? $('<span/>').text(pdf.pagecount)
+              : $(renderFailIcon()))
         )
     )
 
     // Append the table rows to the table.
-    $tableBody.append($tableRows.join(''))
+    $tableBody.append($tableRows)
+    $table.append($tableBody)
 
     return $table
   }
@@ -201,10 +197,10 @@ export const init = (data) => {
    */
   function createDownloadButton($table) {
     // Create the download to csv button.
-    return  $('button')
+    return $('<button/>')
       .addClass('btn btn-secondary mb-2')
       .text('Download to CSV')
-      .click(() => downloadAsCSV($table))
+      .click(() => downloadAsCSV($table.get()))
   }
 
   /**
@@ -214,7 +210,7 @@ export const init = (data) => {
    */
   function createModalTriggerButton(modal) {
     // Create the button triggering the modal.
-    return $('button')
+    return $('<button/>')
       .addClass('btn btn-secondary')
       .text('Details')
       .click(() => modal.show())
@@ -264,23 +260,23 @@ export const init = (data) => {
       createModal()
         .then(modal => {
 
-        // Append the button trigger to the DOM.
-        $("#block-a11y-check-more-details-root").append(
-          createModalTriggerButton(modal)
-        )
-
-        // Render the queue stats.
-        if (data.pdfs.pass.length > 0 || data.pdfs.warn.length > 0 || data.pdfs.fail.length > 0) {
-          renderPieChart()
-        } else {
-          $('#block-a11y-check-root').append(
-            createNoDataParagraph()
+          // Append the button trigger to the DOM.
+          $("#block-a11y-check-more-details-root").append(
+            createModalTriggerButton(modal)
           )
-        }
 
-        // TODO: Render the queue stats.
+          // Render the queue stats.
+          if (data.pdfs.pass.length > 0 || data.pdfs.warn.length > 0 || data.pdfs.fail.length > 0) {
+            renderPieChart()
+          } else {
+            $('#block-a11y-check-root').append(
+              createNoDataParagraph()
+            )
+          }
 
-      }).catch((error) => displayException(error));
+          // TODO: Render the queue stats.
+
+        }).catch((error) => displayException(error));
 
     })
     // Deal with this exception (Using core/notify exception function is recommended).
