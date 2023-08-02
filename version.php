@@ -22,9 +22,8 @@
 * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
 /** @var mixed $plugin */
 $plugin->component = 'block_a11y_check';
-$plugin->version = 2023072800;
+$plugin->version = 2023080100;
 $plugin->requires = 2022041906.02;
 $plugin->maturity = MATURITY_ALPHA;
