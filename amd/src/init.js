@@ -4,7 +4,7 @@ import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import ChartJS from 'core/chartjs';
 import ModalFactory from 'core/modal_factory';
-import {downloadAsCSV, renderFailIcon, renderSuccessIcon} from './util'
+import {download_table_as_csv, renderFailIcon, renderSuccessIcon} from './util'
 
 /**
  * This function acts as the main entry point and renderer for the plugin. It will attach to DOM elements created in
@@ -83,7 +83,8 @@ export const init = (data) => {
   function createDetailsTable() {
     // Create the table content.
     const $table = $('<table/>')
-      .addClass('table table-bordered table-hover table-responsive table-sm')
+      .attr('id', 'block-a11y-check-table')
+      .addClass('table table-bordered table-hover table-responsive')
       .append(
         $('<thead/>')
           .append(
@@ -202,7 +203,7 @@ export const init = (data) => {
     return $('<button/>')
       .addClass('btn btn-secondary mb-2')
       .text('Download to CSV')
-      .click(() => downloadAsCSV($table.get()))
+      .click(() => download_table_as_csv('block-a11y-check-table'))
   }
 
   /**
