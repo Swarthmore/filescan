@@ -4,7 +4,7 @@ import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import ChartJS from 'core/chartjs';
 import ModalFactory from 'core/modal_factory';
-import { downloadAsCSV, renderFailIcon, renderWarningIcon, renderSuccessIcon } from './util'
+import {downloadAsCSV, renderFailIcon, renderSuccessIcon} from './util'
 
 /**
  * This function acts as the main entry point and renderer for the plugin. It will attach to DOM elements created in
@@ -24,127 +24,44 @@ import { downloadAsCSV, renderFailIcon, renderWarningIcon, renderSuccessIcon } f
  * @param {object[]} data.results.warn An array of PDFs that meet between 100% and 0% of a11y checks performed by scanner
  * @param {object[]} data.results.fail An array of PDFs that meet 0% of a11y checks performed by scanner
  **/
-export const init = (data) => {}
-
-export const init = (results, a11yresults) => {
-
-  async function renderQueueStats() {
-    // Create the data for the chart.
-    // [0] = text, [1] = language, [3] = layout
-    const data = [
-      results.scanned.total,
-      results.inqueue.total,
-      results.notinqueue.total
-    ];
-
-    // console.log({ results, a11yresults })
-
-    $('#a11yDetailsProgress').append(`
-      <h6>Scan Queue Details</h6>
-          <ul>
-              <li>Scanned ${results.scanned.total}</li>
-              <li>Queued ${results.inqueue.total}</li>
-              <li>Not in queue ${results.notinqueue.total}</li>
-          </ul>
-      </div>`)
-
-    // Create the results table.
-    let tablecontent = '<table id="a11y-check-details-table" class="table table-bordered table-hover table-sm">';
-    // TODO: Add explanations for what each header item actually represents
-    tablecontent += `<thead>
-      <tr>
-        <th scope="col">Filename</th>
-        <th scope="col">Bookmarks</th>
-        <th scope="col">Lang</th>
-        <th scope="col">Text</th>
-        <th scope="col">Title</th>
-        <th scope="col">Tagged</th>
-        <th scope="col">Pages</th>
-      </tr>
-    </thead>`
-
-    // Get all pdfs in a11yresults.fail, a11yresults.pass, and a11yresults.warn
-    const failingpdfs = a11yresults.fail.pdfs
-    const passingpdfs = a11yresults.pass.pdfs
-    const warningpdfs = a11yresults.warn.pdfs
-
-    const allpdfs = [].concat(failingpdfs, passingpdfs, warningpdfs)
-
-    tablecontent += '<tbody>';
-
-    // console.log({allpdfs})
-
-    for (let i=0; i<allpdfs.length; i++) {
-      // TODO: Clean this up with a template literal
-      // TODO: Split up the table by context, OR add contextual color representing if a PDF is passing or not.
-      tablecontent += '<tr>' +
-          `<td class="text-truncate">${allpdfs[i].filename}</td>` +
-          `<td>${allpdfs[i].hasbookmarks === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
-          `<td>${allpdfs[i].haslanguage === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
-          `<td>${allpdfs[i].hastext === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
-          `<td>${allpdfs[i].hastitle === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
-          `<td>${allpdfs[i].istagged === "1" ? renderSuccessIcon() : renderFailIcon()}</td>` +
-          `<td>${+allpdfs[i].pagecount >= 1 ? allpdfs[i].pagecount : renderFailIcon()}</td>` +
-    '</tr>'
-    }
-
-    tablecontent += '</tbody>';
-    tablecontent += '</table>';
-
-    // Create the download to csv button
-    const $downloadToCsvButton = $('<button class="btn btn-secondary mb-2">Download to CSV</button>')
-
-    // Create the modal body
-    const $modalbody = $('<div></div>')
-
-    $modalbody
-        .append($downloadToCsvButton)
-        .append(tablecontent)
-
-    // Create the modal
-    const modal = await ModalFactory.create({
-      title: 'A11y Check Details',
-      body: $modalbody,
-      // TODO: Add last updated timestamp
-      footer: '<p></p>',
-      large: true
-    })
-
-    modal.getRoot()[0].childNodes[1].style.maxWidth = '75vw' || undefined
-
-    // I think this needs to come after the modal is created...
-    $downloadToCsvButton.click(() => downloadAsCSV(document.getElementById('a11y-check-details-table')))
-
-    // Create the button triggering the modal
-    const $modalbtn = $('<button class="btn btn-secondary">Details</button>')
-    $modalbtn.click(() => modal.show())
-
-    // Append the button trigger to the DOM
-    $("#more-details-container").append($modalbtn)
-
-  }
-
-  function renderA11yPieChart() {
+export const init = (data) => {
+  /**
+   * Create stats breakdown in pie graph and attach to the DOM.
+   * Pie slices are pas, warn, and fail.
+   */
+  function renderPieChart() {
 
     // Create the canvas element.
-    const canvas = $('<canvas/>').attr({
-      id: '#a11yPieChart',
-      'aria-label': 'A11y check pie chart describing the a11y status of the course PDFs.'
-    })
+    const canvas = $('<canvas/>')
+      .attr({
+        id: '#block-a11y-check-pie-chart-canvas',
+        'aria-label': 'A11y check pie chart describing the a11y status of the course PDFs.'
+      })
 
     const ctx = canvas[0].getContext('2d')
 
-    // Append the canvas to the DOM
-    $('#a11y-chart-container')
-        .append(`<h6 class="mb-2">PDF A11y Stats</h6>`)
-        .append(canvas)
+    // Append the canvas to the DOM.
+    $('#block-a11y-check-pie-chart-root')
+      .append(`<h6 class="mb-2">Course PDF A11y</h6>`)
+      .append(canvas)
 
     const chartData = {
-      labels: [`Pass (${a11yresults.pass.total})`, `Warn (${a11yresults.warn.total})`, `Fail (${a11yresults.fail.total})`],
+      labels: [`Pass (${data.results.totals.pass})`, `Warn (${data.results.totals.warn})`, `Fail (${data.results.totals.fail})`],
       datasets: [{
         label: 'A11y Check',
-        data: [a11yresults.pass.total, a11yresults.warn.total, a11yresults.fail.total],
-        backgroundColor: ['#5cb85c', '#f0ad4e', '#d9534f']
+        data: [
+          data.results.totals.pass,
+          data.results.totals.warn,
+          data.results.totals.fail
+        ],
+        backgroundColor: [
+          // Green.
+          '#5cb85c',
+          // Yellow.
+          '#f0ad4e',
+          // Red.
+          '#d9534f'
+        ]
       }]
     }
     new ChartJS(ctx, {
@@ -153,26 +70,216 @@ export const init = (results, a11yresults) => {
     })
   }
 
+  function createNoDataParagraph() {
+    return $('<p/>')
+      .text("No data to show")
+  }
+
+  /**
+   * Creates details table showing breakdown of stats returned by the scanner.
+   * @returns {*|jQuery|void}
+   */
+  function createDetailsTable() {
+    // Create the table content.
+    const $table = $('#block-a11y-check-details-table')
+      .append(
+        $('<table/>')
+          .addClass('table table-bordered table-hover table-responsive table-sm')
+          .append(
+            $('<thead/>')
+              .append(
+                $('<tr/>')
+                  .append(
+                    $('<th/>')
+                      .attr('scope', 'col')
+                      .text('Filename')
+                  )
+                  .append(
+                    $('<th/>')
+                      .attr('scope', 'col')
+                      .text('Bookmarks')
+                  )
+                  .append(
+                    $('<th/>')
+                      .attr('scope', 'col')
+                      .text('Lang')
+                  )
+                  .append(
+                    $('<th/>')
+                      .attr('scope', 'col')
+                      .text('Text')
+                  )
+                  .append(
+                    $('<th/>')
+                      .attr('scope', 'col')
+                      .text('Title')
+                  )
+                  .append(
+                    $('<th/>')
+                      .attr('scope', 'col')
+                      .text('Tagged')
+                  )
+                  .append(
+                    $('<th/>')
+                      .attr('scope', 'col')
+                      .text('Pages')
+                  )
+              )
+          )
+          .append('<tr/>')
+      )
+
+    // Create the table body.
+    const $tableBody = $('<tbody/>')
+
+    // Concatenate an array with all pdfs in data arg.
+    const pdfs = [].concat(
+      data.results.pass,
+      data.results.warn,
+      data.results.fail
+    )
+
+    // Generate the table rows
+    const $tableRows = pdfs.map(
+      pdf => $('<tr/>')
+        .append(
+          $('<td/>')
+            .addClass('text-truncate')
+            .text(pdf.filename)
+        )
+        .append(
+          $('<td/>')
+            .text(pdf.hasbookmarks === "1"
+              ? renderSuccessIcon()
+              : renderFailIcon())
+        )
+        .append(
+          $('<td/>')
+            .text(pdf.haslanguage === "1"
+              ? renderSuccessIcon()
+              : renderFailIcon())
+        )
+        .append(
+          $('<td/>')
+            .text(pdf.hastext === "1"
+              ? renderSuccessIcon()
+              : renderFailIcon())
+        )
+        .append(
+          $('<td/>')
+            .text(pdf.hastitle === "1"
+              ? renderSuccessIcon()
+              : renderFailIcon())
+        )
+        .append(
+          $('<td/>')
+            .text(pdf.istagged === "1"
+              ? renderSuccessIcon()
+              : renderFailIcon())
+        )
+        .append(
+          $('<td/>')
+            .text(pdf.pagecount >= 1
+              ? pdf.pagecount
+              : renderFailIcon())
+        )
+    )
+
+    // Append the table rows to the table.
+    $tableBody.append($tableRows.join(''))
+
+    return $table
+  }
+
+  /**
+   * Creates a download button that when clicked, downloads a CSV version of the table.
+   * @param $table
+   * @returns {*|jQuery|void}
+   */
+  function createDownloadButton($table) {
+    // Create the download to csv button.
+    return  $('<button/>')
+      .addClass('btn btn-secondary mb-2')
+      .text('Download to CSV')
+      .click(() => downloadAsCSV($table))
+  }
+
+  /**
+   * Create the button element that when clicked, opens the modal.
+   * @param modal
+   * @returns {*|void}
+   */
+  function createModalTriggerButton(modal) {
+    // Create the button triggering the modal.
+    return ('<button/>')
+      .addClass('btn btn-secondary')
+      .text('Details')
+      .click(() => modal.show())
+  }
+
+  /**
+   * Creates a modal window that displays a table of each PDF scanned by the plugin in the current course.
+   * @returns {Promise<*>}
+   */
+  async function createModal() {
+
+    const $table = createDetailsTable()
+
+    // Create the modal body first, so we can attach it during the modal's instantiation.
+    const $modalBody = $('<div/>')
+      .append(createDownloadButton($table))
+      .append($table)
+
+    // Create the modal.
+    const modal = await ModalFactory.create({
+      title: 'A11y Check Details',
+      body: $modalBody,
+      // TODO: Add last updated timestamp
+      footer: '<p>Last updated mm dd at ##:##:##</p>',
+      large: true
+    })
+
+    // This allows the modal to have 95% of screen width.
+    modal.getRoot()[0].childNodes[1].style.maxWidth = '95vw' || undefined
+
+    return modal
+  }
+
+  // Create the context. This gets passed to the template.
   const context = {
-    name: 'A11y Check',
-    results: results,
-    a11yresults: a11yresults
+    name: 'A11y Check'
   };
 
   // This will call the function to load and render our template.
   Templates.renderForPromise('block_a11y_check/summary', context)
-    .then(({ html, js }) => {
+    .then(({html, js}) => {
 
       // Render the template.
-      Templates.appendNodeContents("#block_a11y_check_root", html, js);
+      Templates.appendNodeContents("#block-a11y-check-root", html, js);
 
-      // Render the queue stats.
-      renderQueueStats()
-      // Only render the chart if there's data.
-      if (results.scanned.total > 0) {
-        renderA11yPieChart()
-      }
-  })
-  // Deal with this exception (Using core/notify exception function is recommended).
-  .catch((error) => displayException(error));
+      // Create the modal.
+      createModal()
+        .then(modal => {
+
+        // Append the button trigger to the DOM.
+        $("#block-a11y-check-more-details-root").append(
+          createModalTriggerButton(modal)
+        )
+
+        // Render the queue stats.
+        if (data.results.totals.pass > 0 || data.results.totals.warn > 0 || data.results.totals.fail > 0) {
+          renderPieChart()
+        } else {
+          $('#block-a11y-check-root').append(
+            createNoDataParagraph()
+          )
+        }
+
+        // TODO: Render the queue stats.
+
+      }).catch((error) => displayException(error));
+
+    })
+    // Deal with this exception (Using core/notify exception function is recommended).
+    .catch((error) => displayException(error));
 };
