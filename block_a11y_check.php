@@ -273,12 +273,18 @@ class block_a11y_check extends block_base
     $this->content->text = '<div id="block-a11y-check-root"></div>';
     $this->content->footer = '';
 
-
     // Generate the results.
-    $data = $this->get_stats(strval($COURSE->id));
+    $cache = cache::make('block_a11y_check', 'a11y_check_results');
+    if ($cache->get(0)) {
+      $data = $cache->get(0);
+    } else {
+      $data = $this->get_stats(strval($COURSE->id));
+      $cache->set(0, $data);
+    }
 
     // This pages requires an AMD module.
     $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', [$data]);
 
+    return $this;
   }
 }

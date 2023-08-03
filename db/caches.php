@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 $definitions = array(
-    'a11y_check' => array(
+    'a11y_check_results' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => True
     )
