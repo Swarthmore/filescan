@@ -52,6 +52,7 @@ class block_a11y_check extends block_base
   /**
    * Get all files (either as a resource or folder activity) within a course's course modules and create URLs for them.
    * @returns string[]
+   * @throws moodle_exception
    */
   private function get_course_file_urls()
   {
@@ -81,14 +82,14 @@ class block_a11y_check extends block_base
       $sectionnumber = $cm->get_course_module_record(true)->sectionnum;
 
       // Check if the resource is a folder. If it is a folder, then get all files with a mime type
-      // of application/pdf and push them to $filelist
-      // If the resourse is a file, then get all pdf files in the "file" resource.
+      // of application/pdf and push them to $files
+      // If the resource is a file, then get all pdf files in the "file" resource.
 
       if ($cmtype === 'folder') {
         $cmfiles = $fs->get_area_files($cm->context->id, 'mod_folder', 'content', false, 'timemodified', false);
         foreach ($cmfiles as $f) {
           if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
-            $files[$f->get_id()] = moodle_url::make_pluginfile_url(
+            $url = moodle_url::make_pluginfile_url(
               $f->get_contextid(),
               $f->get_component(),
               $f->get_filearea(),
@@ -96,13 +97,14 @@ class block_a11y_check extends block_base
               $f->get_filepath(),
               $f->get_filename()
             );
+            $files[$f->get_id()] = $url;
           }
         }
       } else if ($cmtype === 'resource') {
-        $files = $fs->get_area_files($cm->context->id, 'mod_resource', 'content', false, 'timemodified', false);
-        foreach ($files as $f) {
+        $cmfiles = $fs->get_area_files($cm->context->id, 'mod_resource', 'content', false, 'timemodified', false);
+        foreach ($cmfiles as $f) {
           if (isset($f) && ($f->get_mimetype() === 'application/pdf')) {
-            $files[$f->get_id()] = moodle_url::make_pluginfile_url(
+            $url = moodle_url::make_pluginfile_url(
               $f->get_contextid(),
               $f->get_component(),
               $f->get_filearea(),
@@ -110,6 +112,7 @@ class block_a11y_check extends block_base
               $f->get_filepath(),
               $f->get_filename()
             );
+            $files[$f->get_id()] = $url;
           }
         }
       }
@@ -239,7 +242,7 @@ class block_a11y_check extends block_base
         "istagged" => $record->istagged,
         "pagecount" => $record->pagecount,
         "scanstatus" => $record->scanstatus,
-        "url" => $coursefileurls[$record->fileid]->out()
+        "url" => is_null($coursefileurls[$record->fileid]) ? '' : $coursefileurls[$record->fileid]->out()
       ];
 
       $results["totals"][$mod]++;
@@ -263,7 +266,6 @@ class block_a11y_check extends block_base
 
     require_once($CFG->dirroot . '/course/lib.php');
 
-    // TODO: Cache the block
     if ($this->content !== null) {
       return $this->content;
     }
