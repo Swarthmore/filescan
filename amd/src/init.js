@@ -22,6 +22,12 @@ import {download_table_as_csv, renderFailIcon, renderSuccessIcon} from './util'
  **/
 export const init = (data) => {
 
+  console.log([
+    'block_a11y_check data',
+    { data }
+    ]
+  )
+
   /**
    * Create stats breakdown in pie graph and attach to the DOM.
    * Pie slices are pas, warn, and fail.
@@ -39,6 +45,7 @@ export const init = (data) => {
 
     // Append the canvas to the DOM.
     $('#block-a11y-check-pie-chart-root')
+      .addClass("mb-2 w-100")
       .append(
         $('<h6/>')
           .addClass('mb-2')
@@ -47,7 +54,11 @@ export const init = (data) => {
       .append(canvas)
 
     const chartData = {
-      labels: [`Pass (${data.pdfs.pass.length})`, `Warn (${data.pdfs.warn.length})`, `Fail (${data.pdfs.fail.length})`],
+      labels: [
+        `Pass (${data.pdfs.pass.length})`,
+        `Warn (${data.pdfs.warn.length})`,
+        `Fail (${data.pdfs.fail.length})`
+      ],
       datasets: [{
         label: 'Accessibility of Course PDFs',
         data: [
@@ -269,9 +280,11 @@ export const init = (data) => {
             renderPieChart()
 
             // Append the button trigger to the DOM.
-            $("#block-a11y-check-more-details-root").append(
-              createModalTriggerButton(modal)
-            )
+            $("#block-a11y-check-more-details-root")
+              .addClass('mb-2')
+              .append(
+                createModalTriggerButton(modal)
+              )
 
           } else {
             $('#block-a11y-check-root').append(

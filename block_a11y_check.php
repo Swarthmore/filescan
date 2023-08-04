@@ -177,8 +177,6 @@ class block_a11y_check extends block_base
     // results (if they exist) to $results along the way.
     foreach ($recordset as $record) {
 
-      // TODO: Figure out a way to create the file URL so that it can be linked to in the template.
-
       // If the record has yet to be queued, $record->scanid will be NULL
       if (is_null($record->scanid)) {
         $results["totals"]["notinqueue"]++;
@@ -216,7 +214,6 @@ class block_a11y_check extends block_base
         && $record->istagged == 1
       ) {
         $mod = "pass";
-        $results["totals"]["pass"]++;
       } else if (
         $record->hastext == 0
         && $record->hastitle == 0
@@ -225,10 +222,8 @@ class block_a11y_check extends block_base
         && $record->istagged == 0
       ) {
         $mod = "fail";
-        $results["totals"]["fail"]++;
       } else {
         $mod = "warn";
-        $results["totals"]["warn"]++;
       }
 
       // This will add the file to the appropriate array.
