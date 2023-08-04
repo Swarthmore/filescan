@@ -32,7 +32,7 @@ export const init = (data) => {
     const canvas = $('<canvas/>')
       .attr({
         id: '#block-a11y-check-pie-chart-canvas',
-        'aria-label': 'A11y check pie chart describing the a11y status of the course PDFs.'
+        'aria-label': 'Pie chart describing the accessibility status of this course\'s PDFs.'
       })
 
     const ctx = canvas[0].getContext('2d')
@@ -42,14 +42,14 @@ export const init = (data) => {
       .append(
         $('<h6/>')
           .addClass('mb-2')
-          .text('PDF Accessibility')
+          .text('Accessibility of Course PDFs')
       )
       .append(canvas)
 
     const chartData = {
       labels: [`Pass (${data.pdfs.pass.length})`, `Warn (${data.pdfs.warn.length})`, `Fail (${data.pdfs.fail.length})`],
       datasets: [{
-        label: 'A11y Check',
+        label: 'Accessibility of Course PDFs',
         data: [
           data.pdfs.pass.length,
           data.pdfs.warn.length,
@@ -84,7 +84,7 @@ export const init = (data) => {
     // Create the table content.
     const $table = $('<table/>')
       .attr('id', 'block-a11y-check-table')
-      .addClass('table table-bordered table-hover table-responsive')
+      .addClass('table table-bordered table-hover table-responsive w-100')
       .append(
         $('<thead/>')
           .append(
@@ -234,7 +234,7 @@ export const init = (data) => {
 
     // Create the modal.
     const modal = await ModalFactory.create({
-      title: 'A11y Check Details',
+      title: 'Course PDFs Accessibility Details',
       body: $modalBody,
       // TODO: Add last updated timestamp
       footer: '<p>Last updated mm dd at ##:##:##</p>',
@@ -263,21 +263,21 @@ export const init = (data) => {
       createModal()
         .then(modal => {
 
-          // Append the button trigger to the DOM.
-          $("#block-a11y-check-more-details-root").append(
-            createModalTriggerButton(modal)
-          )
-
           // Render the queue stats.
           if (data.pdfs.pass.length > 0 || data.pdfs.warn.length > 0 || data.pdfs.fail.length > 0) {
+            // Render the pie chart.
             renderPieChart()
+
+            // Append the button trigger to the DOM.
+            $("#block-a11y-check-more-details-root").append(
+              createModalTriggerButton(modal)
+            )
+
           } else {
             $('#block-a11y-check-root').append(
               createNoDataParagraph()
             )
           }
-
-          // TODO: Render the queue stats.
 
         }).catch((error) => displayException(error));
 
