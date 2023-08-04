@@ -272,11 +272,11 @@ class block_a11y_check extends block_base
 
     // Generate the results.
     $cache = cache::make('block_a11y_check', 'a11y_check_results');
-    if ($cache->get(0)) {
-      $data = $cache->get(0);
+    if ($cache->get($COURSE->id)) {
+      $data = $cache->get($COURSE->id);
     } else {
       $data = $this->get_stats(strval($COURSE->id));
-      $cache->set(0, $data);
+      $cache->set($COURSE->id, $data);
     }
 
     // This pages requires an AMD module.
