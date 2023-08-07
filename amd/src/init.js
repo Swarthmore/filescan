@@ -29,8 +29,12 @@ export const init = (data) => {
   function getLastScanned() {
     const allPdfs = [].concat(data.pdfs.pass, data.pdfs.warn, data.pdfs.fail)
     const [sorted] = allPdfs.sort((a, b) => a.lastchecked - b.lastchecked)
-    const date = new Date(+sorted.lastchecked * 1000)
-    return `Last scanned ${date.toDateString()} at ${date.toLocaleTimeString()}`
+    if (sorted) {
+      const date = new Date(+sorted.lastchecked * 1000)
+      return `Last scanned ${date.toDateString()} at ${date.toLocaleTimeString()}`
+    } else {
+      return ''
+    }
   }
 
   /**
