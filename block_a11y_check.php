@@ -129,15 +129,12 @@ class block_a11y_check extends block_base
     // Moodle global to access database operations.
     global $DB;
 
-    // Moodle global to access config.
-    global $CFG;
-
     // This query joins the {files} table with the local_a11y_check tables, returning stats
     // about the files themselves, and their scan results.
     $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", ' .
       'c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname", ' .
-      'lacq.id as "scanid", lactp.hastext as "hastext", lactp.hastitle as "hastitle", ' .
-      'lactp.haslanguage as "haslanguage", lactp.hasbookmarks as "hasbookmarks", ' .
+      'lacq.id as "scanid", lacq.lastchecked as "lastchecked", lactp.hastext as "hastext", ' .
+      'lactp.hastitle as "hastitle", lactp.haslanguage as "haslanguage", ' .
       'lactp.istagged as "istagged", lactp.pagecount as "pagecount", lacq.status as "scanstatus" ' .
       'from {files} f ' .
       'inner join {context} ctx on ctx.id = f.contextid ' .
@@ -210,7 +207,6 @@ class block_a11y_check extends block_base
         $record->hastext == 1
         && $record->hastitle == 1
         && $record->haslanguage == 1
-        && $record->hasbookmarks == 1
         && $record->istagged == 1
       ) {
         $mod = "pass";
@@ -218,7 +214,6 @@ class block_a11y_check extends block_base
         $record->hastext == 0
         && $record->hastitle == 0
         && $record->haslanguage == 0
-        && $record->hasbookmarks == 0
         && $record->istagged == 0
       ) {
         $mod = "fail";
@@ -233,11 +228,11 @@ class block_a11y_check extends block_base
         "hastext" => $record->hastext,
         "hastitle" => $record->hastitle,
         "haslanguage" => $record->haslanguage,
-        "hasbookmarks" => $record->hasbookmarks,
         "istagged" => $record->istagged,
         "pagecount" => $record->pagecount,
         "scanstatus" => $record->scanstatus,
-        "url" => is_null($coursefileurls[$record->fileid]) ? '' : $coursefileurls[$record->fileid]->out()
+        "url" => is_null($coursefileurls[$record->fileid]) ? '' : $coursefileurls[$record->fileid]->out(),
+        "lastchecked" => $record->lastchecked
       ];
 
       $results["totals"][$mod]++;

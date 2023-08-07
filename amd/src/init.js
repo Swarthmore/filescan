@@ -22,11 +22,16 @@ import {download_table_as_csv, renderFailIcon, renderSuccessIcon} from './util'
  **/
 export const init = (data) => {
 
-  console.log([
-    'block_a11y_check data',
-    { data }
-    ]
-  )
+  /**
+   * Get the last scanned file from {data}
+   * @return string
+   */
+  function getLastScanned() {
+    const allPdfs = [].concat(data.pdfs.pass, data.pdfs.warn, data.pdfs.fail)
+    const [sorted] = allPdfs.sort((a, b) => a.lastchecked - b.lastchecked)
+    const date = new Date(+sorted.lastchecked * 1000)
+    return `Last scanned ${date.toDateString()} at ${date.toLocaleTimeString()}`
+  }
 
   /**
    * Create stats breakdown in pie graph and attach to the DOM.
@@ -60,7 +65,7 @@ export const init = (data) => {
         `Fail (${data.pdfs.fail.length})`
       ],
       datasets: [{
-        label: 'Accessibility of Course PDFs',
+        label: 'PDFs',
         data: [
           data.pdfs.pass.length,
           data.pdfs.warn.length,
@@ -68,11 +73,11 @@ export const init = (data) => {
         ],
         backgroundColor: [
           // Green.
-          '#5cb85c',
+          '#437F3C',
           // Yellow.
-          '#f0ad4e',
+          '#9F631D',
           // Red.
-          '#d9534f'
+          '#B43135'
         ]
       }]
     }
@@ -84,7 +89,7 @@ export const init = (data) => {
 
   function createNoDataParagraph() {
     return $('<p/>')
-      .text("No data to show")
+      .text("No data to show 😢")
   }
 
   /**
@@ -104,11 +109,6 @@ export const init = (data) => {
                 $('<th/>')
                   .attr('scope', 'col')
                   .text('Filename')
-              )
-              .append(
-                $('<th/>')
-                  .attr('scope', 'col')
-                  .text('Bookmarks')
               )
               .append(
                 $('<th/>')
@@ -161,12 +161,6 @@ export const init = (data) => {
         )
         .append(
           $('<td/>')
-            .append(pdf.hasbookmarks === "1"
-              ? $(renderSuccessIcon())
-              : $(renderFailIcon()))
-        )
-        .append(
-          $('<td/>')
             .append(pdf.haslanguage === "1"
               ? $(renderSuccessIcon())
               : $(renderFailIcon()))
@@ -206,10 +200,9 @@ export const init = (data) => {
 
   /**
    * Creates a download button that when clicked, downloads a CSV version of the table.
-   * @param $table
    * @returns {*|jQuery|void}
    */
-  function createDownloadButton($table) {
+  function createDownloadButton() {
     // Create the download to csv button.
     return $('<button/>')
       .addClass('btn btn-secondary mb-2')
@@ -245,10 +238,12 @@ export const init = (data) => {
 
     // Create the modal.
     const modal = await ModalFactory.create({
-      title: 'Course PDFs Accessibility Details',
+      title: 'Accessibility of Course PDFs Details',
       body: $modalBody,
-      // TODO: Add last updated timestamp
-      footer: '<p>Last updated mm dd at ##:##:##</p>',
+      footer: $('<p/>')
+        .text(
+          getLastScanned()
+        ),
       large: true
     })
 
