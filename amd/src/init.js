@@ -47,19 +47,19 @@ export const init = (data, courseid) => {
     // Create the canvas element.
     const canvas = $('<canvas/>')
       .attr({
-        id: '#block-a11y-check-pie-chart-canvas',
+        id: '#block-accessibility-filescan-pie-chart-canvas',
         'aria-label': 'Pie chart describing the accessibility status of this course\'s PDFs.'
       })
 
     const ctx = canvas[0].getContext('2d')
 
     // Append the canvas to the DOM.
-    $('#block-a11y-check-pie-chart-root')
+    $('#block-accessibility-filescan-pie-chart-root')
       .addClass("mb-2 w-100")
       .append(
         $('<h6/>')
           .addClass('mb-2')
-          // TODO: Text label should be a string in lang/en/block_a11y_check.php
+          // TODO: Text label should be a string in lang/en/block_accessibility_filescan.php
           .text('Accessibility of Course PDFs')
       )
       .append(canvas)
@@ -105,7 +105,7 @@ export const init = (data, courseid) => {
   function createDetailsTable() {
     // Create the table content.
     const $table = $('<table/>')
-      .attr('id', 'block-a11y-check-table')
+      .attr('id', 'block-accessibility-filescan-table')
       .addClass('table table-bordered table-hover table-responsive w-100')
       .append(
         $('<thead/>')
@@ -213,7 +213,7 @@ export const init = (data, courseid) => {
     return $('<button/>')
       .addClass('btn btn-secondary mb-2')
       .text('Download to CSV')
-      .click(() => download_table_as_csv('block-a11y-check-table'))
+      .click(() => download_table_as_csv('block-accessibility-filescan-table'))
   }
 
   /**
@@ -228,7 +228,7 @@ export const init = (data, courseid) => {
       .text('Details')
       .click(() => {
         // Dispatch event to invalidate the block's cache
-        dispatchEvent("\\block_a11y_check\\event\\invalidate_results_cache" , { courseid: +courseid })
+        //dispatchEvent("\\block_a11y_check\\event\\invalidate_results_cache" , { courseid: +courseid })
         // Show the modal
         modal.show()
       })
@@ -270,11 +270,11 @@ export const init = (data, courseid) => {
   };
 
   // This will call the function to load and render our template.
-  Templates.renderForPromise('block_a11y_check/summary', context)
+  Templates.renderForPromise('block_accessibility_filescan/summary', context)
     .then(({html, js}) => {
 
       // Render the template.
-      Templates.appendNodeContents("#block-a11y-check-root", html, js);
+      Templates.appendNodeContents("#block-accessibility-filescan-root", html, js);
 
       // Create the modal.
       createModal()
@@ -286,14 +286,14 @@ export const init = (data, courseid) => {
             renderPieChart()
 
             // Append the button trigger to the DOM.
-            $("#block-a11y-check-more-details-root")
+            $("#block-accessibility-filescan-more-details-root")
               .addClass('mb-2')
               .append(
                 createModalTriggerButton(modal)
               )
 
           } else {
-            $('#block-a11y-check-root').append(
+            $('#block-accessibility-filescan-root').append(
               createNoDataParagraph()
             )
           }

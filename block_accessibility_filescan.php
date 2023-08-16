@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for block_a11y_check
+ * Version information for block_accessibility_filescan
  *
- * @package   block_a11y_check
+ * @package   block_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-class block_a11y_check extends block_base
+class block_accessibility_filescan extends block_base
 {
 
   public function init()
   {
-    $this->title = get_string('pluginname', 'block_a11y_check');
+    $this->title = get_string('pluginname', 'block_accessibility_filescan');
   }
 
 
@@ -129,7 +129,7 @@ class block_a11y_check extends block_base
     // Moodle global to access database operations.
     global $DB;
 
-    // This query joins the {files} table with the local_a11y_check tables, returning stats
+    // This query joins the {files} table with the local_accessibility_filescan tables, returning stats
     // about the files themselves, and their scan results.
     $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", ' .
       'c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname", ' .
@@ -140,9 +140,9 @@ class block_a11y_check extends block_base
       'inner join {context} ctx on ctx.id = f.contextid ' .
       'inner join {course_modules} cm on cm.id = ctx.instanceid ' .
       'inner join {course} c on c.id = cm.course ' .
-      'left outer join {local_a11y_check_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id ' .
-      'left outer join {local_a11y_check_queue} lacq on lacq.id = lacp.scanid ' .
-      'left outer join {local_a11y_check_type_pdf} lactp on lacq.id = lactp.scanid ' .
+      'left outer join {local_a11y_filescan_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id ' .
+      'left outer join {local_a11y_filescan_queue} lacq on lacq.id = lacp.scanid ' .
+      'left outer join {local_a11y_filescan_type_pdf} lactp on lacq.id = lactp.scanid ' .
       'where c.id = :course ' .
       "and f.mimetype = 'application/pdf' " .
       'and ctx.contextlevel = 70';
@@ -180,13 +180,13 @@ class block_a11y_check extends block_base
       }
 
       // If the record is in the queue but hasn't been scanned, $record->scantatus will be '0'
-      // @ See local/a11y_check/locallib.php
+      // @ See local/accessibility_filescan/locallib.php
       else if ($record->scanstatus == 0) {
         $results["totals"]["inqueue"]++;
       }
 
       // If the record has already been scanned, $record->status will be 1
-      // @ See local/a11y_check/locallib.php
+      // @ See local/accessibility_filescan/locallib.php
       else if ($record->scanstatus == 1) {
         $results["totals"]["scanned"]++;
       }
@@ -258,7 +258,7 @@ class block_a11y_check extends block_base
 
     // Check if the user has capability to view the block. If they don't, return an empty class.
     // If the user is able to view, display it.
-    $viewable = has_capability('block/a11y_check:view', context_course::instance($COURSE->id));
+    $viewable = has_capability('block/accessibility_filescan:view', context_course::instance($COURSE->id));
 
     // This was leftover from Swarthmore/filescan. Not sure if it's needed anymore.
     // I have no idea what this does. Why would $this-content not be null?
@@ -270,11 +270,11 @@ class block_a11y_check extends block_base
 
       // Create the DOM element the plugin will attach to.
       $this->content = new stdClass();
-      $this->content->text = '<div id="block-a11y-check-root"></div>';
+      $this->content->text = '<div id="block-accessibility-filescan-root"></div>';
       $this->content->footer = '';
 
       // Generate the results.
-      //$cache = cache::make('block_a11y_check', 'a11y_check_results');
+      //$cache = cache::make('block_accessibility_filescan', 'accessibility_filescan_results');
       //if ($cache->get($COURSE->id)) {
       //  $data = $cache->get($COURSE->id);
       //} else {
@@ -286,7 +286,7 @@ class block_a11y_check extends block_base
       $data = $this->get_stats(strval($COURSE->id));
 
       // This pages requires an AMD module.
-      $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', [$data, $COURSE->id]);
+      $PAGE->requires->js_call_amd('block_accessibility_filescan/init', 'init', [$data, $COURSE->id]);
 
     } else {
       // Not authorized.

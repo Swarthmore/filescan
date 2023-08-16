@@ -15,15 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Version information for block_a11y_check
+* Version information for block_accessibility_filescan
 *
-* @package   block_a11y_check
+* @package   block_accessibility_filescan
 * @copyright 2023 Swarthmore College
 * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 /** @var mixed $plugin */
-$plugin->component = 'block_a11y_check';
-$plugin->version = 2023081602;
+$plugin->component = 'block_accessibility_filescan';
+$plugin->version = 2023081603;
 $plugin->requires = 2022041906.02;
 $plugin->maturity = MATURITY_ALPHA;

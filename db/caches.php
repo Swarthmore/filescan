@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for block_a11y_check
+ * Version information for block_accessibility_filescan
  *
- * @package   block_a11y_check
+ * @package   block_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,7 +25,7 @@
 #defined('MOODLE_INTERNAL') || die;
 #
 #$definitions = array(
-#    'a11y_check_results' => array(
+#    'accessibility_filescan_results' => array(
 #        'mode' => cache_store::MODE_APPLICATION,
 #        'simplekeys' => True
 #    )

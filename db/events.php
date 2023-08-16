@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for block_a11y_check
+ * Version information for block_accessibility_filescan
  *
- * @package   block_a11y_check
+ * @package   block_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@
 #
 #$observers = array(
 #  array(
-#    'eventname' => '\block_a11y_check\event\invalidate_results_cache',
-#    'callback' => 'block_a11y_check_observer::invalidate_results_cache'
+#    'eventname' => '\block_accessibility_filescan\event\invalidate_results_cache',
+#    'callback' => 'block_accessibility_filescan_observer::invalidate_results_cache'
 #  )
 #);

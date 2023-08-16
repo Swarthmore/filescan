@@ -15,16 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for block_a11y_check
+ * Version information for block_accessibility_filescan
  *
- * @package   block_a11y_check
+ * @package   block_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-class block_a11y_check_observer
+class block_accessibility_filescan_observer
 {
 
   /**
@@ -32,7 +32,7 @@ class block_a11y_check_observer
    */
   //public static function invalidate_results_cache(\core\event\base $event, int $courseid) {
   //  $event_data = $event->get_data();
-  //  $cache = cache::make('block_a11y_check', 'a11y_check_results');
+  //  $cache = cache::make('block_accessibility_filescan', 'accessibility_filescan_results');
   //  $cache->delete($courseid);
   //}
 
@@ -51,7 +51,7 @@ class block_a11y_check_observer
   #  $event_data = $event->get_data();
 
   #  // Clear any existing cache data for this course
-  #  $cache = cache::make('block_a11y_check', 'a11y_check_results');
+  #  $cache = cache::make('block_accessibility_filescan', 'accessibility_filescan_results');
   #  $cache->delete($event_data["courseid"]);
 
   #  // Determine if we should invalidate the cache if file or folder activity is affected at all
@@ -64,7 +64,7 @@ class block_a11y_check_observer
   #    (isset($event_data["eventname"]) && isset($event_data["other"]) && isset($event_data["other"]["modulename"]) && $event_data["eventname"] == "\\core\\event\\course_module_updated" && $event_data["other"]["modulename"] == "resource")) {
 
   #    // Clear any existing cache data for this course
-  #    $cache = cache::make('block_a11y_check', 'a11y_check_results');
+  #    $cache = cache::make('block_accessibility_filescan', 'accessibility_filescan_results');
   #    $cache->delete($event_data["courseid"]);
   #  }
 

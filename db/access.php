@@ -16,9 +16,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Version information for block_a11y_check
+* Version information for block_accessibility_filescan
 *
-* @package   block_a11y_check
+* @package   block_accessibility_filescan
 * @copyright 2023 Swarthmore College
 * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-  'block/a11y_check:addinstance' => array(
+  'block/accessibility_filescan:addinstance' => array(
     'riskbitmask' => RISK_SPAM | RISK_XSS,
     'captype' => 'write',
     'contextlevel' => CONTEXT_BLOCK,
@@ -39,7 +39,7 @@ $capabilities = array(
     'clonepermissionsfrom' => 'moodle/site:manageblocks'
   ),
 
-  'block/a11y_check:myaddinstance' => array(
+  'block/accessibility_filescan:myaddinstance' => array(
     'captype' => 'write',
     'contextlevel' => CONTEXT_SYSTEM,
     'archetypes' => array(
@@ -47,7 +47,7 @@ $capabilities = array(
     )
   ),
 
-  'block/a11y_check:view' => array(
+  'block/accessibility_filescan:view' => array(
     'captype' => 'read',
     'contextlevel' => CONTEXT_COURSE,
     'legacy' => array(

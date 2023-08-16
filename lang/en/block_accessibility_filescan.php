@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Version information for block_a11y_check
+* Version information for block_accessibility_filescan
 *
-* @package   block_a11y_check
+* @package   block_accessibility_filescan
 * @copyright 2023 Swarthmore College
 * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 // General
-$string['pluginname'] = 'A11y Check';
+$string['pluginname'] = 'Accessibility Filescan';
 $string['settings:text_check_help'] = "Text Check Help Link";
 $string['settings:text_check_help_desc'] = "Link to help documentation for the text check";
 $string['settings:title_check_help'] = "Title Check Help Link";
@@ -35,4 +35,4 @@ $string['settings:lang_check_help_desc'] = "Link to help documentation for the l
 $string['settings:outline_check_help'] = "Outline Check Help Link";
 $string['settings:outline_check_help_desc'] = "Link to help documentation for the outline check";
 
-$string['cachedef_a11y_check'] = 'This caches the a11y_check details of a course block';
+$string['cachedef_accessibility_filescan'] = 'This caches the accessibility_filescan details of a course block';

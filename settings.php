@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Version information for block_a11y_check
+* Version information for block_accessibility_filescan
 *
-* @package   block_a11y_check
+* @package   block_accessibility_filescan
 * @copyright 2023 Swarthmore College
 * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
@@ -28,37 +28,37 @@ global $CFG;
 
 if ($hassiteconfig) {
 
-  $settings = new admin_settingpage('block_a11y_check', get_string('pluginname', 'block_a11y_check'));
+  $settings = new admin_settingpage('block_accessibility_filescan', get_string('pluginname', 'block_accessibility_filescan'));
 
-  //$ADMIN->add('blockplugins', $settings); 
+  //$ADMIN->add('blockplugins', $settings);
 
-  $settings->add(new admin_setting_configtext('block_a11y_check/text_check_help',
-        get_string('settings:text_check_help', 'block_a11y_check'),
-        get_string('settings:text_check_help_desc', 'block_a11y_check'),
+  $settings->add(new admin_setting_configtext('block_accessibility_filescan/text_check_help',
+        get_string('settings:text_check_help', 'block_accessibility_filescan'),
+        get_string('settings:text_check_help_desc', 'block_accessibility_filescan'),
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
         60
     ));
 
-    $settings->add(new admin_setting_configtext('block_a11y_check/title_check_help',
-        get_string('settings:title_check_help', 'block_a11y_check'),
-        get_string('settings:title_check_help_desc', 'block_a11y_check'),
+    $settings->add(new admin_setting_configtext('block_accessibility_filescan/title_check_help',
+        get_string('settings:title_check_help', 'block_accessibility_filescan'),
+        get_string('settings:title_check_help_desc', 'block_accessibility_filescan'),
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
         60
     ));
 
-    $settings->add(new admin_setting_configtext('block_a11y_check/lang_check_help',
-        get_string('settings:lang_check_help', 'block_a11y_check'),
-        get_string('settings:lang_check_help_desc', 'block_a11y_check'),
+    $settings->add(new admin_setting_configtext('block_accessibility_filescan/lang_check_help',
+        get_string('settings:lang_check_help', 'block_accessibility_filescan'),
+        get_string('settings:lang_check_help_desc', 'block_accessibility_filescan'),
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
         60
     ));
 
-    $settings->add(new admin_setting_configtext('block_a11y_check/outline_check_help',
-        get_string('settings:outline_check_help', 'block_a11y_check'),
-        get_string('settings:outline_check_help_desc', 'block_a11y_check'),
+    $settings->add(new admin_setting_configtext('block_accessibility_filescan/outline_check_help',
+        get_string('settings:outline_check_help', 'block_accessibility_filescan'),
+        get_string('settings:outline_check_help_desc', 'block_accessibility_filescan'),
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
         60

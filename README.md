@@ -1,6 +1,6 @@
-# moodle-block_a11y_check
+# moodle-block_accessibility_filescan
 
-Moodle plugin to display results from the [local_a11y_check](https://github.com/Swarthmore/moodle-local_a11y_check) Moodle plugin.
+Moodle plugin to display results from the [local_accessibility_filescan](https://github.com/Swarthmore/moodle-local_accessibility_filescan) Moodle plugin.
 
 # Requirements
 
@@ -8,7 +8,7 @@ Moodle plugin to display results from the [local_a11y_check](https://github.com/
 
 # Installation
 ```
-git clone https://github.com/aweed1/moodle-block_a11y_check $MOODLE_WWW_ROOT/blocks/a11y_check
+git clone https://github.com/aweed1/moodle-block_accessibility_filescan $MOODLE_WWW_ROOT/blocks/a11y_check
 ```
 
 # Configuration
