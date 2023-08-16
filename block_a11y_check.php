@@ -42,8 +42,8 @@ class block_a11y_check extends block_base
   public function applicable_formats()
   {
     return [
-      'site' => true,
-      'my' => true,
+      'site' => false,
+      'my' => false,
       'course' => true
     ];
   }
@@ -256,27 +256,45 @@ class block_a11y_check extends block_base
 
     require_once($CFG->dirroot . '/course/lib.php');
 
+    // Check if the user has capability to view the block. If they don't, return an empty class.
+    // If the user is able to view, display it.
+    $viewable = has_capability('block/a11y_check:view', context_course::instance($COURSE->id));
+
+    // This was leftover from Swarthmore/filescan. Not sure if it's needed anymore.
+    // I have no idea what this does. Why would $this-content not be null?
     if ($this->content !== null) {
       return $this->content;
     }
 
-    // Create the DOM element the plugin will attach to.
-    $this->content = new stdClass();
-    $this->content->text = '<div id="block-a11y-check-root"></div>';
-    $this->content->footer = '';
+    if ($viewable) {
 
-    // Generate the results.
-    $cache = cache::make('block_a11y_check', 'a11y_check_results');
-    if ($cache->get($COURSE->id)) {
-      $data = $cache->get($COURSE->id);
-    } else {
+      // Create the DOM element the plugin will attach to.
+      $this->content = new stdClass();
+      $this->content->text = '<div id="block-a11y-check-root"></div>';
+      $this->content->footer = '';
+
+      // Generate the results.
+      //$cache = cache::make('block_a11y_check', 'a11y_check_results');
+      //if ($cache->get($COURSE->id)) {
+      //  $data = $cache->get($COURSE->id);
+      //} else {
+      //  $data = $this->get_stats(strval($COURSE->id));
+      //  $cache->set($COURSE->id, $data);
+      //}
+
+      // Generate the data. Normally this would be cached, but because it is only teachers/managers/etc. viewing, it's probably ok not to.
       $data = $this->get_stats(strval($COURSE->id));
-      $cache->set($COURSE->id, $data);
+
+      // This pages requires an AMD module.
+      $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', [$data, $COURSE->id]);
+
+    } else {
+      // Not authorized.
+      $this->content = new stdClass();
+      $this->content->text = '';
+      $this->content->footer = '';
+      //return $this;
     }
 
-    // This pages requires an AMD module.
-    $PAGE->requires->js_call_amd('block_a11y_check/init', 'init', [$data]);
-
-    return $this;
   }
 }

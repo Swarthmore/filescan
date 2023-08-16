@@ -47,7 +47,7 @@ $capabilities = array(
     )
   ),
 
-  'block/a11y_check:viewpages' => array(
+  'block/a11y_check:view' => array(
     'captype' => 'read',
     'contextlevel' => CONTEXT_COURSE,
     'legacy' => array(
@@ -60,43 +60,4 @@ $capabilities = array(
     )
   ),
 
-  'block/a11y_check:managepages' => array(
-    'captype' => 'read',
-    'contextlevel' => CONTEXT_COURSE,
-    'legacy' => array(
-      'guest' => CAP_PREVENT,
-      'student' => CAP_PREVENT,
-      'teacher' => CAP_PREVENT,
-      'editingteacher' => CAP_ALLOW,
-      'coursecreator' => CAP_ALLOW,
-      'manager' => CAP_ALLOW
-    )
-  ),
-
-  'block/a11y_check:scan' => array(
-    'riskbitmask' => RISK_PERSONAL,
-    'captype' => 'read',
-    'contextlevel' => CONTEXT_COURSE,
-    'archetypes' => array(
-      'guest'           => CAP_PREVENT,
-      'student'         => CAP_PREVENT,
-      'teacher'         => CAP_PREVENT,
-      'coursecreator'   => CAP_ALLOW,
-      'editingteacher'  => CAP_ALLOW,
-      'manager'         => CAP_ALLOW
-    )
-  ),
-
-  'block/a11y_check:viewadminreport' => array(
-    'captype' => 'read',
-    'contextlevel' => CONTEXT_BLOCK,
-    'archetypes' => array(
-      'guest'          => CAP_PREVENT,
-      'student'        => CAP_PREVENT,
-      'teacher'        => CAP_PREVENT,
-      'editingteacher' => CAP_PREVENT,
-      'coursecreator'  => CAP_PREVENT,
-      'manager'        => CAP_ALLOW
-    )
-  )
 );

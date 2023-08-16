@@ -3,6 +3,7 @@ import $ from 'jquery';
 import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import ChartJS from 'core/chartjs';
+import {dispatchEvent} from 'core/event_dispatcher';
 import ModalFactory from 'core/modal_factory';
 import {download_table_as_csv, renderFailIcon, renderSuccessIcon} from './util'
 
@@ -20,7 +21,7 @@ import {download_table_as_csv, renderFailIcon, renderSuccessIcon} from './util'
  * @param {object[]} data.pdfs.warn An array of PDFs that meet between 100% and 0% of a11y checks performed by scanner
  * @param {object[]} data.pdfs.fail An array of PDFs that meet 0% of a11y checks performed by scanner
  **/
-export const init = (data) => {
+export const init = (data, courseid) => {
 
   /**
    * Get the last scanned file from {data}
@@ -58,6 +59,7 @@ export const init = (data) => {
       .append(
         $('<h6/>')
           .addClass('mb-2')
+          // TODO: Text label should be a string in lang/en/block_a11y_check.php
           .text('Accessibility of Course PDFs')
       )
       .append(canvas)
@@ -224,7 +226,12 @@ export const init = (data) => {
     return $('<button/>')
       .addClass('btn btn-secondary')
       .text('Details')
-      .click(() => modal.show())
+      .click(() => {
+        // Dispatch event to invalidate the block's cache
+        dispatchEvent("\\block_a11y_check\\event\\invalidate_results_cache" , { courseid: +courseid })
+        // Show the modal
+        modal.show()
+      })
   }
 
   /**
