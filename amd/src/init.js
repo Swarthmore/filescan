@@ -3,9 +3,12 @@ import $ from 'jquery';
 import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import ChartJS from 'core/chartjs';
-import {dispatchEvent} from 'core/event_dispatcher';
 import ModalFactory from 'core/modal_factory';
 import {download_table_as_csv, renderFailIcon, renderSuccessIcon} from './util'
+
+const COLOR_PASS = '#198754'
+const COLOR_CHECK = '#f0ad4e'
+const COLOR_FAIL = '#d9534f'
 
 /**
  * This function acts as the main entry point and renderer for the plugin. It will attach to DOM elements created in
@@ -29,9 +32,9 @@ export const init = (data, courseid) => {
    */
   function getLastScanned() {
     const allPdfs = [].concat(data.pdfs.pass, data.pdfs.warn, data.pdfs.fail)
-    const [sorted] = allPdfs.sort((a, b) => a.lastchecked - b.lastchecked)
-    if (sorted) {
-      const date = new Date(+sorted.lastchecked * 1000)
+    const max = allPdfs.reduce((a, b) => (+a.lastchecked > +b.lastchecked) ? a : b)
+    if (max) {
+      const date = new Date(+max.lastchecked * 1000)
       return `Last scanned ${date.toDateString()} at ${date.toLocaleTimeString()}`
     } else {
       return ''
@@ -66,9 +69,9 @@ export const init = (data, courseid) => {
 
     const chartData = {
       labels: [
-        `Pass (${data.pdfs.pass.length})`,
-        `Warn (${data.pdfs.warn.length})`,
-        `Fail (${data.pdfs.fail.length})`
+        `Satisfies all checks (${data.pdfs.pass.length})`,
+        `Satisfies some checks (${data.pdfs.warn.length})`,
+        `Satisfies no checks (${data.pdfs.fail.length})`
       ],
       datasets: [{
         label: 'PDFs',
@@ -78,12 +81,9 @@ export const init = (data, courseid) => {
           data.pdfs.fail.length
         ],
         backgroundColor: [
-          // Green.
-          '#437F3C',
-          // Yellow.
-          '#9F631D',
-          // Red.
-          '#B43135'
+          COLOR_PASS,
+          COLOR_CHECK,
+          COLOR_FAIL
         ]
       }]
     }
@@ -106,11 +106,13 @@ export const init = (data, courseid) => {
     // Create the table content.
     const $table = $('<table/>')
       .attr('id', 'block-accessibility-filescan-table')
-      .addClass('table table-bordered table-hover table-responsive w-100')
+      .addClass('table table-bordered table-hover w-100')
       .append(
         $('<thead/>')
+          .addClass('w-100')
           .append(
             $('<tr/>')
+              .addClass('w-100')
               .append(
                 $('<th/>')
                   .attr('scope', 'col')
@@ -156,6 +158,7 @@ export const init = (data, courseid) => {
     // Generate the table rows
     const $tableRows = pdfs.map(
       pdf => $('<tr/>')
+        .addClass('w-100')
         .append(
           $('<td/>')
             .addClass('text-truncate')
@@ -245,11 +248,15 @@ export const init = (data, courseid) => {
     // Create the modal body first, so we can attach it during the modal's instantiation.
     const $modalBody = $('<div/>')
       .append(createDownloadButton($table))
-      .append($table)
+      .append(
+        $('<div/>')
+          .addClass('table-responsive')
+        )
+        .append($table)
 
     // Create the modal.
     const modal = await ModalFactory.create({
-      title: 'Accessibility of Course PDFs Details',
+      title: 'Accessibility of Course PDFs - Details',
       body: $modalBody,
       footer: $('<p/>')
         .text(
@@ -291,7 +298,16 @@ export const init = (data, courseid) => {
               .append(
                 createModalTriggerButton(modal)
               )
-
+              .append(
+                $('<p/>')
+                  .addClass('mt-3')
+                  .append(
+                    $('<small/>')
+                      .text(
+                        getLastScanned()
+                      )
+                  )
+              )
           } else {
             $('#block-accessibility-filescan-root').append(
               createNoDataParagraph()
