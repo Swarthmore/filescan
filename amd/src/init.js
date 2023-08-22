@@ -32,10 +32,14 @@ export const init = (data, courseid) => {
    */
   function getLastScanned() {
     const allPdfs = [].concat(data.pdfs.pass, data.pdfs.warn, data.pdfs.fail)
-    const max = allPdfs.reduce((a, b) => (+a.lastchecked > +b.lastchecked) ? a : b)
-    if (max) {
-      const date = new Date(+max.lastchecked * 1000)
-      return `Last scanned ${date.toDateString()} at ${date.toLocaleTimeString()}`
+    if (allPdfs.length > 0) {
+      const max = allPdfs.reduce((a, b) => (+a.lastchecked > +b.lastchecked) ? a : b)
+      if (max) {
+        const date = new Date(+max.lastchecked * 1000)
+        return `Last scanned ${date.toDateString()} at ${date.toLocaleTimeString()}`
+      } else {
+        return ''
+      }
     } else {
       return ''
     }
