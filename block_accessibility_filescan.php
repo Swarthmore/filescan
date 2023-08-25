@@ -231,7 +231,7 @@ class block_accessibility_filescan extends block_base
         "istagged" => $record->istagged,
         "pagecount" => $record->pagecount,
         "scanstatus" => $record->scanstatus,
-        "url" => is_null($coursefileurls[$record->fileid]) ? '' : $coursefileurls[$record->fileid]->out(),
+        "url" => array_key_exists($record->fileid, $coursefileurls) ? $coursefileurls[$record->fileid]->out() : '',
         "lastchecked" => $record->lastchecked
       ];
 
