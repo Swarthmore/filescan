@@ -10,6 +10,11 @@ const COLOR_PASS = '#198754'
 const COLOR_CHECK = '#f0ad4e'
 const COLOR_FAIL = '#d9534f'
 
+const LANG_CHECK_URL = 'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html'
+const OUTLINE_CHECK_URL = 'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html'
+const TITLE_CHECK_URL = 'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html'
+const TEXT_CHECK_URL = 'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html'
+
 /**
  * This function acts as the main entry point and renderer for the plugin. It will attach to DOM elements created in
  * the templates/**.mustache, and populate them with data.
@@ -106,7 +111,8 @@ export const init = (data, courseid) => {
    * Creates details table showing breakdown of stats returned by the scanner.
    * @returns {*|jQuery|void}
    */
-  function createDetailsTable() {
+  async function createDetailsTable() {
+
     // Create the table content.
     const $table = $('<table/>')
       .attr('id', 'block-accessibility-filescan-table')
@@ -126,21 +132,65 @@ export const init = (data, courseid) => {
                 $('<th/>')
                   .attr('scope', 'col')
                   .text('Lang')
+                  .append(
+                    $('<i/>')
+                      .attr('type', 'button')
+                      .attr('class', 'ml-2 fa-solid fa-circle-info text-info')
+                      .click(() => {
+                        const newWindow = window.open(LANG_CHECK_URL, 'height=600,width=600')
+                        if (window.focus) {
+                          newWindow.focus()
+                        }
+                      })
+                  )
               )
               .append(
                 $('<th/>')
                   .attr('scope', 'col')
                   .text('Text')
+                  .append(
+                    $('<i/>')
+                      .attr('type', 'button')
+                      .attr('class', 'ml-2 fa-solid fa-circle-info text-info')
+                      .click(() => {
+                        const newWindow = window.open(TEXT_CHECK_URL, 'height=600,width=600')
+                        if (window.focus) {
+                          newWindow.focus()
+                        }
+                      })
+                  )
               )
               .append(
                 $('<th/>')
                   .attr('scope', 'col')
                   .text('Title')
+                  .append(
+                    $('<i/>')
+                      .attr('type', 'button')
+                      .attr('class', 'ml-2 fa-solid fa-circle-info text-info')
+                      .click(() => {
+                        const newWindow = window.open(TITLE_CHECK_URL, 'height=600,width=600')
+                        if (window.focus) {
+                          newWindow.focus()
+                        }
+                      })
+                  )
               )
               .append(
                 $('<th/>')
                   .attr('scope', 'col')
                   .text('Tagged')
+                  .append(
+                    $('<i/>')
+                      .attr('type', 'button')
+                      .attr('class', 'ml-2 fa-solid fa-circle-info text-info')
+                      .click(() => {
+                        const newWindow = window.open(OUTLINE_CHECK_URL, 'height=600,width=600')
+                        if (window.focus) {
+                          newWindow.focus()
+                        }
+                      })
+                  )
               )
               .append(
                 $('<th/>')
@@ -247,7 +297,7 @@ export const init = (data, courseid) => {
    */
   async function createModal() {
 
-    const $table = createDetailsTable()
+    const $table = await createDetailsTable()
 
     // Create the modal body first, so we can attach it during the modal's instantiation.
     const $modalBody = $('<div/>')
