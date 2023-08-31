@@ -119,10 +119,10 @@ export const init = (data, courseid) => {
       .addClass('table table-bordered table-hover w-100')
       .append(
         $('<thead/>')
-          .addClass('w-100')
+          .addClass('mw-100 w-100')
           .append(
             $('<tr/>')
-              .addClass('w-100')
+              .addClass('mw-100 w-100')
               .append(
                 $('<th/>')
                   .attr('scope', 'col')
@@ -216,6 +216,7 @@ export const init = (data, courseid) => {
         .append(
           $('<td/>')
             .addClass('text-truncate')
+            .attr('style', 'max-width: 300px;')
             .append(
               $('<a/>')
                 .attr('href', pdf.url)

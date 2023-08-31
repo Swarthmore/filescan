@@ -24,7 +24,7 @@
 
 /** @var mixed $plugin */
 $plugin->component = 'block_accessibility_filescan';
-$plugin->version = 2023083000;
+$plugin->version = 2023083100;
 $plugin->requires = 2022041906.02;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->release = 'rc-1.0.0';
