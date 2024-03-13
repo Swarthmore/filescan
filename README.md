@@ -10,7 +10,7 @@ Moodle block plugin to display accessibility results from the [local_accessibili
 
 ```sh
 MOODLE_ROOT=/path/to/your/moodle
-git clone https://github.com/aweed1/moodle-block_accessibility_filescan $MOODLE_ROOT/blocks/a11y_check
+git clone https://github.com/aweed1/moodle-block_accessibility_filescan $MOODLE_ROOT/blocks/accessibility_filescan
 ```
 
 # Configuration
