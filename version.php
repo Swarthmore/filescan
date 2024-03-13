@@ -15,16 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Version information for block_accessibility_filescan
-*
-* @package   block_accessibility_filescan
-* @copyright 2023 Swarthmore College
-* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Version information for block_accessibility_filescan
+ *
+ * @package   block_accessibility_filescan
+ * @copyright 2023 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
 
 /** @var mixed $plugin */
 $plugin->component = 'block_accessibility_filescan';
-$plugin->version = 2023083100;
+$plugin->version = 2024031100;
 $plugin->requires = 2022041906.02;
 $plugin->maturity = MATURITY_ALPHA;
-$plugin->release = 'rc-1.0.0';
+$plugin->release = '1.0.0';

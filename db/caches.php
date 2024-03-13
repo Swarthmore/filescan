@@ -22,11 +22,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-#defined('MOODLE_INTERNAL') || die;
-#
-#$definitions = array(
-#    'accessibility_filescan_results' => array(
-#        'mode' => cache_store::MODE_APPLICATION,
-#        'simplekeys' => True
-#    )
-#);
+// defined('MOODLE_INTERNAL') || die;
+//
+// $definitions = array(
+// 'accessibility_filescan_results' => array(
+// 'mode' => cache_store::MODE_APPLICATION,
+// 'simplekeys' => True
+// )
+// );

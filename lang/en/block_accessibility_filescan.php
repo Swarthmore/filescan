@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Version information for block_accessibility_filescan
-*
-* @package   block_accessibility_filescan
-* @copyright 2023 Swarthmore College
-* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Version information for block_accessibility_filescan
+ *
+ * @package   block_accessibility_filescan
+ * @copyright 2023 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die;
 
