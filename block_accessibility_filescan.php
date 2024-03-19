@@ -124,6 +124,8 @@ class block_accessibility_filescan extends block_base {
         // Moodle global to access database operations.
         global $DB;
 
+
+
         // This query joins the {files} table with the local_accessibility_filescan tables, returning stats
         // about the files themselves, and their scan results.
         $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", ' .
@@ -239,6 +241,7 @@ class block_accessibility_filescan extends block_base {
 
         global $COURSE;
         global $CFG;
+        global $DB;
 
         require_once($CFG->dirroot . '/course/lib.php');
 
@@ -246,13 +249,34 @@ class block_accessibility_filescan extends block_base {
         // If the user is able to view, display it.
         $viewable = has_capability('block/accessibility_filescan:view', context_course::instance($COURSE->id));
 
+        // We then need to check that the local_a11y_filescan tables are installed.
+        // Array of table names to check.
+        $tablestocheck = [
+            'local_a11y_filescan_pivot',
+            'local_a11y_filescan_queue',
+            'local_a11y_filescan_type_pdf',
+        ];
+
+        // Flag to track table existence.
+        $alltablesexist = true;
+
+        // Loop through each table and check if it exists.
+        foreach ($tablestocheck as $tablename) {
+            if (!$DB->get_manager()->table_exists($tablename)) {
+                // If any table does not exist, set the flag to false and break the loop.
+                $alltablesexist = false;
+                // Exit the loop as we found a table that doesn't exist.
+                break;
+            }
+        }
+
         // This was leftover from Swarthmore/filescan. Not sure if it's needed anymore.
         // I have no idea what this does. Why would $this-content not be null?
         if ($this->content !== null) {
             return $this->content;
         }
 
-        if ($viewable) {
+        if ($viewable && $alltablesexist) {
             // Create the DOM element the plugin will attach to.
             $this->content = new stdClass();
             $this->content->text = '<div id="block-accessibility-filescan-root"></div>';

@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /** @var mixed $plugin */
 $plugin->component = 'block_accessibility_filescan';
-$plugin->version = 2024031100;
+$plugin->version = 2024031900;
 $plugin->requires = 2022041906.02;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->release = '1.0.0';
