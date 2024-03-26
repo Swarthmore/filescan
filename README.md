@@ -1,3 +1,10 @@
+# ⚠️ This plugin has been rewritten and split into the following plugins.
+
+- [https://github.com/Swarthmore/moodle-block_accessibility_filescan](https://github.com/Swarthmore/moodle-block_accessibility_filescan) (displays your scan results)
+- [https://github.com/Swarthmore/moodle-local_accessibility_filescan](https://github.com/Swarthmore/moodle-local_accessibility_filescan) (scans your PDFs)
+
+---
+
 # Moodle Accessibility File Scan Block
 Moodle block to check PDFs for accessibility.  
 
